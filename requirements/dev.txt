@@ -1,0 +1,7 @@
+-r base.txt
+
+django-debug-toolbar==1.3.2
+django-extensions==1.5.7
+
+# Mac/OSX only
+bpython==0.14.2

@@ -1,0 +1,57 @@
+html,
+body {
+  height: 100%;
+  font-family: 'Droid Sans', sans-serif;
+}
+
+
+/* Wrapper for page content to push down footer */
+#wrap {
+  min-height: 100%;
+  height: auto;
+  /* Negative indent footer by its height */
+  margin: 0 auto -60px;
+}
+#wrap > .container-fluid {
+  padding: 60px 15px 0;
+}
+
+
+/* HTML error context */
+.error {
+    background-color: #ECE3E3;
+    border: 2px solid rgb(153, 114, 114);
+    border-radius: 5px;
+    height: 100%;
+    padding: 30px;
+    text-align: center;
+}
+.error h1 {
+    font-size: 48px;
+    color: rgb(155, 126, 49);
+    text-align: center;
+}
+.error p {
+    font-weight: bold;
+    font-size: 1.3em;
+    font-family: monospace;
+}
+
+
+/* html5 number spinners */
+/*disable chrome*/
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/*disable firefox*/
+input[type=number] {
+  -moz-appearance:textfield;
+}
+
+
+/* toastr status modals */
+.toast-top-right {
+  top: 62px;
+}

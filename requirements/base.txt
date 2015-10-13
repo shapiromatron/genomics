@@ -1,0 +1,12 @@
+Django==1.8.5
+djangorestframework==3.2.3
+django-filter==0.11.0
+psycopg2==2.5.5
+django_compressor==1.5
+django-crispy-forms==1.5.1
+celery==3.1.18
+redis==2.10.3
+scipy==0.16.0
+numpy==1.10.0.post2
+bokeh==0.10.0
+pandas==0.17.0

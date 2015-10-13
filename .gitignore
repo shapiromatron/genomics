@@ -1,0 +1,7 @@
+*.log
+*.py[co]
+celerybeat-schedule
+project/django_project/settings/local.py
+tmux.sh
+public
+*celerybeat.pid
