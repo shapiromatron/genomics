@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+
+{% block title %}Heatmap{% endblock %}
+
+
+{% block mid_content %}
+    <h1>Bokeh heatmap example</h1>
+    {{bokeh_content|safe}}
+{% endblock mid_content %}
+
+
+{% block extra_js %}
+    {{bokeh_script|safe}}
+{% endblock %}

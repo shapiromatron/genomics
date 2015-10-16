@@ -17,6 +17,8 @@
               href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
         <link rel="stylesheet" type="text/css"
               href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.2/toastr.min.css">
+        <link rel="stylesheet" type="text/css"
+              href="http://cdn.pydata.org/bokeh/release/bokeh-0.10.0.min.css">
     {% else %}
         <link rel='stylesheet' type='text/css'
               href='{{STATIC_URL}}lib/css/bootstrap.min.css'>
@@ -24,6 +26,8 @@
               href="{{STATIC_URL}}lib/css/font-awesome.css">
         <link rel="stylesheet" type="text/css"
               href="{{STATIC_URL}}lib/css/toastr.css">
+        <link rel="stylesheet" type="text/css"
+              href="{{STATIC_URL}}lib/css/bokeh-0.10.0.css">
         {% endif %}
     {% compress css %}
     <link rel="stylesheet" type="text/css" media="all" href="{{STATIC_URL}}css/site.css">
@@ -76,6 +80,8 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.3/backbone-min.js"></script>
     <script charset="utf-8"
             src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.2/toastr.min.js"></script>
+    <script charset="utf-8"
+            src="http://cdn.pydata.org/bokeh/release/bokeh-0.10.0.min.js"></script>
     {% else %}
     <script charset="utf-8"
             src="{{ STATIC_URL}}lib/js/handlebars.min.js"></script>
@@ -89,6 +95,8 @@
             src="{{ STATIC_URL}}lib/js/backbone-min.js"></script>
     <script charset="utf-8"
             src="{{ STATIC_URL}}lib/js/toastr.min.js"></script>
+    <script charset="utf-8"
+            src="{{ STATIC_URL}}lib/js/bokeh-0.10.0.js"></script>
     {% endif %}
     {% compress js %}
     <script charset="utf-8"

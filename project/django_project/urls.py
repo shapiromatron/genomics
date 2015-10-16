@@ -12,6 +12,10 @@ urlpatterns = [
         views.Home.as_view(),
         name="home"),
 
+    url(r'^genomics/',
+        include('genomics.urls',
+        namespace='genomics')),
+
     url(r'^admin/',
         include(admin.site.urls)),
 
