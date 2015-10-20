@@ -134,7 +134,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'basic',
-            'filename': os.path.join(PROJECT_ROOT, 'bbmdweb.log'),
+            'filename': os.path.join(PROJECT_ROOT, 'genomics.log'),
             'maxBytes': 10 * 1024 * 1024,  # 10 MB
             'backupCount': 10,
         },
@@ -147,7 +147,7 @@ LOGGING = {
         },
         '': {
             'handlers': ['file'],
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
     }
 }
@@ -157,6 +157,18 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 LOGIN_URL = 'user:login'
 LOGOUT_URL = 'user:logout'
 LOGIN_REDIRECT_URL = 'home'
+
+# Cache settings
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': os.getenv('DJANGO_CACHE_SOCK'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient'
+        },
+        'TIMEOUT': 3600   # one hour
+    }
+}
 
 # CELERY
 BROKER_URL = 'redis://localhost:6379'

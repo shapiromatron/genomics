@@ -11,6 +11,10 @@ INTERNAL_IPS = ('127.0.0.1', )
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+CACHES['default']['BACKEND'] = 'django.core.cache.backends.locmem.LocMemCache'
+
+LOGGING['loggers']['']['handlers'] = ['console']
+
 # execute celery-tasks locally instead of sending to queue
 CELERY_ALWAYS_EAGER = True
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
