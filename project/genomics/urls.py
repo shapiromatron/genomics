@@ -1,12 +1,17 @@
-from django.conf.urls import url
+from django.conf.urls import include, url
 
 from . import views
 
 
 urlpatterns = [
 
-    url(r'^bokeh-heatmap/$',
-        views.BokehHeatmap.as_view(),
-        name='bokeh_heatmap'),
+
+    url(r'^bokeh-plot/$',
+        views.BokehPlot.as_view(),
+        name='bokeh_plot'),
+
+    url(r'^result/(?P<pk>\d+)/$',
+        views.ResultDetail.as_view(),
+        name="result_detail")
 
 ]

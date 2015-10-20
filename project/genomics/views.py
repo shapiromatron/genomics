@@ -1,16 +1,26 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView, ListView
 
-from plotting import heatmap
+from . import models
 
-
-class Home(TemplateView):
-    template_name = "genomics/home.html"
+from plotting import scatter, heatmap
 
 
-class BokehHeatmap(TemplateView):
-    template_name = "genomics/bokeh-heatmap.html"
+class ResultList(ListView):
+    model = models.Result
+
+
+class BokehPlot(TemplateView):
+    template_name = "genomics/plot.html"
 
     def get_context_data(self):
-        data = super(BokehHeatmap, self).get_context_data()
-        data.update(heatmap.simple_chart())
+        data = super(BokehPlot, self).get_context_data()
+        data.update(scatter.simple_chart())
+        return data
+
+
+class ResultDetail(DetailView):
+    model = models.Result
+
+    def get_context_data(self, **kwargs):
+        data = super(ResultDetail, self).get_context_data(**kwargs)
         return data

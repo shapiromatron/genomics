@@ -9,7 +9,7 @@ from genomics import views
 urlpatterns = [
 
     url(r'^$',
-        views.Home.as_view(),
+        views.ResultList.as_view(),
         name="home"),
 
     url(r'^genomics/',
