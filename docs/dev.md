@@ -7,15 +7,14 @@ Requires the following software before beginning:
 - Python virtualenv and virtualenvwrapper
 
 Create a new python virtual environment, we'll use `genomics` throughout the
-documentation. Next, `cd` to the root level of this project. Then, we'll install
+documentation. Next, change paths to the root level of this project. Then, we'll install
 all python requirements by runing the command:
 
 ```
 pip install -r requirements/dev.txt
 ```
 
-Next, change directories into the `project` path.
-Copy default django local-development settings:
+Next, change directories into the `/project` path. Copy default django local-development settings:
 
 ```
 cp django_project/settings/local.example.py django_project/settings/local.py
@@ -28,7 +27,7 @@ echo "export DJANGO_SETTINGS_MODULE=django_project.settings.local" >> $VIRTUAL_E
 echo "unset DJANGO_SETTINGS_MODULE" >> $VIRTUAL_ENV/bin/postdeactivate
 ```
 
-Next, create a database. Use the following command:
+Next, create a database:
 
 ```
 createdb -E UTF-8 genomics
@@ -41,7 +40,9 @@ commands:
 ```
 python manage.py migrate
 python manage.py createsuperuser
-python manage.py runserver 4000
+python manage.py runserver 9000
 ```
 
-Navigate to [localhost:3000](http://127.0.0.1:3000/), and start developing!
+Navigate to [localhost:9000](http://127.0.0.1:9000/), and start developing!
+
+To access the [jupyter notebooks](http://jupyter.org/), use [localhost:8888](http://127.0.0.1:8888/).
