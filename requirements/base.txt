@@ -11,3 +11,5 @@ scipy==0.16.0
 numpy==1.10.0.post2
 bokeh==0.10.0
 pandas==0.17.0
+matplotlib==1.4.3
+seaborn==0.6.0
