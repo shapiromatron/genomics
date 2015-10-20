@@ -5,3 +5,4 @@ project/django_project/settings/local.py
 tmux.sh
 public
 *celerybeat.pid
+notebooks/.ipynb_checkpoints/*
