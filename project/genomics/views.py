@@ -23,4 +23,5 @@ class ResultDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         data = super(ResultDetail, self).get_context_data(**kwargs)
+        data.update(self.object.heatmap())
         return data

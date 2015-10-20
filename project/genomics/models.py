@@ -62,6 +62,9 @@ class Result(models.Model):
             matrix = cPickle.loads(matrix)
         return matrix
 
+    def heatmap(self):
+        return heatmap.fixed_chart(self)
+
     def get_heatmap_dataset(self, start=0, width=-1, aslist=True):
         matrix = self.matrix
         shape = matrix.shape
