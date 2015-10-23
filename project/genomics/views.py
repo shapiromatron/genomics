@@ -2,7 +2,7 @@ from django.views.generic import TemplateView, DetailView, ListView
 
 from . import models
 
-from plotting import scatter, heatmap
+from plotting import scatter
 
 
 class ResultList(ListView):
@@ -20,8 +20,3 @@ class BokehPlot(TemplateView):
 
 class ResultDetail(DetailView):
     model = models.Result
-
-    def get_context_data(self, **kwargs):
-        data = super(ResultDetail, self).get_context_data(**kwargs)
-        data.update(self.object.heatmap())
-        return data

@@ -1,12 +1,16 @@
+from bokeh.protocol import BokehJSONEncoder
 from django.shortcuts import get_object_or_404
-
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 
 from utils.api import SiteMixin
-
 from . import models, serializers
+
+
+class PlottingJSONRenderer(JSONRenderer):
+    encoder_class = BokehJSONEncoder
 
 
 class ResultViewset(SiteMixin, viewsets.ModelViewSet):
@@ -20,6 +24,12 @@ class ResultViewset(SiteMixin, viewsets.ModelViewSet):
         return models.Result.objects\
             .filter(user=self.request.user)\
             .order_by('last_updated')
+
+    @detail_route(methods=['get'], renderer_classes=(PlottingJSONRenderer,))
+    def plot(self, request, pk=None):
+        obj = get_object_or_404(models.Result, id=pk)
+        data = obj.get_plot()
+        return Response(data)
 
     @detail_route(methods=['get'])
     def dataset(self, request, pk):

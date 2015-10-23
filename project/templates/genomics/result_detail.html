@@ -6,10 +6,16 @@
 
 {% block mid_content %}
   <h1>{{object}}</h1>
-    {{bokeh_content|safe}}
+  <div id="pHeader"></div>
 {% endblock mid_content %}
 
 
 {% block extra_js %}
-    {{bokeh_script|safe}}
+<script type="text/javascript">
+$(document).ready(function(){
+    $.get("{{object.get_url_plot}}", function(d){
+        $('#pHeader').drawBokeh(d);
+    });
+});
+</script>
 {% endblock extra_js %}

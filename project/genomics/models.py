@@ -38,6 +38,9 @@ class Result(models.Model):
     def get_absolute_url(self):
         return reverse('genomics:result_detail', args=[self.id])
 
+    def get_url_plot(self):
+        return reverse('genomics:api:result-plot', args=[self.id])
+
     @property
     def matrix_cache_key(self):
         return "result-{}".format(self.id)
@@ -62,8 +65,10 @@ class Result(models.Model):
             matrix = cPickle.loads(matrix)
         return matrix
 
-    def heatmap(self):
-        return heatmap.fixed_chart(self)
+    def get_plot(self):
+        dataset = self.get_heatmap_dataset(aslist=False)
+        plot = heatmap.Heatmap(dataset)
+        return plot.as_json()
 
     def get_heatmap_dataset(self, start=0, width=-1, aslist=True):
         matrix = self.matrix

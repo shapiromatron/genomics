@@ -1,71 +1,108 @@
+import abc
 from collections import OrderedDict
-import seaborn as sns
-from matplotlib import cm
-from matplotlib.colors import rgb2hex, Normalize
-
-from bokeh.plotting import figure
-from bokeh.resources import CDN
-from bokeh.embed import components
-from bokeh.models import HoverTool, ColumnDataSource
-
 import numpy as np
+from matplotlib.colors import rgb2hex, Normalize
+from bokeh.models import HoverTool, FactorRange
+from bokeh.plotting import figure, ColumnDataSource
+from bokeh.embed import _get_components
+from bokeh.resources import CDN
+import seaborn as sns
 
 
-def get_gradient(arr):
-    gradient = np.zeros(arr.size, dtype="S7")
-    normalizer = Normalize()
-    norm_arr = normalizer(arr).tolist()
-    cmap = sns.diverging_palette(220, 20, sep=20, as_cmap=True)
-    rgbs = cmap(norm_arr)
-    for i, rbg in enumerate(rgbs):
-        gradient[i] = rgb2hex(rbg)
-    print set(gradient.tolist())
-    return gradient
+class Chart(object):
+
+    def __init__(self, data, tools="save", *args, **kwargs):
+        self.plot = figure(tools=tools, toolbar_location="right")
+        self.data = data
+        self.set_data()
+        self.set_metadata()
+
+    @abc.abstractmethod
+    def set_data(self):
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def set_metadata(self):
+        raise NotImplementedError()
+
+    def as_json(self, resource=CDN):
+        all_models, plots, plot_info, divs = _get_components(self.plot, resource)
+        return {
+            "all_models": all_models,
+            "plots": plots,
+            "info": plot_info,
+        }
 
 
-def fixed_chart(object):
-    data = object.get_heatmap_dataset(aslist=False)
-    matrix = data.get('matrix')
-    shape = matrix.shape
-    xvals = ["x{}".format(i+1) for i in xrange(shape[0])]
-    yvals = ["y{}".format(i+1) for i in xrange(shape[1])]
-    xs = np.tile(xvals, shape[1])
-    ys = np.repeat(yvals, shape[0])
-    vals = matrix.ravel()
-    colors = get_gradient(vals)
+class Heatmap(Chart):
 
-    source = ColumnDataSource(
-        data=dict(
-            xs=xs.tolist(),
-            ys=ys.tolist(),
-            colors=colors.tolist(),
-            val=vals.tolist()))
+    def __init__(self, data, *args, **kwargs):
+        kwargs["tools"] = "reset,wheel_zoom,box_zoom,save,hover"
+        return super(Heatmap, self).__init__(data, *args, **kwargs)
 
-    p = figure(
-        title=None,
-        x_range=xvals,
-        y_range=list(reversed(yvals)),
-        x_axis_location="below",
-        plot_width=1000,
-        plot_height=200,
-        toolbar_location="right",
-        tools="reset,box_zoom,save,hover")
+    def get_palette(self):
+        return sns.diverging_palette(220, 20, sep=20, as_cmap=True)
 
-    p.rect("xs", "ys", 1, 1, source=source, color="colors")
+    def get_gradient(self, arr):
 
-    p.grid.grid_line_color = None
-    p.axis.axis_line_color = None
-    p.axis.major_tick_line_color = None
-    p.axis.major_label_text_font_size = "0.5em"
-    p.axis.major_label_standoff = 3
-    p.xaxis.major_label_orientation = np.pi/4
-    p.axis.visible = None
+        # normalize dataset
+        normalizer = Normalize()
+        norm_arr = normalizer(arr).tolist()
 
-    hover = p.select(dict(type=HoverTool))
-    hover.tooltips = OrderedDict([
-        ('value', '@val'),
-        ('color', '@colors'),
-    ])
+        # get color pallete
+        palette = self.get_palette()
+        rgbs = palette(norm_arr)
 
-    script, content = components(p, CDN)
-    return {"bokeh_script": script, "bokeh_content": content}
+        # convert rgb to HEX and return gradient
+        gradient = np.zeros(arr.size, dtype="S7")
+        for i, rbg in enumerate(rgbs):
+            gradient[i] = rgb2hex(rbg)
+
+        return gradient
+
+    def set_data(self):
+        matrix = self.data.get('matrix')
+        shape = matrix.shape
+        xvals = ["x{}".format(i+1) for i in xrange(shape[0])]
+        yvals = ["y{}".format(i+1) for i in xrange(shape[1])]
+        xs = np.tile(xvals, shape[1])
+        ys = np.repeat(yvals, shape[0])
+        vals = matrix.ravel()
+        colors = self.get_gradient(vals)
+
+        source = ColumnDataSource(
+            data=dict(
+                xs=xs.tolist(),
+                ys=ys.tolist(),
+                colors=colors.tolist(),
+                val=vals.tolist()))
+
+        self.plot.x_range = FactorRange(factors=xvals)
+        self.plot.y_range = FactorRange(factors=list(reversed(yvals)))
+
+        self.plot.rect("xs", "ys", 1, 1, source=source, color="colors")
+
+        hover = self.plot.select(dict(type=HoverTool))
+        hover.tooltips = OrderedDict([
+            ('value', '@val'),
+            ('color', '@colors'),
+        ])
+
+    def set_metadata(self):
+        self.plot.plot_width = 1000
+        self.plot.plot_height = 200
+
+        # self.plot.responsive = True
+        self.plot.webgl = True
+
+        self.plot.toolbar_location = "right"
+
+        self.plot.grid.grid_line_color = None
+
+        self.plot.axis.axis_line_color = None
+        self.plot.axis.major_tick_line_color = None
+        self.plot.axis.major_label_text_font_size = "0.5em"
+        self.plot.axis.major_label_standoff = 3
+        self.plot.axis.visible = None
+
+        self.plot.xaxis.major_label_orientation = np.pi/4

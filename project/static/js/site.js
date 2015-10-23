@@ -79,3 +79,23 @@ String.prototype.printf = function(){
         }
     });
 })(Backbone);
+
+
+(function (Bokeh, $) {
+    $.fn.drawBokeh = function(data) {
+      var $el = $(this);
+      $el.attr('id', data.info.elementid);
+      var all_models = data.all_models;
+      Bokeh.load_models(all_models);
+      var plots = data.plots;
+      for (idx in plots) {
+        var plot = plots[idx];
+        var model = Bokeh.Collections(plot.modeltype).get(plot.modelid);
+        var view = new model.default_view({
+          model: model,
+          el: '#' + plot.elementid
+        });
+        Bokeh.index[plot.modelid] = view;
+      }
+    }
+})(Bokeh, jQuery);
