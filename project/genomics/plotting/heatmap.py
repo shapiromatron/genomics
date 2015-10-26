@@ -3,7 +3,9 @@ from collections import OrderedDict
 import numpy as np
 from matplotlib.colors import rgb2hex, Normalize
 from bokeh.models import HoverTool, FactorRange
-from bokeh.plotting import figure, ColumnDataSource
+from bokeh.models.callbacks import CustomJS
+from bokeh.models.sources import AjaxDataSource, ColumnDataSource
+from bokeh.plotting import figure
 from bokeh.embed import _get_components
 from bokeh.resources import CDN
 import seaborn as sns
@@ -40,17 +42,19 @@ class Heatmap(Chart):
         kwargs["tools"] = "reset,wheel_zoom,box_zoom,save,hover"
         return super(Heatmap, self).__init__(data, *args, **kwargs)
 
-    def get_palette(self):
+    @classmethod
+    def get_palette(cls):
         return sns.diverging_palette(220, 20, sep=20, as_cmap=True)
 
-    def get_gradient(self, arr):
+    @classmethod
+    def get_gradient(cls, arr):
 
         # normalize dataset
         normalizer = Normalize()
         norm_arr = normalizer(arr).tolist()
 
-        # get color pallete
-        palette = self.get_palette()
+        # get color palette
+        palette = cls.get_palette()
         rgbs = palette(norm_arr)
 
         # convert rgb to HEX and return gradient
@@ -60,23 +64,31 @@ class Heatmap(Chart):
 
         return gradient
 
-    def set_data(self):
-        matrix = self.data.get('matrix')
-        shape = matrix.shape
+    @classmethod
+    def to_bokeh_source(cls, data):
+        shape = data['matrix'].shape
+        print shape
         xvals = ["x{}".format(i+1) for i in xrange(shape[0])]
         yvals = ["y{}".format(i+1) for i in xrange(shape[1])]
         xs = np.tile(xvals, shape[1])
         ys = np.repeat(yvals, shape[0])
-        vals = matrix.ravel()
-        colors = self.get_gradient(vals)
+        vals = data['matrix'].ravel()
+        colors = cls.get_gradient(vals)
+        return dict(
+            xs=xs.tolist(),
+            ys=ys.tolist(),
+            colors=colors.tolist(),
+            val=vals.tolist())
 
-        source = ColumnDataSource(
-            data=dict(
-                xs=xs.tolist(),
-                ys=ys.tolist(),
-                colors=colors.tolist(),
-                val=vals.tolist()))
+    def set_data(self):
+        cb = CustomJS(args=dict())
+        cb.code = """console.log('example');"""
 
+        source = AjaxDataSource(
+            data_url='http://127.0.0.1:9000/genomics/api/result/1/plot_data/')
+
+        xvals = ["x{}".format(i+1) for i in xrange(250)]
+        yvals = ["y{}".format(i+1) for i in xrange(80)]
         self.plot.x_range = FactorRange(factors=xvals)
         self.plot.y_range = FactorRange(factors=list(reversed(yvals)))
 
@@ -90,7 +102,7 @@ class Heatmap(Chart):
 
     def set_metadata(self):
         self.plot.plot_width = 1000
-        self.plot.plot_height = 200
+        self.plot.plot_height = 500
 
         # self.plot.responsive = True
         self.plot.webgl = True

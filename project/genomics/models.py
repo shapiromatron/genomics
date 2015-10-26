@@ -65,6 +65,10 @@ class Result(models.Model):
             matrix = cPickle.loads(matrix)
         return matrix
 
+    def get_plot_data(self):
+        dataset = self.get_heatmap_dataset(aslist=False)
+        return heatmap.Heatmap.to_bokeh_source(dataset)
+
     def get_plot(self):
         dataset = self.get_heatmap_dataset(aslist=False)
         plot = heatmap.Heatmap(dataset)

@@ -31,9 +31,14 @@ class ResultViewset(SiteMixin, viewsets.ModelViewSet):
         data = obj.get_plot()
         return Response(data)
 
+    @detail_route(methods=['get'], renderer_classes=(PlottingJSONRenderer,))
+    def plot_data(self, request, pk=None):
+        obj = get_object_or_404(models.Result, id=pk)
+        data = obj.get_plot_data()
+        return Response(data)
+
     @detail_route(methods=['get'])
     def dataset(self, request, pk):
-
         start = 0
         try:
             start = int(self.request.query_params.get('start', start))
