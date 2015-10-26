@@ -38,6 +38,9 @@ class Result(models.Model):
     def get_absolute_url(self):
         return reverse('genomics:result_detail', args=[self.id])
 
+    def get_absolute_url2(self):
+        return reverse('genomics:result_detail2', args=[self.id])
+
     def get_url_plot(self):
         return reverse('genomics:api:result-plot', args=[self.id])
 
@@ -68,6 +71,10 @@ class Result(models.Model):
     def get_plot_data(self):
         dataset = self.get_heatmap_dataset(aslist=False)
         return heatmap.Heatmap.to_bokeh_source(dataset)
+
+    def get_plot_data2(self, start, width):
+        dataset = self.get_heatmap_dataset(start=start, width=width, aslist=True)
+        return dataset
 
     def get_plot(self):
         dataset = self.get_heatmap_dataset(aslist=False)

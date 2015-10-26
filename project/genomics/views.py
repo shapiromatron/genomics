@@ -20,3 +20,8 @@ class BokehPlot(TemplateView):
 
 class ResultDetail(DetailView):
     model = models.Result
+
+
+class ResultDetail2(DetailView):
+    model = models.Result
+    template_name = 'genomics/result_detail2.html'

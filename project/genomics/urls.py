@@ -18,6 +18,10 @@ urlpatterns = [
 
     url(r'^result/(?P<pk>\d+)/$',
         views.ResultDetail.as_view(),
-        name="result_detail")
+        name="result_detail"),
+
+    url(r'^result2/(?P<pk>\d+)/$',
+        views.ResultDetail2.as_view(),
+        name="result_detail2"),
 
 ]

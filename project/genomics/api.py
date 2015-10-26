@@ -31,14 +31,7 @@ class ResultViewset(SiteMixin, viewsets.ModelViewSet):
         data = obj.get_plot()
         return Response(data)
 
-    @detail_route(methods=['get'], renderer_classes=(PlottingJSONRenderer,))
-    def plot_data(self, request, pk=None):
-        obj = get_object_or_404(models.Result, id=pk)
-        data = obj.get_plot_data()
-        return Response(data)
-
-    @detail_route(methods=['get'])
-    def dataset(self, request, pk):
+    def get_dataset_params(self, request):
         start = 0
         try:
             start = int(self.request.query_params.get('start', start))
@@ -52,6 +45,24 @@ class ResultViewset(SiteMixin, viewsets.ModelViewSet):
         except ValueError:
             pass
 
+        return start, width
+
+    @detail_route(methods=['get'], renderer_classes=(PlottingJSONRenderer,))
+    def plot_data(self, request, pk=None):
+        obj = get_object_or_404(models.Result, id=pk)
+        data = obj.get_plot_data()
+        return Response(data)
+
+    @detail_route(methods=['get'], renderer_classes=(PlottingJSONRenderer,))
+    def plot_data2(self, request, pk=None):
+        obj = get_object_or_404(models.Result, id=pk)
+        start, width = self.get_dataset_params(request)
+        data = obj.get_plot_data2(start, width)
+        return Response(data)
+
+    @detail_route(methods=['get'])
+    def dataset(self, request, pk):
         object_ = get_object_or_404(models.Result, pk=pk)
+        start, width = self.get_dataset_params(request)
         response = object_.get_heatmap_dataset(start, width)
         return Response(response)
