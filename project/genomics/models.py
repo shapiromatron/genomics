@@ -54,8 +54,8 @@ class Result(models.Model):
         # set persistent cache
         matrix = cache.get(self.matrix_cache_key)
         if matrix is None:
-            matrix = self.np_matrix.ix[:, 6:].as_matrix()
-            assert matrix.dtype == np.int64
+            matrix = self.np_matrix.ix[:, 6:].as_matrix().astype(np.float64)
+            assert matrix.dtype == np.float64
             mPickle = cPickle.dumps(matrix, protocol=2)
             logging.info("Setting cache...")
             cache.set(self.matrix_cache_key, mPickle)
@@ -94,7 +94,7 @@ class Result(models.Model):
         # resize image if greater than maximum size
         if width > self.MAX_HEATMAP_WIDTH or width < 1:
             response["scaled"] = True
-            subset = imresize(subset, (self.MAX_HEATMAP_WIDTH, shape[1]), interp="bilinear")
+            subset = imresize(subset, (self.MAX_HEATMAP_WIDTH, shape[1]), interp="bilinear", mode="F")
         else:
             response["scaled"] = False
 
