@@ -20,8 +20,8 @@ Heatmap.prototype = {
             nCols = this.data.matrix.length;
 
         // height / width of cells in heatmap
-        var h = Math.min(Math.floor(1200 / nCols), 10),
-            w = h;
+        var h = Math.min(Math.floor(600 / nRows),  10),
+            w = Math.min(Math.floor(1200 / nCols), 10);
 
         //attach a SVG element to the document's body
         var svg = d3.select("#heatmap")
