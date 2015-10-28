@@ -97,6 +97,7 @@ INSTALLED_APPS = (
     'utils',
     'myuser',
     'genomics',
+    'schemas',
 )
 
 AUTH_USER_MODEL = 'myuser.User'
