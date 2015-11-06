@@ -6,3 +6,6 @@ tmux.sh
 public
 *celerybeat.pid
 notebooks/.ipynb_checkpoints/*
+project/node_modules/*
+project/assets/bundles*
+project/webpack-stats.json

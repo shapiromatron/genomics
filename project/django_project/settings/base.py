@@ -39,6 +39,7 @@ STATIC_URL = '/static/'
 # Additional locations of static files
 STATICFILES_DIRS = (
     os.path.join(PROJECT_PATH, 'static'),
+    os.path.join(PROJECT_PATH, 'assets'),
 )
 
 STATICFILES_FINDERS = (
@@ -93,6 +94,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'compressor',
     'rest_framework',
+    'webpack_loader',
     # Custom apps
     'utils',
     'myuser',
@@ -183,3 +185,12 @@ CELERY_TIMEZONE = 'US/Eastern'
 COMPRESS_ENABLED = False
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(PROJECT_PATH, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map']
+    }
+}

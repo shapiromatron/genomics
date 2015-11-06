@@ -25,3 +25,7 @@ class ResultDetail(DetailView):
 class ResultDetail2(DetailView):
     model = models.Result
     template_name = 'genomics/result_detail2.html'
+
+
+class ReactView(TemplateView):
+    template_name = "genomics/react.html"

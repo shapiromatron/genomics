@@ -12,6 +12,11 @@ urlpatterns = [
     # api
     url(r'^api/', include(router.urls, namespace="api")),
 
+
+    url(r'^react/$',
+        views.ReactView.as_view(),
+        name='react'),
+
     url(r'^bokeh-plot/$',
         views.BokehPlot.as_view(),
         name='bokeh_plot'),
