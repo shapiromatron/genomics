@@ -4,7 +4,7 @@ from django.db import models
 from django.conf import settings
 
 
-# python manage.py graph_models -g -o schemas.png --pydot schemas && open schemas.py
+# python manage.py graph_models -g -o schemas.png --pydot schemas && open schemas.png
 
 
 class Dataset(models.Model):
@@ -98,7 +98,7 @@ class AnalysisDatasets(models.Model):
     display_name = models.CharField(
         max_length=128)
     intermediate_matrix = models.ForeignKey(
-        'IntermediateMatrix',
+        'FeatureListCountMatrix',
         null=True)
     created = models.DateTimeField(
         auto_now_add=True)
@@ -137,7 +137,7 @@ class Analysis(models.Model):
         auto_now=True)
 
 
-class IntermediateMatrix(models.Model):
+class FeatureListCountMatrix(models.Model):
     feature_list = models.ForeignKey(
         FeatureList,
         related_name="intermediates")
