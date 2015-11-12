@@ -48,7 +48,11 @@ GENOME_ASSEMBLY_CHOICES = (
 class GenomicDataset(Dataset):
     genome_assembly = models.PositiveSmallIntegerField(
         choices=GENOME_ASSEMBLY_CHOICES)
-    binary = models.FileField(
+    data_ambiguous = models.FileField(
+        max_length=256)
+    data_plus = models.FileField(
+        max_length=256)
+    data_minus = models.FileField(
         max_length=256)
 
 
@@ -62,6 +66,8 @@ class UserDataset(GenomicDataset):
 
 class EncodeDataset(GenomicDataset):
     data_type = models.CharField(
+        max_length=16)
+    cell_type = models.CharField(
         max_length=16)
     antibody = models.CharField(
         max_length=32,
@@ -81,11 +87,15 @@ class EncodeDataset(GenomicDataset):
 
 
 class FeatureList(Dataset):
+    stranded = models.BooleanField(
+        default=True)
     text = models.TextField(
         blank=True)
 
 
 class SortVector(Dataset):
+    feature_list = models.ForeignKey(
+        FeatureList)
     text = models.TextField(
         blank=True)
 
@@ -97,7 +107,7 @@ class AnalysisDatasets(models.Model):
         'GenomicDataset')
     display_name = models.CharField(
         max_length=128)
-    intermediate_matrix = models.ForeignKey(
+    count_matrix = models.ForeignKey(
         'FeatureListCountMatrix',
         null=True)
     created = models.DateTimeField(
@@ -124,8 +134,10 @@ class Analysis(models.Model):
         null=True)
     validated = models.BooleanField(
         default=False)
-    completed = models.BooleanField(
-        default=False)
+    start_time = models.DateTimeField(
+        null=True)
+    end_time = models.DateTimeField(
+        null=True)
     uuid = models.UUIDField(
         default=uuid.uuid4,
         editable=False)
