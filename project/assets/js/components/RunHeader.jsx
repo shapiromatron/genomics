@@ -1,8 +1,11 @@
 import React from 'react';
+import d3 from 'd3';
+
 
 var RunHeader = React.createClass({
   render: function(){
     var data = this.props.data;
+    console.log(d3.selectAll('div'));
     return (
       <h1>
         Welcome, <span>{data.name}</span>. My name is <span>{data.name}</span>.

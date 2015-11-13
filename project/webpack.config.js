@@ -18,11 +18,7 @@ module.exports = {
     publicPath: 'http://localhost:9001/assets/bundles/',
   },
 
-  externals: {
-    // "jquery": "$",
-    // "underscore": "_",
-    // "backbone": "Backbone",
-  },
+  externals: {},
 
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
