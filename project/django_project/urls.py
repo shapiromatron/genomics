@@ -3,18 +3,18 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from genomics import views
+from analysis import views
 
 
 urlpatterns = [
 
     url(r'^$',
-        views.ResultList.as_view(),
+        views.Home.as_view(),
         name="home"),
 
-    url(r'^genomics/',
-        include('genomics.urls',
-        namespace='genomics')),
+    url(r'^dashboard/',
+        include('analysis.urls',
+        namespace='analysis')),
 
     url(r'^admin/',
         include(admin.site.urls)),

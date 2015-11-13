@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+
+{% block title %}Home{% endblock %}
+
+
+{% block mid_content %}
+  <h1>Home.</h1>
+  <ul>
+    <li><a href="{% url 'analysis:dashboard' %}">Dashboard</a></li>
+  </ul>
+{% endblock mid_content %}

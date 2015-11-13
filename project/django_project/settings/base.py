@@ -1,4 +1,3 @@
-from copy import deepcopy
 import os
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -45,7 +44,6 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -92,14 +90,12 @@ INSTALLED_APPS = (
     'django.contrib.sitemaps',
     # External apps
     'crispy_forms',
-    'compressor',
     'rest_framework',
     'webpack_loader',
     # Custom apps
     'utils',
     'myuser',
-    'genomics',
-    'schemas',
+    'analysis',
 )
 
 AUTH_USER_MODEL = 'myuser.User'
@@ -182,8 +178,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'US/Eastern'
 
 # Application settings
-COMPRESS_ENABLED = False
-
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 WEBPACK_LOADER = {

@@ -4,9 +4,6 @@ from django.db import models
 from django.conf import settings
 
 
-# python manage.py graph_models -g -o schemas.png --pydot schemas && open schemas.png
-
-
 class Dataset(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
