@@ -46,10 +46,13 @@ class GenomicDataset(Dataset):
     genome_assembly = models.PositiveSmallIntegerField(
         choices=GENOME_ASSEMBLY_CHOICES)
     data_ambiguous = models.FileField(
+        blank=True,
         max_length=256)
     data_plus = models.FileField(
+        blank=True,
         max_length=256)
     data_minus = models.FileField(
+        blank=True,
         max_length=256)
 
 
