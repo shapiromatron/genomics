@@ -1,8 +1,11 @@
-var path = require("path")
-var webpack = require('webpack')
-var BundleTracker = require('webpack-bundle-tracker')
+var path = require("path"),
+    webpack = require('webpack'),
+    BundleTracker = require('webpack-bundle-tracker'),
+    devFlagPlugin = new webpack.DefinePlugin({__DEBUG__: false});
 
 module.exports = {
+
+  __devFlagPlugin: devFlagPlugin,
 
   context: __dirname,
 
@@ -23,7 +26,8 @@ module.exports = {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
-    new BundleTracker({filename: './webpack-stats.json'})
+    new BundleTracker({filename: './webpack-stats.json'}),
+    devFlagPlugin,
   ],
 
   module: {
@@ -31,7 +35,13 @@ module.exports = {
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loaders: ['react-hot', 'babel'],
+        loader: 'react-hot'
+      },
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel',
+        query: {stage: 0}  // TODO add decorators
       }
     ],
   },
