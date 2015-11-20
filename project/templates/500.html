@@ -1,13 +1,34 @@
-{% extends "base.html" %}
+{% comment %}
+    Adapted from: https://gist.github.com/pitch-gist/2999707
 
-{% block title %}Server error{% endblock %}
 
-{% block mid_content %}
+    https://docs.djangoproject.com/en/1.9/ref/views/#the-500-server-error-view
 
-<div class="col-md-offset-2 col-md-8 error">
-    <h1>500 server error. Uh oh :(</h1>
-    <p>Houston, we have a problem. An administrator has been notified
-       of the issue; we're sorry for the trouble.</p>
-</div>
+    The default 500 view passes no variables to the 500.html template and
+    is rendered with an empty Context to lessen the chance of additional
+    errors. Thus, static css links are missing. We keep this one simple.
 
-{% endblock mid_content %}
+{% endcomment %}
+
+<html>
+  <head>
+    <title>500 server error</title>
+    <style>
+      body { text-align: center; padding:150px 100px 0 100px; }
+      h1 { font-size: 50px; }
+      body { font: 20px Helvetica, sans-serif; color: #333; }
+      article { display: block; text-align: left; width: 600px; margin: 0 auto; }
+      .signature { color: #08739F; text-decoration: none; font-style: italic;}
+    </style>
+  </head>
+  <body>
+    <article>
+      <h1>Server error.</h1>
+      <div>
+        <p>Houston, we have a problem. &#128557;.  An administrator has been notified
+           of the issue; we're sorry for the trouble.  </p>
+        <p>&mdash; <span class="signature">the webteam</span></p>
+      </div>
+    </article>
+  </body>
+</html>
