@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^api/',
         include(router.urls, namespace="api")),
 
-    url(r'^$',
+    url(r'^',
         views.Dashboard.as_view(),
         name='dashboard'),
 ]
