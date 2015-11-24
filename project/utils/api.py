@@ -1,4 +1,3 @@
-from django.contrib.auth.models import AnonymousUser
 from rest_framework import authentication, permissions
 
 
@@ -26,10 +25,10 @@ class OwnedButSharablePermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS and obj.public:
             return True
 
-        if request.user is not AnonymousUser:
-            return obj.owner == request.user
+        if request.user.is_anonymous():
+            return False
 
-        return False
+        return obj.owner == request.user
 
 
 class OwnedButShareableMixin(SiteMixin):
