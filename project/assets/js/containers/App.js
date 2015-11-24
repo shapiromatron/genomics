@@ -1,24 +1,49 @@
-import React, { Component } from 'react';
-import { combineReducers } from 'redux';
-import { Provider } from 'react-redux';
+import React, { Component, PropTypes } from 'react';
+import { pushState } from 'redux-router';
+import { Link } from "react-router";
+import { connect } from 'react-redux';
 
-import { finalCreateStore, renderDevTools } from '../utils/devTools';
-import UserDatasetApp from './UserDatasetApp';
 
-import * as reducers from '../reducers';
+@connect((state) => ({}))
+class App extends Component {
+  static propTypes = {
+    children: PropTypes.node
+  }
 
-const reducer = combineReducers(reducers);
-const store = finalCreateStore(reducer);
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
 
-export default class App extends Component {
+  handleClick(event) {
+    event.preventDefault();
+    const { dispatch } = this.props;
+    dispatch(pushState(null, '/dashboard/parent/child/custom'));
+  }
+
   render() {
+    const links = [
+      '/dashboard/',
+      '/dashboard/parent?foo=bar',
+      '/dashboard/parent/child?bar=baz',
+      '/dashboard/parent/child/123?baz=foo'
+    ].map(l =>
+      <p>
+        <Link to={l}>{l}</Link>
+      </p>
+    );
+
     return (
-        <div>
-            <Provider store={store}>
-                <UserDatasetApp />
-            </Provider>
-            {renderDevTools(store)}
-        </div>
+      <div>
+        <h1>Base app container</h1>
+        {links}
+        <a href="#" onClick={this.handleClick}>
+          /dashboard/parent/child/custom
+        </a>
+        {this.props.children}
+      </div>
     );
   }
 }
+
+export default App;
