@@ -49,7 +49,7 @@ python manage.py createsuperuser
 
 Two references I used for setup help:
 
-- [Webpack and djagno](http://owaislone.org/blog/webpack-plus-reactjs-and-django/)
+- [Webpack and django](http://owaislone.org/blog/webpack-plus-reactjs-and-django/)
 - [React for beginners](https://reactforbeginners.com/)
 
 First make sure [node.js](https://nodejs.org/en/foundation/) and [npm](https://www.npmjs.com/) are installed, and are accessible in our environment.
