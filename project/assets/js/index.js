@@ -9,6 +9,7 @@ import { Provider } from 'react-redux';
 import { createHistory } from 'history';
 
 import Dashboard from './containers/Dashboard';
+import UserDataset from './containers/UserDataset';
 import reducer from './reducers';
 
 import { devMiddleware, renderDevTools } from './utils/devTools';
@@ -26,6 +27,7 @@ class Root extends Component {
                 <Provider store={store}>
                     <ReduxRouter>
                         <Route path="/dashboard/" component={Dashboard}></Route>
+                        <Route path="/dashboard/user-datasets/" component={UserDataset}></Route>
                     </ReduxRouter>
                 </Provider>
                 {renderDevTools(store)}
