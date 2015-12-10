@@ -29,13 +29,13 @@
         ]
     },
     "env": {
-        "es6": true,
-        "browser": true
+        es6: true,
+        browser: true
     },
     "extends": "eslint:recommended",
     "ecmaFeatures": {
-        "jsx": true,
-        "modules": true,
+        jsx: true,
+        modules: true,
     },
     "plugins": [
         "react"
