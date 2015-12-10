@@ -15,10 +15,21 @@ class Dashboard extends React.Component {
             <div>
                 <BreadcrumbBar paths={[urls.dashboard]} />
                 <h1>Dashboard</h1>
-                <p><Link to={urls.user_dataset.url}>{urls.user_dataset.name}</Link></p>
-                <p><Link to={urls.feature_list.url}>{urls.feature_list.name}</Link></p>
-                <p><Link to={urls.sort_vector.url}>{urls.sort_vector.name}</Link></p>
-                <p><Link to={urls.analysis.url}>{urls.analysis.name}</Link></p>
+
+                <h2>Your completed analyses</h2>
+                <p className='help-block'>You have no completed analyses (or list)</p>
+
+
+                <h2>Your running analyses</h2>
+                <p className='help-block'>You have no running analyses (or list)</p>
+
+                <h2> Manage my data</h2>
+                <ul className="nav nav-pills">
+                    <Link className="pill" to={urls.user_dataset.url}>{urls.user_dataset.name}</Link>
+                    <Link className="pill" to={urls.feature_list.url}>{urls.feature_list.name}</Link>
+                    <Link className="pill" to={urls.sort_vector.url}>{urls.sort_vector.name}</Link>
+                    <Link className="pill" to={urls.analysis.url}>{urls.analysis.name}</Link>
+                </ul>
             </div>
         );
     }
