@@ -2,7 +2,7 @@ import Dashboard from '../containers/Dashboard';
 
 export default {
     dashboard: {
-        name: 'Dashboard',
+        name: 'Home',
         url: '/dashboard/',
     },
     user_dataset: {

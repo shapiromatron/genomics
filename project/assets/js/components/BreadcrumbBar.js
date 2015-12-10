@@ -1,22 +1,28 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import urls from '../constants/urls';
-
 
 class BreadCrumbBar extends React.Component {
 
     render() {
+        const current =  (this.props.current) ?
+            <li className="active">{this.props.current}</li> :
+            null;
+
         return (
             <ol className="breadcrumb">
-                <li><a href="/">Home</a></li>
                 {this.props.paths.map(function(p){
-                    return <li><Link to={p.url}>{p.name}</Link></li>;
+                    return <li key={p.name}><Link to={p.url}>{p.name}</Link></li>;
                 })}
-                <li className="active">{this.props.current}</li>
+                {current}
             </ol>
         );
     }
 }
+
+BreadCrumbBar.propTypes = {
+    current: React.PropTypes.string,
+    paths: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+};
 
 export default BreadCrumbBar;

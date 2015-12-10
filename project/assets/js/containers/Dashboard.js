@@ -13,12 +13,12 @@ class Dashboard extends React.Component {
     render() {
         return (
             <div>
-                <BreadcrumbBar paths={[]} current="Dashboard" />
+                <BreadcrumbBar paths={[urls.dashboard]} />
                 <h1>Dashboard</h1>
-                <p><Link to={urls.user_dataset.url}>My datasets</Link></p>
-                <p><Link to={urls.feature_list.url}>My feature lists</Link></p>
-                <p><Link to={urls.sort_vector.url}>My sort vectors</Link></p>
-                <p><Link to={urls.analysis.url}>My analyses</Link></p>
+                <p><Link to={urls.user_dataset.url}>{urls.user_dataset.name}</Link></p>
+                <p><Link to={urls.feature_list.url}>{urls.feature_list.name}</Link></p>
+                <p><Link to={urls.sort_vector.url}>{urls.sort_vector.name}</Link></p>
+                <p><Link to={urls.analysis.url}>{urls.analysis.name}</Link></p>
             </div>
         );
     }
