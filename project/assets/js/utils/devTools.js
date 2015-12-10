@@ -16,7 +16,7 @@ var renderDevTools = function (store) {
     if (__DEBUG__) {
         return (
             <DebugPanel top right bottom>
-                <DevTools store={store} monitor={LogMonitor} />
+                <DevTools visibleOnLoad={false} store={store} monitor={LogMonitor} />
             </DebugPanel>
         );
     }
