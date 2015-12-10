@@ -6,7 +6,7 @@ import BreadcrumbBar from '../components/BreadcrumbBar';
 
 
 @connect((state) => ({}))
-class SortVector extends React.Component {
+class SortVectorApp extends React.Component {
 
     render() {
         return (
@@ -18,4 +18,4 @@ class SortVector extends React.Component {
     }
 }
 
-export default SortVector;
+export default SortVectorApp;

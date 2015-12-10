@@ -6,7 +6,7 @@ import BreadcrumbBar from '../components/BreadcrumbBar';
 
 
 @connect((state) => ({}))
-class FeatureList extends React.Component {
+class FeatureListApp extends React.Component {
 
     render() {
         return (
@@ -18,4 +18,4 @@ class FeatureList extends React.Component {
     }
 }
 
-export default FeatureList;
+export default FeatureListApp;

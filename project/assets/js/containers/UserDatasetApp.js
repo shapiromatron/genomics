@@ -7,7 +7,7 @@ import BreadcrumbBar from '../components/BreadcrumbBar';
 
 
 @connect((state) => ({}))
-class UserDataset extends React.Component {
+class UserDatasetApp extends React.Component {
 
   render() {
     return (
@@ -19,4 +19,4 @@ class UserDataset extends React.Component {
   }
 }
 
-export default UserDataset;
+export default UserDatasetApp;

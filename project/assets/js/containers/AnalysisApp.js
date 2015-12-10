@@ -6,7 +6,7 @@ import BreadcrumbBar from '../components/BreadcrumbBar';
 
 
 @connect((state) => ({}))
-class Analysis extends React.Component {
+class AnalysisApp extends React.Component {
 
   render() {
     return (
@@ -18,4 +18,4 @@ class Analysis extends React.Component {
   }
 }
 
-export default Analysis;
+export default AnalysisApp;
