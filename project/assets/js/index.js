@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore, compose } from 'redux';
 
 import { ReduxRouter, reduxReactRouter } from 'redux-router';
 
-import { Route } from "react-router";
+import { Route } from 'react-router';
 import { Provider } from 'react-redux';
 import { createHistory } from 'history';
 
@@ -20,14 +20,14 @@ const store = compose(
     devMiddleware()
 )(createStore)(reducer);
 
-class Root extends Component {
+class Root extends React.Component {
     render() {
         return (
             <div>
                 <Provider store={store}>
                     <ReduxRouter>
-                        <Route path="/dashboard/" component={Dashboard}></Route>
-                        <Route path="/dashboard/user-datasets/" component={UserDataset}></Route>
+                        <Route path='/dashboard/' component={Dashboard}></Route>
+                        <Route path='/dashboard/user-datasets/' component={UserDataset}></Route>
                     </ReduxRouter>
                 </Provider>
                 {renderDevTools(store)}

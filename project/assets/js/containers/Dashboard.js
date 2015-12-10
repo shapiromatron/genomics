@@ -11,7 +11,7 @@ class Dashboard extends React.Component {
     return (
       <div>
         <h1>Dashboard main</h1>
-        <p><Link to="/dashboard/user-datasets/">My datasets</Link></p>
+        <p><Link to='/dashboard/user-datasets/'>My datasets</Link></p>
       </div>
     );
   }
