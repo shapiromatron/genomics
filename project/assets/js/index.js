@@ -8,6 +8,7 @@ import { Route } from "react-router";
 import { Provider } from 'react-redux';
 import { createHistory } from 'history';
 
+import Dashboard from './containers/Dashboard';
 import reducer from './reducers';
 
 import { devMiddleware, renderDevTools } from './utils/devTools';
@@ -24,6 +25,7 @@ class Root extends Component {
             <div>
                 <Provider store={store}>
                     <ReduxRouter>
+                        <Route path="/dashboard/" component={Dashboard}></Route>
                     </ReduxRouter>
                 </Provider>
                 {renderDevTools(store)}
