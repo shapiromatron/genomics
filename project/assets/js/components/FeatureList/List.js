@@ -1,6 +1,11 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { pushState } from 'redux-router';
+import { Link } from 'react-router';
 
 import Loading from '../Loading';
+import urls from '../../constants/urls';
+import BreadcrumbBar from '../BreadcrumbBar';
 
 
 class FeatureListList extends React.Component {
@@ -32,11 +37,11 @@ class FeatureListList extends React.Component {
                 <td>{d.validated.toString()}</td>
                 <td>{d.last_updated}</td>
                 <td>
-                    <button className='btn btn-primary'>View</button>
+                    <Link className='btn btn-primary' to={`${urls.feature_list.url}${d.id}/`} >View</Link>
                     &nbsp;
-                    <button className='btn btn-info'>Update</button>
+                    <Link className='btn btn-info' to={`${urls.feature_list.url}${d.id}/update/`}>Update</Link>
                     &nbsp;
-                    <button className='btn btn-danger'>Delete</button>
+                    <Link className='btn btn-danger' to={`${urls.feature_list.url}${d.id}/delete/`}>Delete</Link>
                 </td>
             </tr>
         );
@@ -51,9 +56,20 @@ class FeatureListList extends React.Component {
         } else {
             content = this.renderObjectsTable();
         }
-
-        return content;
+        return (
+            <div>
+                <BreadcrumbBar paths={[urls.dashboard]} current="Feature lists" />
+                <h1>Feature lists
+                    <Link className="pull-right btn btn-primary" to={`${urls.feature_list.url}create/`}>Create new</Link>
+                </h1>
+                {content}
+            </div>
+        );
     }
 }
 
-export default FeatureListList;
+
+export default connect(
+  state => ({objects: state.feature_list}),
+  { pushState }
+)(FeatureListList);
