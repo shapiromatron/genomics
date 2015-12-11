@@ -25,6 +25,9 @@ module.exports = {
         new webpack.NoErrorsPlugin(),
         new BundleTracker({filename: './webpack-stats.json'}),
         devFlagPlugin,
+        new webpack.ProvidePlugin({
+            'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch',
+        }),
     ],
 
     module: {

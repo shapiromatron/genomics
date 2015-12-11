@@ -11,7 +11,12 @@
 {% block extra_js %}
 <script id="config" type="text/json" charset="utf-8">
     {
-        "object_url": "http://www.google.com"
+        "user_dataset": "{% url 'analysis:api:user-dataset-list' %}",
+        "encode_dataset": "{% url 'analysis:api:encode-dataset-list' %}",
+        "feature_list": "{% url 'analysis:api:feature-list-list' %}",
+        "sort_vector": "{% url 'analysis:api:sort-vector-list' %}",
+        "analysis": "{% url 'analysis:api:analysis-list' %}",
+        "analysis": "{% url 'analysis:api:analysis-list' %}"
     }
 </script>
 {% render_bundle 'main' %}

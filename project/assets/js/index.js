@@ -1,12 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, compose } from 'redux';
 
+import { createStore, compose, applyMiddleware } from 'redux';
 import { ReduxRouter, reduxReactRouter } from 'redux-router';
+import thunk from 'redux-thunk';
 
 import { Route } from 'react-router';
 import { Provider } from 'react-redux';
 import { createHistory } from 'history';
+
+import { devMiddleware, renderDevTools } from './utils/devTools';
 
 import Dashboard from './containers/Dashboard';
 import UserDatasetApp from './containers/UserDatasetApp';
@@ -15,16 +18,21 @@ import SortVectorApp from './containers/SortVectorApp';
 import AnalysisApp from './containers/AnalysisApp';
 import reducer from './reducers';
 import urls from './constants/urls';
+import { loadApi } from './actions/urls';
 
-import { devMiddleware, renderDevTools } from './utils/devTools';
 
-
+const middleware = [ thunk ];
 const store = compose(
+    applyMiddleware(...middleware),
     reduxReactRouter({ createHistory }),
     devMiddleware()
 )(createStore)(reducer);
 
 class Root extends React.Component {
+
+    componentWillMount() {
+        store.dispatch(loadApi());
+    }
     render() {
         return (
             <div>

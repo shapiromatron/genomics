@@ -10,10 +10,9 @@ import BreadcrumbBar from '../components/BreadcrumbBar';
 @connect((state) => ({}))
 class Dashboard extends React.Component {
 
-    render() {
+    renderDashboard(){
         return (
             <div>
-                <BreadcrumbBar paths={[urls.dashboard]} />
                 <h1>Dashboard</h1>
 
                 <h2>Your completed analyses</h2>
@@ -30,6 +29,15 @@ class Dashboard extends React.Component {
                     <Link className="pill" to={urls.sort_vector.url}>{urls.sort_vector.name}</Link>
                     <Link className="pill" to={urls.analysis.url}>{urls.analysis.name}</Link>
                 </ul>
+            </div>
+        )
+    }
+
+    render() {
+        return (
+            <div>
+                <BreadcrumbBar paths={[urls.dashboard]} />
+                {this.props.children || this.renderDashboard()}
             </div>
         );
     }

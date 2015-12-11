@@ -13,6 +13,10 @@ export default {
         name: 'Feature lists',
         url: '/dashboard/feature-lists/',
     },
+    feature_list_create: {
+        name: 'Create new',
+        url: '/dashboard/feature-lists/create/',
+    },
     sort_vector: {
         name: 'Sort vectors',
         url: '/dashboard/sort-vectors/',
