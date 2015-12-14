@@ -1,11 +1,11 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { pushState } from 'redux-router';
 import { Link } from 'react-router';
 
 import Loading from '../Loading';
 import urls from '../../constants/urls';
 import BreadcrumbBar from '../BreadcrumbBar';
+
+import h from '../../utils/helpers';
 
 
 class FeatureListList extends React.Component {
@@ -30,6 +30,7 @@ class FeatureListList extends React.Component {
     }
 
     renderObject(d){
+        const url = h.getObjectURL(urls.feature_list.url, d.id);
         return (
             <tr key={d.id}>
                 <td>{d.name}</td>
@@ -37,11 +38,17 @@ class FeatureListList extends React.Component {
                 <td>{d.validated.toString()}</td>
                 <td>{d.last_updated}</td>
                 <td>
-                    <Link className='btn btn-primary' to={`${urls.feature_list.url}${d.id}/`} >View</Link>
+                    <Link
+                        className='btn btn-primary'
+                        to={url} >View</Link>
                     &nbsp;
-                    <Link className='btn btn-info' to={`${urls.feature_list.url}${d.id}/update/`}>Update</Link>
+                    <Link
+                        className='btn btn-info'
+                        to={url +'update/'}>Update</Link>
                     &nbsp;
-                    <Link className='btn btn-danger' to={`${urls.feature_list.url}${d.id}/delete/`}>Delete</Link>
+                    <Link
+                        className='btn btn-danger'
+                        to={url +'delete/'}>Delete</Link>
                 </td>
             </tr>
         );
@@ -52,15 +59,17 @@ class FeatureListList extends React.Component {
         if(this.props.objects.isFetching){
             content = <Loading />;
         } else if(this.props.objects.items.length ===0) {
-            content = <p>No feature lists are available</p>;
+            content = <p className='help-block'>No feature lists are available</p>;
         } else {
             content = this.renderObjectsTable();
         }
         return (
             <div>
-                <BreadcrumbBar paths={[urls.dashboard]} current="Feature lists" />
+                <BreadcrumbBar paths={[urls.dashboard]} current='Feature lists' />
                 <h1>Feature lists
-                    <Link className="pull-right btn btn-primary" to={`${urls.feature_list.url}create/`}>Create new</Link>
+                    <Link
+                        className='pull-right btn btn-primary'
+                        to={`${urls.feature_list.url}create/`}>Create new</Link>
                 </h1>
                 {content}
             </div>
@@ -69,7 +78,4 @@ class FeatureListList extends React.Component {
 }
 
 
-export default connect(
-  state => ({objects: state.feature_list}),
-  { pushState }
-)(FeatureListList);
+export default FeatureListList;

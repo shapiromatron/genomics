@@ -13,15 +13,17 @@ import { devMiddleware, renderDevTools } from './utils/devTools';
 
 import Dashboard from './containers/Dashboard';
 import UserDatasetApp from './containers/UserDatasetApp';
+
 import FeatureListApp from './containers/FeatureListApp';
 import FLForm from './containers/FeatureListForm';
+import FLList from './containers/FeatureListList';
+
 import SortVectorApp from './containers/SortVectorApp';
 import AnalysisApp from './containers/AnalysisApp';
 import reducer from './reducers';
 import urls from './constants/urls';
 import { loadApi } from './actions/urls';
 
-import FLList from './components/FeatureList/List';
 import FLDetail from './components/FeatureList/Detail';
 
 
