@@ -4,7 +4,7 @@ import React from 'react';
 import BreadcrumbBar from '../BreadcrumbBar';
 import urls from '../../constants/urls';
 
-import { patchFeatureList } from '../../actions/FeatureList';
+import { postFeatureList, patchFeatureList } from '../../actions/FeatureList';
 
 
 class UserDatasetForm extends React.Component {
@@ -72,14 +72,15 @@ class UserDatasetForm extends React.Component {
         const { dispatch } = this.props;
         e.preventDefault();
         let originalObj = this.getObject(this.props);
+        let success_cb = function(){
+            dispatch(pushState(null, '/dashboard/feature-lists/'));
+        };
         if (_.isUndefined(this.state.id)){
             let post = this.state;
+            dispatch(postFeatureList(post, success_cb));
         } else {
             let patch = this.getPatch(originalObj, this.state);
-            let cb = function(){
-                dispatch(pushState(null, '/dashboard/feature-lists/'));
-            };
-            dispatch(patchFeatureList(this.state.id, patch, cb));
+            dispatch(patchFeatureList(this.state.id, patch, success_cb));
         }
     }
 
