@@ -17,14 +17,13 @@ import UserDatasetApp from './containers/UserDatasetApp';
 import FeatureListApp from './containers/FeatureListApp';
 import FLForm from './containers/FeatureListForm';
 import FLList from './containers/FeatureListList';
+import FLObject from './containers/FeatureListObject';
 
 import SortVectorApp from './containers/SortVectorApp';
 import AnalysisApp from './containers/AnalysisApp';
 import reducer from './reducers';
 import urls from './constants/urls';
 import { loadApi } from './actions/urls';
-
-import FLDetail from './components/FeatureList/Detail';
 
 
 const middleware = [ thunk ];
@@ -49,9 +48,9 @@ class Root extends React.Component {
                         <Route path={urls.feature_list.url} component={FeatureListApp}>
                             <IndexRoute component={FLList} />
                             <Route path="create/" component={FLForm} />
-                            <Route path=":id/" component={FLDetail} />
+                            <Route path=":id/" component={FLObject} />
                             <Route path=":id/update/" component={FLForm} />
-                            <Route path=":id/delete/" component={FLDetail} />
+                            <Route path=":id/delete/" component={FLObject} />
                         </Route>
                         <Route path={urls.sort_vector.url} component={SortVectorApp}></Route>
                         <Route path={urls.analysis.url} component={AnalysisApp}></Route>
