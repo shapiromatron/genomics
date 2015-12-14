@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-class UserDatasetList extends React.Component {
+class AnalysisList extends React.Component {
 
     render() {
         return (
@@ -12,4 +12,4 @@ class UserDatasetList extends React.Component {
     }
 }
 
-export default UserDatasetList;
+export default AnalysisList;

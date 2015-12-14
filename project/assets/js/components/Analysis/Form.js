@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-class UserDatasetForm extends React.Component {
+class AnalysisForm extends React.Component {
 
     render() {
         return (
@@ -12,4 +12,4 @@ class UserDatasetForm extends React.Component {
     }
 }
 
-export default UserDatasetForm;
+export default AnalysisForm;

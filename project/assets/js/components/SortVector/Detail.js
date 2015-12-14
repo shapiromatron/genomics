@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-class UserDatasetDetail extends React.Component {
+class SortVectorDetail extends React.Component {
 
     render() {
         return (
@@ -12,4 +12,4 @@ class UserDatasetDetail extends React.Component {
     }
 }
 
-export default UserDatasetDetail;
+export default SortVectorDetail;
