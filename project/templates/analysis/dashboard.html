@@ -16,7 +16,8 @@
         "feature_list": "{% url 'analysis:api:feature-list-list' %}",
         "sort_vector": "{% url 'analysis:api:sort-vector-list' %}",
         "analysis": "{% url 'analysis:api:analysis-list' %}",
-        "analysis": "{% url 'analysis:api:analysis-list' %}"
+        "analysis": "{% url 'analysis:api:analysis-list' %}",
+        "csrf": "{% csrf_token %}"
     }
 </script>
 {% render_bundle 'main' %}
