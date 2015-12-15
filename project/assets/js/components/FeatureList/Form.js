@@ -56,6 +56,17 @@ class FeatureListForm extends React.Component {
             'Create feature list';
     }
 
+    renderNonFieldErrors(errs){
+        if (!errs.non_field_errors) return null;
+        return (
+            <div className='form-group'>
+                <div className='col-sm-12 alert alert-danger has-error'>
+                    <FormFieldError errors={errs.non_field_errors} />
+                </div>
+            </div>
+        );
+    }
+
     render() {
         let errs = this.props.errors || {};
         return (
@@ -64,6 +75,8 @@ class FeatureListForm extends React.Component {
                 <h2>{this.getTitle()}</h2>
 
                 <form className='form-horizontal' onSubmit={this.handleSubmit.bind(this)}>
+
+                    {this.renderNonFieldErrors(errs)}
 
                     <div className={h.getInputDivClass('name', errs)}>
                         <label className='col-sm-2 control-label'>Name</label>
