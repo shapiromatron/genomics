@@ -16,7 +16,15 @@ class FeatureListObject extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
+        this.state = this.getState(props);
+    }
+
+    componentWillReceiveProps(props) {
+        this.setState(this.getState(props));
+    }
+
+    getState(props){
+        return {
             isDelete: props.location.pathname.indexOf('/delete/') > 0,
             id: parseInt(props.params.id),
         };

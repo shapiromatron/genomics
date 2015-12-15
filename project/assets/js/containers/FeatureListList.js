@@ -16,7 +16,6 @@ class FeatureListList extends React.Component {
     }
 }
 
-
 export default connect(
   state => ({objects: state.feature_list}),
   { pushState }

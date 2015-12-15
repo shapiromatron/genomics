@@ -19,7 +19,6 @@ class FeatureListList extends React.Component {
                         <th>Public</th>
                         <th>Validated</th>
                         <th>Last updated</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,23 +32,12 @@ class FeatureListList extends React.Component {
         const url = h.getObjectURL(urls.feature_list.url, d.id);
         return (
             <tr key={d.id}>
-                <td>{d.name}</td>
+                <td>
+                    <Link to={url} >{d.name}</Link>
+                </td>
                 <td>{d.public.toString()}</td>
                 <td>{d.validated.toString()}</td>
-                <td>{d.last_updated}</td>
-                <td>
-                    <Link
-                        className='btn btn-primary'
-                        to={url} >View</Link>
-                    &nbsp;
-                    <Link
-                        className='btn btn-info'
-                        to={url +'update/'}>Update</Link>
-                    &nbsp;
-                    <Link
-                        className='btn btn-danger'
-                        to={url +'delete/'}>Delete</Link>
-                </td>
+                <td>{h.datetimeFormat(d.last_updated)}</td>
             </tr>
         );
     }
@@ -76,6 +64,5 @@ class FeatureListList extends React.Component {
         );
     }
 }
-
 
 export default FeatureListList;

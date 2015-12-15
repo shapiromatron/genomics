@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 import BreadcrumbBar from '../BreadcrumbBar';
 import urls from '../../constants/urls';
@@ -28,13 +29,28 @@ class FeatureListObject extends React.Component {
 
     render() {
         let object = this.props.object;
+        const url = h.getObjectURL(urls.feature_list.url, object.id);
         return (
             <div>
                 <BreadcrumbBar
                     paths={[urls.dashboard, urls.feature_list]}
                     current={object.name} />
 
-                <h2>{object.name}</h2>
+                <h2>
+
+                    <span>{object.name}</span>
+
+                    <div className='dropdown pull-right'>
+                      <button className='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
+                        Actions <span className="caret"></span>
+                      </button>
+                      <ul className='dropdown-menu'>
+                        <li><Link to={url +'update/'}>Update</Link></li>
+                        <li><Link to={url +'delete/'}>Delete</Link></li>
+                      </ul>
+                    </div>
+
+                </h2>
 
                 <table className='table table-condensed'>
                     <col style={{width: '15%'}} />
@@ -59,12 +75,5 @@ class FeatureListObject extends React.Component {
         );
     }
 }
-
-
-
-
-
-
-
 
 export default FeatureListObject;
