@@ -129,7 +129,11 @@ class FeatureListForm extends React.Component {
                     </div>
 
                     <div className='form-actions'>
-                        <button className='pull-right btn btn-primary'>Save</button>
+                        <div className='pull-right'>
+                            <button className='btn btn-default' type='button' onClick={h.goBack}>Cancel</button>
+                            <span>&nbsp;</span>
+                            <button className='btn btn-primary'>Save</button>
+                        </div>
                     </div>
 
                 </form>

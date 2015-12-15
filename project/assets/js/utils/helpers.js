@@ -62,6 +62,10 @@ var helpers = {
     datetimeFormat(dt){
         return moment(dt).format('MMMM Do YYYY, h:mm:ss a');
     },
+    goBack(e){
+        e.preventDefault();
+        window.history.back();
+    },
     getInputDivClass(name, errors, extra=[]){
         extra.push('form-group');
         if (errors && errors[name]) extra.push('has-error');

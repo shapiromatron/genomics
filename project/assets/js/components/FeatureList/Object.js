@@ -15,6 +15,8 @@ class FeatureListObject extends React.Component {
                 <form method="post" onSubmit={this.props.handleDeleteForm}>
                     <p>Are you sure you want to delete?</p>
                     <button className='btn btn-danger' type="submit">Confirm delete</button>
+                    <span>&nbsp;</span>
+                    <button className='btn btn-default' type='button' onClick={h.goBack}>Cancel</button>
                 </form>
             </div>
         );
