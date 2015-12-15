@@ -32,14 +32,19 @@ class FeatureListFormContainer extends React.Component {
 
     handleSubmit(newObj){
         const { dispatch } = this.props;
-        let success_cb = function(){
-            dispatch(pushState(null, '/dashboard/feature-lists/'));
+        const self = this;
+        let cb = function(errors){
+            if (errors){
+                self.setState({errors: errors});
+            } else {
+                dispatch(pushState(null, '/dashboard/feature-lists/'));
+            }
         };
         if (_.isUndefined(this.state.id)){
-            dispatch(postFeatureList(newObj, success_cb));
+            dispatch(postFeatureList(newObj, cb));
         } else {
             let patch = h.getPatch(this.state.object, newObj);
-            dispatch(patchFeatureList(this.state.id, patch, success_cb));
+            dispatch(patchFeatureList(this.state.id, patch, cb));
         }
     }
 
@@ -51,6 +56,7 @@ class FeatureListFormContainer extends React.Component {
 
         return (
             <FLForm
+                errors={this.state.errors}
                 id={id}
                 object={object}
                 handleSubmit={this.handleSubmit.bind(this)}

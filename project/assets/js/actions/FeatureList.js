@@ -66,9 +66,10 @@ export function patchFeatureList(id, patch, cb){
                 if (response.status === 200){
                     response.json()
                         .then((json) => dispatch(loadLatestFeatureList(json.id)))
-                        .then(cb);
+                        .then(cb(null));
                 } else {
-                    console.log('failed');
+                    response.json()
+                        .then((json) => cb(json));
                 }
             })
             .catch((ex) => console.error('Feature-list parsing failed', ex));
@@ -85,9 +86,10 @@ export function deleteFeatureList(id, cb){
             .then(function(response){
                 if (response.status === 204){
                     dispatch(deleteFeatureListAction(id));
-                    cb();
+                    cb(null);
                 } else {
-                    console.log('failed');
+                    response.json()
+                        .then((json) => cb(json));
                 }
             })
             .catch((ex) => console.error('Feature-list parsing failed', ex));
@@ -105,9 +107,10 @@ export function postFeatureList(post, cb){
                 if (response.status === 201){
                     response.json()
                         .then((json) => dispatch(receiveFeatureList(json)))
-                        .then(cb);
+                        .then(cb(null));
                 } else {
-                    console.log('failed');
+                    response.json()
+                        .then((json) => cb(json));
                 }
             })
             .catch((ex) => console.error('Feature-list parsing failed', ex));

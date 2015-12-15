@@ -1,6 +1,7 @@
 import React from 'react';
 
 import BreadcrumbBar from '../BreadcrumbBar';
+import FormFieldError from '../FormFieldError';
 import urls from '../../constants/urls';
 import h from '../../utils/helpers';
 
@@ -56,6 +57,7 @@ class FeatureListForm extends React.Component {
     }
 
     render() {
+        let errs = this.props.errors || {};
         return (
             <div>
                 {this.getBreadcrumbs()}
@@ -63,48 +65,53 @@ class FeatureListForm extends React.Component {
 
                 <form className='form-horizontal' onSubmit={this.handleSubmit.bind(this)}>
 
-                    <div className='form-group'>
+                    <div className={h.getInputDivClass('name', errs)}>
                         <label className='col-sm-2 control-label'>Name</label>
                         <div className='col-sm-10'>
                             <input name='name' className='form-control' type='text'
                                    value={this.state.name}
                                    onChange={this.handleChange.bind(this)} />
+                            <FormFieldError errors={errs.name} />
                         </div>
                     </div>
 
-                    <div className='form-group'>
+                    <div className={h.getInputDivClass('description', errs)}>
                         <label className='col-sm-2 control-label'>Description</label>
                         <div className='col-sm-10'>
                             <textarea name='description' className='form-control'
                                    value={this.state.description}
                                    onChange={this.handleChange.bind(this)} />
+                            <FormFieldError errors={errs.description} />
                         </div>
                     </div>
 
-                    <div className='form-group horizontal-checkbox'>
+                    <div className={h.getInputDivClass('public', errs)}>
                         <label className='col-sm-2 control-label'>Public</label>
                         <div className='col-sm-10'>
                             <input type='checkbox' name='public'
                                    checked={this.state.public}
                                    onChange={this.handleChange.bind(this)} />
+                            <FormFieldError errors={errs.public} />
                         </div>
                     </div>
 
-                    <div className='form-group horizontal-checkbox'>
+                    <div className={h.getInputDivClass('stranded', errs)}>
                         <label className='col-sm-2 control-label'>Stranded</label>
                         <div className='col-sm-10'>
                             <input type='checkbox' name='stranded'
                                    checked={this.state.stranded}
                                    onChange={this.handleChange.bind(this)} />
+                            <FormFieldError errors={errs.stranded} />
                         </div>
                     </div>
 
-                    <div className='form-group horizontal-checkbox'>
+                    <div className={h.getInputDivClass('text', errs)}>
                         <label className='col-sm-2 control-label'>Content</label>
                         <div className='col-sm-10'>
                             <textarea name='text' className='form-control' rows='10'
                                    value={this.state.text}
                                    onChange={this.handleChange.bind(this)} />
+                            <FormFieldError errors={errs.text} />
                         </div>
                     </div>
 
