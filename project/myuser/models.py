@@ -40,9 +40,6 @@ class User(authModels.AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    def __unicode__(self):
-        return self.email
-
     def get_full_name(self):
         return self.email
 

@@ -4,11 +4,11 @@ from rest_framework.routers import DefaultRouter
 from . import api, views
 
 router = DefaultRouter()
-router.register(r'analysis', api.AnalysisViewset, base_name="analysis")
-router.register(r'user-dataset', api.UserDatasetViewset, base_name="user-dataset")
-router.register(r'encode-dataset', api.EncodeDatasetViewset, base_name="encode-dataset")
-router.register(r'feature-list', api.FeatureListViewset, base_name="feature-list")
-router.register(r'sort-vector', api.SortVectorViewset, base_name="sort-vector")
+router.register('analysis', api.AnalysisViewset, base_name='analysis')
+router.register('user-dataset', api.UserDatasetViewset, base_name='user-dataset')
+router.register('encode-dataset', api.EncodeDatasetViewset, base_name='encode-dataset')
+router.register('feature-list', api.FeatureListViewset, base_name='feature-list')
+router.register('sort-vector', api.SortVectorViewset, base_name='sort-vector')
 
 
 urlpatterns = [

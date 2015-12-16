@@ -33,6 +33,9 @@ class Dataset(models.Model):
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return self.name
+
 
 HG19 = 1
 MM9 = 2
@@ -115,6 +118,9 @@ class AnalysisDatasets(models.Model):
     last_updated = models.DateTimeField(
         auto_now=True)
 
+    class Meta:
+        verbose_name_plural = 'Analysis datasets'
+
 
 class Analysis(models.Model):
     owner = models.ForeignKey(
@@ -148,6 +154,9 @@ class Analysis(models.Model):
     last_updated = models.DateTimeField(
         auto_now=True)
 
+    class Meta:
+        verbose_name_plural = 'Analyses'
+
 
 class FeatureListCountMatrix(models.Model):
     feature_list = models.ForeignKey(
@@ -163,6 +172,9 @@ class FeatureListCountMatrix(models.Model):
     last_updated = models.DateTimeField(
         auto_now=True)
 
+    class Meta:
+        verbose_name_plural = 'Feature list count matrices'
+
 
 class DatasetCorrelationMatrix(models.Model):
     analysis = models.OneToOneField(Analysis)
@@ -172,3 +184,6 @@ class DatasetCorrelationMatrix(models.Model):
         auto_now_add=True)
     last_updated = models.DateTimeField(
         auto_now=True)
+
+    class Meta:
+        verbose_name_plural = 'Dataset correlation matrices'

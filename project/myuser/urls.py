@@ -1,6 +1,4 @@
-from django.conf import settings
-from django.conf.urls import include, url
-from django.contrib import admin
+from django.conf.urls import url
 from django.core.urlresolvers import reverse_lazy
 
 from . import forms, views
@@ -25,8 +23,8 @@ urlpatterns = [
     url(r'^reset-password/$',
         'django.contrib.auth.views.password_reset',
         {
-        'post_reset_redirect': reverse_lazy("user:password_reset_done"),
-        'password_reset_form': forms.ResetPasswordEmailForm,
+            'post_reset_redirect': reverse_lazy("user:password_reset_done"),
+            'password_reset_form': forms.ResetPasswordEmailForm,
         },
         name='password_reset'),
 

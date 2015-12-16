@@ -6,7 +6,7 @@ from django.views.generic import TemplateView
 
 
 class Home(TemplateView):
-    template_name = "analysis/home.html"
+    template_name = 'analysis/home.html'
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated():
@@ -15,7 +15,7 @@ class Home(TemplateView):
 
 
 class Dashboard(TemplateView):
-    template_name = "analysis/dashboard.html"
+    template_name = 'analysis/dashboard.html'
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
