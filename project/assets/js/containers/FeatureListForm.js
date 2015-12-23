@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
 import { bindActionCreators } from 'redux';
 
-import { postFeatureList, patchFeatureList } from '../actions/FeatureList';
-
 import h from '../utils/helpers';
+
+import { postFeatureList, patchFeatureList } from '../actions/FeatureList';
 
 import FLForm from '../components/FeatureList/Form';
 import Loading from '../components/Loading';
@@ -65,7 +65,7 @@ class FeatureListFormContainer extends React.Component {
     }
 }
 
-function selector(state) {
+function mapStateToProps(state) {
     return {
         objects: state.feature_list,
     };
@@ -76,4 +76,4 @@ function mapDispatchToProps(dispatch) {
         pushState: bindActionCreators(pushState, dispatch),
     };
 }
-export default connect(selector, mapDispatchToProps)(FeatureListFormContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(FeatureListFormContainer);

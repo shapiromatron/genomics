@@ -8,7 +8,6 @@ function requestFeatureLists() {
     };
 }
 
-
 function receiveFeatureLists(json) {
     return {
         type: types.RECEIVE_FEATURE_LISTS,

@@ -1,22 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { pushState } from 'redux-router';
 
 import FL from '../components/FeatureList/List.js';
 
 
 class FeatureListList extends React.Component {
-
     render() {
-        return (
-            <div>
-                <FL objects={this.props.objects}/>
-            </div>
-        );
+        return <FL objects={this.props.objects}/>;
     }
 }
 
-export default connect(
-  state => ({objects: state.feature_list}),
-  { pushState }
-)(FeatureListList);
+
+function mapStateToProps(state) {
+    return {
+        objects: state.feature_list,
+    };
+}
+
+export default connect(mapStateToProps)(FeatureListList);
