@@ -5,11 +5,11 @@ import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
 import { bindActionCreators } from 'redux';
 
-import Loading from '../components/Loading';
+import Loading from '../../components/Loading';
 
-import { deleteFeatureList } from '../actions/FeatureList';
+import { deleteFeatureList } from '../../actions/FeatureList';
 
-import FL from '../components/FeatureList/Object.js';
+import FL from '../../components/FeatureList/Object.js';
 
 
 class FeatureListDelete extends React.Component {

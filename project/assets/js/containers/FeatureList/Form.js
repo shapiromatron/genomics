@@ -5,12 +5,12 @@ import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
 import { bindActionCreators } from 'redux';
 
-import h from '../utils/helpers';
+import h from '../../utils/helpers';
 
-import { postFeatureList, patchFeatureList } from '../actions/FeatureList';
+import { postFeatureList, patchFeatureList } from '../../actions/FeatureList';
 
-import FLForm from '../components/FeatureList/Form';
-import Loading from '../components/Loading';
+import FLForm from '../../components/FeatureList/Form';
+import Loading from '../../components/Loading';
 
 
 class FeatureListFormContainer extends React.Component {

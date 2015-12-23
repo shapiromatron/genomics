@@ -3,9 +3,9 @@ import React from 'react';
 
 import { connect } from 'react-redux';
 
-import Loading from '../components/Loading';
+import Loading from '../../components/Loading';
 
-import FL from '../components/FeatureList/Object.js';
+import FL from '../../components/FeatureList/Object.js';
 
 
 class FeatureListObject extends React.Component {

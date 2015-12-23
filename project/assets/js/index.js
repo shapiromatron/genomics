@@ -14,11 +14,11 @@ import { devMiddleware, renderDevTools } from './utils/devTools';
 import Dashboard from './containers/Dashboard';
 import UserDatasetApp from './containers/UserDatasetApp';
 
-import FeatureListApp from './containers/FeatureListApp';
-import FLForm from './containers/FeatureListForm';
-import FLList from './containers/FeatureListList';
-import FLObject from './containers/FeatureListObject';
-import FLDelete from './containers/FeatureListDelete';
+import FeatureListApp from './containers/FeatureList/App';
+import FLForm from './containers/FeatureList/Form';
+import FLList from './containers/FeatureList/List';
+import FLObject from './containers/FeatureList/Object';
+import FLDelete from './containers/FeatureList/Delete';
 
 import SortVectorApp from './containers/SortVectorApp';
 import AnalysisApp from './containers/AnalysisApp';

@@ -2,7 +2,7 @@ import _ from 'underscore';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { fetchFeatureListsIfNeeded } from '../actions/FeatureList';
+import { fetchFeatureListsIfNeeded } from '../../actions/FeatureList';
 
 
 @connect((state) => (state))
