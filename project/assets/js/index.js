@@ -12,8 +12,12 @@ import { createHistory } from 'history';
 import { devMiddleware, renderDevTools } from './utils/devTools';
 
 import Dashboard from './containers/Dashboard';
-import UserDatasetApp from './containers/UserDatasetApp';
 
+import UDApp from    './containers/UserDataset/App';
+import UDForm from   './containers/UserDataset/Form';
+import UDList from   './containers/UserDataset/List';
+import UDDetail from './containers/UserDataset/Detail';
+import UDDelete from './containers/UserDataset/Delete';
 
 import FLApp from    './containers/FeatureList/App';
 import FLForm from   './containers/FeatureList/Form';
@@ -47,7 +51,13 @@ class Root extends React.Component {
                 <Provider store={store}>
                     <ReduxRouter>
                         <Route path={urls.dashboard.url} component={Dashboard}></Route>
-                        <Route path={urls.user_dataset.url} component={UserDatasetApp}></Route>
+                        <Route path={urls.user_dataset.url} component={UDApp}>
+                            <IndexRoute component={UDList} />
+                            <Route path="create/" component={UDForm} />
+                            <Route path=":id/" component={UDDetail} />
+                            <Route path=":id/update/" component={UDForm} />
+                            <Route path=":id/delete/" component={UDDelete} />
+                        </Route>
                         <Route path={urls.feature_list.url} component={FLApp}>
                             <IndexRoute component={FLList} />
                             <Route path="create/" component={FLForm} />
