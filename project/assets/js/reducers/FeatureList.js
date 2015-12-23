@@ -3,10 +3,11 @@ import * as types from '../constants/ActionTypes';
 
 
 let defaultState = {
+    itemsLoaded: false,
     isFetching: false,
     items: [],
-    // dirtyObject: {},
-    // dirtyObjectValidiation: {},
+    editObject: {},  //todo change to null
+    editObjectErrors: null,
 };
 
 
@@ -23,6 +24,7 @@ export default function (state=defaultState, action) {
         return Object.assign({}, state, {
             items: action.items,
             isFetching: false,
+            itemsLoaded: true,
         });
 
     case types.FEATURE_LIST.RECIEVE_OBJECT:
@@ -60,6 +62,17 @@ export default function (state=defaultState, action) {
         return Object.assign({}, state, {
             isFetching: false,
             items,
+        });
+
+    case types.FEATURE_LIST.CREATE_EDIT_OBJECT:
+        return Object.assign({}, state, {
+            editObject: action.object,
+            editObjectErrors: {},
+        });
+
+    case types.FEATURE_LIST.RECEIVE_EDIT_ERRORS:
+        return Object.assign({}, state, {
+            editObjectErrors: action.errors,
         });
 
     default:

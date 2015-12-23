@@ -10,18 +10,7 @@ class FeatureListForm extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = props.object || this.getDefaultObject();
-    }
-
-    getDefaultObject () {
-        return {
-            id: undefined,
-            name: '',
-            description: '',
-            public: false,
-            stranded: true,
-            text: '',
-        };
+        this.state = props.object;
     }
 
     handleChange(e){

@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import * as types from '../constants/ActionTypes';
 import h from '../utils/helpers';
 
@@ -41,6 +42,20 @@ function fetchObject(id){
     };
 }
 
+function setEdititableObject(object){
+    return {
+        type: types.FEATURE_LIST.CREATE_EDIT_OBJECT,
+        object,
+    };
+}
+
+function receiveEditErrors(errors){
+    return {
+        type: types.FEATURE_LIST.RECEIVE_EDIT_ERRORS,
+        errors,
+    };
+}
+
 export function fetchObjectsIfNeeded() {
     return (dispatch, getState) => {
         let state = getState();
@@ -63,10 +78,10 @@ export function patchObject(id, patch, cb){
                 if (response.status === 200){
                     response.json()
                         .then((json) => dispatch(fetchObject(json.id)))
-                        .then(cb(null));
+                        .then(cb());
                 } else {
                     response.json()
-                        .then((json) => cb(json));
+                        .then((json) => dispatch(receiveEditErrors(json)));
                 }
             })
             .catch((ex) => console.error('Feature-list parsing failed', ex));
@@ -83,10 +98,10 @@ export function postObject(post, cb){
                 if (response.status === 201){
                     response.json()
                         .then((json) => dispatch(receiveObject(json)))
-                        .then(cb(null));
+                        .then(cb());
                 } else {
                     response.json()
-                        .then((json) => cb(json));
+                        .then((json) => dispatch(receiveEditErrors(json)));
                 }
             })
             .catch((ex) => console.error('Feature-list parsing failed', ex));
@@ -109,5 +124,27 @@ export function deleteObject(id, cb){
                 }
             })
             .catch((ex) => console.error('Feature-list parsing failed', ex));
+    };
+}
+
+export function initializeEditForm(id=null){
+
+    return (dispatch, getState) => {
+        let state = getState(),
+            object;
+        if (id){
+            object = _.findWhere(state.feature_list.items, {id});
+            object = _.extend({}, object);  // shallow-copy
+        } else {
+            object = {
+                id: undefined,
+                name: '',
+                description: '',
+                public: false,
+                stranded: true,
+                text: '',
+            };
+        }
+        dispatch(setEdititableObject(object));
     };
 }

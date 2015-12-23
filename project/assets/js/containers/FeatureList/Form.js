@@ -9,7 +9,7 @@ import h from '../../utils/helpers';
 
 import urls from '../../constants/urls';
 
-import { postObject, patchObject } from '../../actions/FeatureList';
+import { postObject, patchObject, initializeEditForm } from '../../actions/FeatureList';
 
 import FLForm from '../../components/FeatureList/Form';
 import Loading from '../../components/Loading';
@@ -17,50 +17,43 @@ import Loading from '../../components/Loading';
 
 class FeatureListFormContainer extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = this.getObjectState(props);
+    componentWillMount() {
+        let id = this.getID();
+        this.props.dispatch(initializeEditForm(id));
     }
 
-    componentWillReceiveProps(props) {
-        this.setState(this.getObjectState(props));
+    getID() {
+        return parseInt(this.props.params.id);
     }
 
-    getObjectState(props){
-        let id = parseInt(props.params.id) || undefined;
-        let object = _.findWhere(props.objects.items, {id});
-        return {id, object};
+    getObject() {
+        let id = this.getID();
+        if (id) return _.findWhere(this.props.model.items, {id});
+        return null;
     }
 
     handleSubmit(newObj){
         const { dispatch } = this.props;
-        const self = this;
-        let cb = function(errors){
-            if (errors){
-                self.setState({errors: errors});
-            } else {
-                dispatch(pushState(null, urls.feature_list.url));
-            }
-        };
-        if (_.isUndefined(this.state.id)){
-            dispatch(postObject(newObj, cb));
+        let id = this.getID(),
+            cb = () => dispatch(pushState(null, urls.feature_list.url));
+        if (id){
+            let patch = h.getPatch(this.getObject(), newObj);
+            dispatch(patchObject(id, patch, cb));
         } else {
-            let patch = h.getPatch(this.state.object, newObj);
-            dispatch(patchObject(this.state.id, patch, cb));
+            dispatch(postObject(newObj, cb));
         }
     }
 
     render() {
-        let id = this.state.id;
-        let object = this.state.object;
+        let id = this.getID(),
+            model = this.props.model;
 
-        if (id && !object) return <Loading />;
+        if (id && !model.editObject.id || !model.itemsLoaded) return <Loading />;
 
         return (
             <FLForm
-                errors={this.state.errors}
-                id={id}
-                object={object}
+                object={model.editObject}
+                errors={model.editObjectErrors}
                 handleSubmit={this.handleSubmit.bind(this)}
             />
         );
@@ -69,7 +62,7 @@ class FeatureListFormContainer extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        objects: state.feature_list,
+        model: state.feature_list,
     };
 }
 function mapDispatchToProps(dispatch) {
