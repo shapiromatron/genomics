@@ -24,7 +24,12 @@ class FeatureListObject extends React.Component {
     }
 
     renderDetailRow(header, content){
-        return <tr><th>{header}</th><td>{content}</td></tr>;
+        return (
+            <tr>
+                <th style={{width:'15%'}}>{header}</th>
+                <td style={{width:'85%'}}>{content}</td>
+            </tr>
+        );
     }
 
     render() {
@@ -52,9 +57,7 @@ class FeatureListObject extends React.Component {
 
                 </h2>
 
-                <table className='table table-condensed'>
-                    <col style={{width: '15%'}} />
-                    <col style={{width: '85%'}} />
+                <table className='table table-condensed' style={{tableLayout: 'fixed'}}>
                     <tbody>
                         {this.renderDetailRow('Description', object.description)}
                         {this.renderDetailRow('Public', h.booleanCheckbox(object.public))}
