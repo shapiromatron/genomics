@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import FL from '../../components/FeatureList/List.js';
 
 
-class FeatureListList extends React.Component {
+class List extends React.Component {
     render() {
         return <FL objects={this.props.objects}/>;
     }
@@ -17,4 +17,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(FeatureListList);
+export default connect(mapStateToProps)(List);

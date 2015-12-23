@@ -14,10 +14,11 @@ import { devMiddleware, renderDevTools } from './utils/devTools';
 import Dashboard from './containers/Dashboard';
 import UserDatasetApp from './containers/UserDatasetApp';
 
-import FeatureListApp from './containers/FeatureList/App';
-import FLForm from './containers/FeatureList/Form';
-import FLList from './containers/FeatureList/List';
-import FLObject from './containers/FeatureList/Object';
+
+import FLApp from    './containers/FeatureList/App';
+import FLForm from   './containers/FeatureList/Form';
+import FLList from   './containers/FeatureList/List';
+import FLDetail from './containers/FeatureList/Detail';
 import FLDelete from './containers/FeatureList/Delete';
 
 import SortVectorApp from './containers/SortVectorApp';
@@ -47,10 +48,10 @@ class Root extends React.Component {
                     <ReduxRouter>
                         <Route path={urls.dashboard.url} component={Dashboard}></Route>
                         <Route path={urls.user_dataset.url} component={UserDatasetApp}></Route>
-                        <Route path={urls.feature_list.url} component={FeatureListApp}>
+                        <Route path={urls.feature_list.url} component={FLApp}>
                             <IndexRoute component={FLList} />
                             <Route path="create/" component={FLForm} />
-                            <Route path=":id/" component={FLObject} />
+                            <Route path=":id/" component={FLDetail} />
                             <Route path=":id/update/" component={FLForm} />
                             <Route path=":id/delete/" component={FLDelete} />
                         </Route>

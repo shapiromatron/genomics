@@ -15,7 +15,7 @@ import FLForm from '../../components/FeatureList/Form';
 import Loading from '../../components/Loading';
 
 
-class FeatureListFormContainer extends React.Component {
+class Form extends React.Component {
 
     componentWillMount() {
         let id = this.getID();
@@ -85,4 +85,4 @@ function mapDispatchToProps(dispatch) {
         pushState: bindActionCreators(pushState, dispatch),
     };
 }
-export default connect(mapStateToProps, mapDispatchToProps)(FeatureListFormContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(Form);

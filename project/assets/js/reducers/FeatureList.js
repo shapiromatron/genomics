@@ -15,19 +15,19 @@ export default function (state=defaultState, action) {
     let index, items;
     switch (action.type) {
 
-    case types.FEATURE_LIST.REQUEST:
+    case types.FL_REQUEST:
         return Object.assign({}, state, {
             isFetching: true,
         });
 
-    case types.FEATURE_LIST.RECEIVE_OBJECTS:
+    case types.FL_RECEIVE_OBJECTS:
         return Object.assign({}, state, {
             items: action.items,
             isFetching: false,
             itemsLoaded: true,
         });
 
-    case types.FEATURE_LIST.RECIEVE_OBJECT:
+    case types.FL_RECIEVE_OBJECT:
         index = state.items.indexOf(
             _.findWhere(state.items, {id: action.item.id})
         );
@@ -48,7 +48,7 @@ export default function (state=defaultState, action) {
             items,
         });
 
-    case types.FEATURE_LIST.DELETE_OBJECT:
+    case types.FL_DELETE_OBJECT:
         index = state.items.indexOf(
             _.findWhere(state.items, {id: action.id})
         );
@@ -64,19 +64,19 @@ export default function (state=defaultState, action) {
             items,
         });
 
-    case types.FEATURE_LIST.RESET_EDIT_OBJECT:
+    case types.FL_RESET_EDIT_OBJECT:
         return Object.assign({}, state, {
             editObject: null,
             editObjectErrors: {},
         });
 
-    case types.FEATURE_LIST.CREATE_EDIT_OBJECT:
+    case types.FL_CREATE_EDIT_OBJECT:
         return Object.assign({}, state, {
             editObject: action.object,
             editObjectErrors: {},
         });
 
-    case types.FEATURE_LIST.RECEIVE_EDIT_ERRORS:
+    case types.FL_RECEIVE_EDIT_ERRORS:
         return Object.assign({}, state, {
             editObjectErrors: action.errors,
         });

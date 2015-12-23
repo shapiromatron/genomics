@@ -5,27 +5,27 @@ import h from '../utils/helpers';
 
 function requestContent() {
     return {
-        type: types.FEATURE_LIST.REQUEST,
+        type: types.FL_REQUEST,
     };
 }
 
 function receiveObjects(json) {
     return {
-        type: types.FEATURE_LIST.RECEIVE_OBJECTS,
+        type: types.FL_RECEIVE_OBJECTS,
         items: json,
     };
 }
 
 function receiveObject(item){
     return {
-        type: types.FEATURE_LIST.RECIEVE_OBJECT,
+        type: types.FL_RECIEVE_OBJECT,
         item,
     };
 }
 
 function removeObject(id){
     return {
-        type: types.FEATURE_LIST.DELETE_OBJECT,
+        type: types.FL_DELETE_OBJECT,
         id,
     };
 }
@@ -44,25 +44,23 @@ function fetchObject(id){
 
 function setEdititableObject(object){
     return {
-        type: types.FEATURE_LIST.CREATE_EDIT_OBJECT,
+        type: types.FL_CREATE_EDIT_OBJECT,
         object,
     };
 }
 
 function receiveEditErrors(errors){
     return {
-        type: types.FEATURE_LIST.RECEIVE_EDIT_ERRORS,
+        type: types.FL_RECEIVE_EDIT_ERRORS,
         errors,
     };
 }
 
-
 function resetEditObject(){
     return {
-        type: types.FEATURE_LIST.RESET_EDIT_OBJECT,
+        type: types.FL_RESET_EDIT_OBJECT,
     };
 }
-
 
 export function fetchObjectsIfNeeded() {
     return (dispatch, getState) => {

@@ -8,7 +8,7 @@ import Loading from '../../components/Loading';
 import FL from '../../components/FeatureList/Object.js';
 
 
-class FeatureListObject extends React.Component {
+class Detail extends React.Component {
 
     getObject(){
         return _.findWhere(
@@ -33,4 +33,4 @@ function mapStateToProps(state) {
         objects: state.feature_list,
     };
 }
-export default connect(mapStateToProps)(FeatureListObject);
+export default connect(mapStateToProps)(Detail);

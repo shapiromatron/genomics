@@ -14,7 +14,7 @@ import urls from '../../constants/urls';
 import FL from '../../components/FeatureList/Object.js';
 
 
-class FeatureListDelete extends React.Component {
+class Delete extends React.Component {
 
     getObject(){
         return _.findWhere(
@@ -57,4 +57,4 @@ function mapDispatchToProps(dispatch) {
         pushState: bindActionCreators(pushState, dispatch),
     };
 }
-export default connect(mapStateToProps, mapDispatchToProps)(FeatureListDelete);
+export default connect(mapStateToProps, mapDispatchToProps)(Delete);

@@ -8,7 +8,7 @@ import { fetchObjectsIfNeeded } from '../../actions/FeatureList';
 
 
 @connect((state) => (state))
-class FeatureListApp extends React.Component {
+class App extends React.Component {
 
     componentWillMount() {
         this.props.dispatch(fetchObjectsIfNeeded());
@@ -19,4 +19,4 @@ class FeatureListApp extends React.Component {
     }
 }
 
-export default FeatureListApp;
+export default App;
