@@ -24,7 +24,7 @@ import SortVectorApp from './containers/SortVectorApp';
 import AnalysisApp from './containers/AnalysisApp';
 import reducer from './reducers';
 import urls from './constants/urls';
-import { loadApi } from './actions/urls';
+import { loadConfig } from './actions/Config';
 
 
 const middleware = [ thunk ];
@@ -37,7 +37,7 @@ const store = compose(
 class Root extends React.Component {
 
     componentWillMount() {
-        store.dispatch(loadApi());
+        store.dispatch(loadConfig());
     }
 
     render() {

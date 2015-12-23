@@ -1,11 +1,13 @@
 import * as types from '../constants/ActionTypes';
 
 
-export default function (state = {}, action) {
+const defaultState = {};
+
+export default function (state=defaultState, action) {
     switch (action.type) {
-    case types.LOAD_URLS:
+    case types.CONFIG.LOAD:
         let data = JSON.parse(document.getElementById('config').textContent);
-        data.csrf= data.csrf.match(/value='([\w]+)'/)[1];
+        data.csrf = data.csrf.match(/value='([\w]+)'/)[1];
         return data;
     default:
         return state;

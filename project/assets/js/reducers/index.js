@@ -1,13 +1,13 @@
 import { combineReducers } from 'redux';
 import { routerStateReducer } from 'redux-router';
 
-import urls from './urls';
+import config from './config';
 import feature_list from './FeatureList';
 
 
 const reducer = combineReducers({
     router: routerStateReducer,
-    urls,
+    config,
     feature_list,
 });
 

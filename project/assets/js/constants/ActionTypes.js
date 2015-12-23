@@ -1,4 +1,6 @@
-export const LOAD_URLS = 'LOAD_URLS';
+export const CONFIG = {
+    LOAD: 'LOAD',
+};
 
 export const REQUEST_FEATURE_LISTS = 'REQUEST_FEATURE_LISTS';
 export const RECEIVE_FEATURE_LISTS = 'RECEIVE_FEATURE_LISTS';
