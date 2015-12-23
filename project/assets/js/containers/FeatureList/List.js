@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import FL from '../../components/FeatureList/List.js';
+import FL from '../../components/FeatureList/List';
 
 
 class List extends React.Component {

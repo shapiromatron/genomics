@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import Loading from '../../components/Loading';
 
-import FL from '../../components/FeatureList/Object.js';
+import FL from '../../components/FeatureList/Object';
 
 
 class Detail extends React.Component {

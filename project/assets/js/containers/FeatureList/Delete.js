@@ -11,7 +11,7 @@ import { deleteObject } from '../../actions/FeatureList';
 
 import urls from '../../constants/urls';
 
-import FL from '../../components/FeatureList/Object.js';
+import FL from '../../components/FeatureList/Object';
 
 
 class Delete extends React.Component {
