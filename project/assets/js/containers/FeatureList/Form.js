@@ -7,7 +7,9 @@ import { bindActionCreators } from 'redux';
 
 import h from '../../utils/helpers';
 
-import { postFeatureList, patchFeatureList } from '../../actions/FeatureList';
+import urls from '../../constants/urls';
+
+import { postObject, patchObject } from '../../actions/FeatureList';
 
 import FLForm from '../../components/FeatureList/Form';
 import Loading from '../../components/Loading';
@@ -37,14 +39,14 @@ class FeatureListFormContainer extends React.Component {
             if (errors){
                 self.setState({errors: errors});
             } else {
-                dispatch(pushState(null, '/dashboard/feature-lists/'));
+                dispatch(pushState(null, urls.feature_list.url));
             }
         };
         if (_.isUndefined(this.state.id)){
-            dispatch(postFeatureList(newObj, cb));
+            dispatch(postObject(newObj, cb));
         } else {
             let patch = h.getPatch(this.state.object, newObj);
-            dispatch(patchFeatureList(this.state.id, patch, cb));
+            dispatch(patchObject(this.state.id, patch, cb));
         }
     }
 

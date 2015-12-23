@@ -2,26 +2,30 @@ import _ from 'underscore';
 import * as types from '../constants/ActionTypes';
 
 
-export default function (state = {
+let defaultState = {
     isFetching: false,
-    didInvalidate: false,
     items: [],
-}, action) {
+    // dirtyObject: {},
+    // dirtyObjectValidiation: {},
+};
+
+
+export default function (state=defaultState, action) {
     let index, items;
     switch (action.type) {
 
-    case types.REQUEST_FEATURE_LISTS:
+    case types.FEATURE_LIST.REQUEST:
         return Object.assign({}, state, {
             isFetching: true,
         });
 
-    case types.RECEIVE_FEATURE_LISTS:
+    case types.FEATURE_LIST.RECEIVE_OBJECTS:
         return Object.assign({}, state, {
             items: action.items,
             isFetching: false,
         });
 
-    case types.RECEIVE_FEATURE_LIST:
+    case types.FEATURE_LIST.RECIEVE_OBJECT:
         index = state.items.indexOf(
             _.findWhere(state.items, {id: action.item.id})
         );
@@ -42,7 +46,7 @@ export default function (state = {
             items,
         });
 
-    case types.DELETE_FEATURE_LIST:
+    case types.FEATURE_LIST.DELETE_OBJECT:
         index = state.items.indexOf(
             _.findWhere(state.items, {id: action.id})
         );

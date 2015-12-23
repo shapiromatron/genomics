@@ -2,14 +2,14 @@ import _ from 'underscore';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { fetchFeatureListsIfNeeded } from '../../actions/FeatureList';
+import { fetchObjectsIfNeeded } from '../../actions/FeatureList';
 
 
 @connect((state) => (state))
 class FeatureListApp extends React.Component {
 
     componentWillMount() {
-        this.props.dispatch(fetchFeatureListsIfNeeded());
+        this.props.dispatch(fetchObjectsIfNeeded());
     }
 
     render() {

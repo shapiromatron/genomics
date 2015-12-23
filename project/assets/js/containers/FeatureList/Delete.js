@@ -7,7 +7,9 @@ import { bindActionCreators } from 'redux';
 
 import Loading from '../../components/Loading';
 
-import { deleteFeatureList } from '../../actions/FeatureList';
+import { deleteObject } from '../../actions/FeatureList';
+
+import urls from '../../constants/urls';
 
 import FL from '../../components/FeatureList/Object.js';
 
@@ -25,8 +27,10 @@ class FeatureListDelete extends React.Component {
         const { dispatch } = this.props;
         e.preventDefault();
         dispatch(
-            deleteFeatureList(this.getObject().id,
-            () => dispatch(pushState(null, '/dashboard/feature-lists/')))
+            deleteObject(
+                this.getObject().id,
+                () => dispatch(pushState(null, urls.feature_list.url))
+            )
         );
     }
 
