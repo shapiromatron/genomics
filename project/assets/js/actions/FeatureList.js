@@ -56,6 +56,14 @@ function receiveEditErrors(errors){
     };
 }
 
+
+function resetEditObject(){
+    return {
+        type: types.FEATURE_LIST.RESET_EDIT_OBJECT,
+    };
+}
+
+
 export function fetchObjectsIfNeeded() {
     return (dispatch, getState) => {
         let state = getState();
@@ -78,7 +86,8 @@ export function patchObject(id, patch, cb){
                 if (response.status === 200){
                     response.json()
                         .then((json) => dispatch(fetchObject(json.id)))
-                        .then(cb());
+                        .then(cb())
+                        .then(() => dispatch(resetEditObject()));
                 } else {
                     response.json()
                         .then((json) => dispatch(receiveEditErrors(json)));
@@ -98,7 +107,8 @@ export function postObject(post, cb){
                 if (response.status === 201){
                     response.json()
                         .then((json) => dispatch(receiveObject(json)))
-                        .then(cb());
+                        .then(cb())
+                        .then(() => dispatch(resetEditObject()));
                 } else {
                     response.json()
                         .then((json) => dispatch(receiveEditErrors(json)));

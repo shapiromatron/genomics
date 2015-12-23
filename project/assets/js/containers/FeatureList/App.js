@@ -15,7 +15,6 @@ class FeatureListApp extends React.Component {
     }
 
     render() {
-        // if(this.props.feature_list.isFetching) return <Loading />;
         return <div>{this.props.children}</div>;
     }
 }

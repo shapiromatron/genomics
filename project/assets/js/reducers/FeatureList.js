@@ -6,7 +6,7 @@ let defaultState = {
     itemsLoaded: false,
     isFetching: false,
     items: [],
-    editObject: {},  //todo change to null
+    editObject: null,
     editObjectErrors: null,
 };
 
@@ -62,6 +62,12 @@ export default function (state=defaultState, action) {
         return Object.assign({}, state, {
             isFetching: false,
             items,
+        });
+
+    case types.FEATURE_LIST.RESET_EDIT_OBJECT:
+        return Object.assign({}, state, {
+            editObject: null,
+            editObjectErrors: {},
         });
 
     case types.FEATURE_LIST.CREATE_EDIT_OBJECT:

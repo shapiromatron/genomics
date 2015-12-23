@@ -23,7 +23,7 @@ class FeatureListFormContainer extends React.Component {
     }
 
     getID() {
-        return parseInt(this.props.params.id);
+        return parseInt(this.props.params.id) || null;
     }
 
     getObject() {
@@ -44,11 +44,25 @@ class FeatureListFormContainer extends React.Component {
         }
     }
 
-    render() {
+    isReadyToRender(){
         let id = this.getID(),
             model = this.props.model;
 
-        if (id && !model.editObject.id || !model.itemsLoaded) return <Loading />;
+        if (id && model.editObject === null ||
+            id && model.editObject && id !== model.editObject.id)
+            return false;
+
+        if (id === null && model.editObject === null ||
+            id === null && model.editObject && model.editObject.id !== undefined)
+            return false;
+
+        return (model.itemsLoaded && model.editObject !== null);
+    }
+
+    render() {
+        let model = this.props.model;
+
+        if (!this.isReadyToRender()) return <Loading />;
 
         return (
             <FLForm
