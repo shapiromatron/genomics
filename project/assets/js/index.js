@@ -18,6 +18,7 @@ import FeatureListApp from './containers/FeatureListApp';
 import FLForm from './containers/FeatureListForm';
 import FLList from './containers/FeatureListList';
 import FLObject from './containers/FeatureListObject';
+import FLDelete from './containers/FeatureListDelete';
 
 import SortVectorApp from './containers/SortVectorApp';
 import AnalysisApp from './containers/AnalysisApp';
@@ -38,6 +39,7 @@ class Root extends React.Component {
     componentWillMount() {
         store.dispatch(loadApi());
     }
+
     render() {
         return (
             <div>
@@ -50,7 +52,7 @@ class Root extends React.Component {
                             <Route path="create/" component={FLForm} />
                             <Route path=":id/" component={FLObject} />
                             <Route path=":id/update/" component={FLForm} />
-                            <Route path=":id/delete/" component={FLObject} />
+                            <Route path=":id/delete/" component={FLDelete} />
                         </Route>
                         <Route path={urls.sort_vector.url} component={SortVectorApp}></Route>
                         <Route path={urls.analysis.url} component={AnalysisApp}></Route>
