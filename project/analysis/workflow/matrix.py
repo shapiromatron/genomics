@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
+import click
 import os
-import argparse
-import sys
 from subprocess import call
 
 
@@ -17,20 +16,26 @@ class BedMatrix(object):
 
     def __init__(self, *args,
                  anchor='center', bin_start=-2500, bin_number=50,
-                 bin_size=100, stranded_bigwigs=False,
-                 stranded_bed=False, opposite_strand_fn=None):
+                 bin_size=100, opposite_strand_fn=None):
+
+        if len(args) == 3:
+            self.stranded_bigwigs = False
+            self.stranded_bed = False
+        elif len(args) == 4:
+            self.stranded_bigwigs = True
+            self.stranded_bed = True
+        else:
+            raise ValueError("Unknown argument number")
 
         # Type checks
         assert anchor in self.ANCHOR_OPTIONS
         assert isinstance(bin_start, int)
         assert isinstance(bin_number, int)
         assert isinstance(bin_size, int)
-        assert isinstance(stranded_bigwigs, bool)
-        assert isinstance(stranded_bed, bool)
         if opposite_strand_fn is not None:
             assert isinstance(opposite_strand_fn, str)
             assert os.path.exists(os.path.dirname(opposite_strand_fn))
-            if not stranded_bed:
+            if not self.stranded_bed:
                 raise ValueError("Cannot report opposite strand coverage without stranded_bed flag!!")
 
         plus_bigwig = None
@@ -39,12 +44,12 @@ class BedMatrix(object):
         feature_bed = None
         output_matrix = None
 
-        if stranded_bigwigs:
+        if self.stranded_bigwigs:
             plus_bigwig, minus_bigwig, feature_bed, output_matrix = args
             assert os.path.exists(plus_bigwig)
             assert os.path.exists(minus_bigwig)
         else:
-            unstraneded_bigwig, feature_bed, output_matrix = args
+            unstranded_bigwig, feature_bed, output_matrix = args
             assert os.path.exists(unstranded_bigwig)
 
         assert os.path.exists(feature_bed)
@@ -55,8 +60,6 @@ class BedMatrix(object):
         self.bin_start = bin_start
         self.bin_number = bin_number
         self.bin_size = bin_size
-        self.stranded_bigwigs = stranded_bigwigs
-        self.stranded_bed = stranded_bed
         self.opposite_strand_fn = opposite_strand_fn
         self.plus_bigwig = plus_bigwig
         self.minus_bigwig = minus_bigwig
@@ -346,36 +349,44 @@ class BedMatrix(object):
                 OPPOSITE.write("\n")
 
 
+@click.group()
+def cli():
+    """
+    Generate matrices for stranded or unstranded bigWig matrices
+    """
+
+
+@cli.command('unstranded')
+@click.argument('unstranded_bigwig')
+@click.argument('feature_bed')
+@click.argument('output_matrix')
+@click.option('-a', '--anchor', default='center', help='Bin anchor', type=click.Choice(BedMatrix.ANCHOR_OPTIONS))
+@click.option('-b', '--bin_start', default=-2500, help='Relative bin start', type=int)
+@click.option('-n', '--bin_number', default=50, help='Number of bins', type=int)
+@click.option('-s', '--bin_size', default=100, help='Size of bins', type=int)
+def unstranded(unstranded_bigwig, feature_bed, output_matrix, **kwargs):
+    """
+    Run with unstranded matrix
+    """
+    BedMatrix(unstranded_bigwig, feature_bed, output_matrix, **kwargs)
+
+
+@cli.command('stranded')
+@click.argument('plus_bigwig')
+@click.argument('minus_bigwig')
+@click.argument('feature_bed')
+@click.argument('output_matrix')
+@click.option('-a', '--anchor', default='center', help='Bin anchor', type=click.Choice(BedMatrix.ANCHOR_OPTIONS))
+@click.option('-b', '--bin_start', default=-2500, help='Relative bin start', type=int)
+@click.option('-n', '--bin_number', default=50, help='Number of bins', type=int)
+@click.option('-s', '--bin_size', default=100, help='Size of bins', type=int)
+@click.option('--opposite_strand_fn', type=str, help='Output filename for opposite strand coverage')
+def stranded(plus_bigwig, minus_bigwig, feature_bed, output_matrix, **kwargs):
+    """
+    Run with stranded matrix
+    """
+    BedMatrix(plus_bigwig, minus_bigwig, feature_bed, output_matrix, **kwargs)
+
+
 if __name__ == '__main__':
-
-    if len(sys.argv) == 1:
-        HELP_TEXT = [
-            'Usage: python matrix.py [Options] <bigWig> <Feature list bed> <Output file>',
-            'Usage: python matrix.py [Options] --stranded_bigwigs <Forward bigWig> <Reverse bigWig> <Feature list bed> <Output file>',
-            'Options:',
-            '    --anchor/-a <center/start/end>: Bin anchor (default: center)',
-            '    --bin_start/-b <int>:           Relative bin start (default: -2500)',
-            '    --bin_number/-n <int>:          Number of bins (default: 50)',
-            '    --bin_size/-s <int>:            Size of bins (default: 100)',
-            '    --stranded_bigwigs:             Expect stranded bigwigs (default: False)',
-            '    --stranded_bed:                 Expect stranded bed (default: False)',
-            '    --opposite_strand <file name>:  Report opposite strand coverage to file',
-        ]
-        print('\n'.join(HELP_TEXT))
-        sys.exit()
-
-    parser = argparse.ArgumentParser(prog="matrix.py")
-    parser.add_argument("-a", "--anchor", action="store", type=str, dest="anchor", default="center", help="--anchor/-a <center/start/end>:\tBin achor (default: center)")
-    parser.add_argument("-b", "--bin_start", action="store", type=int, dest="bin_start", default=-2500, help="bin_start/-b <int>:\t\tRelative bin start (default: -2500)")
-    parser.add_argument("-n", "--bin_number", action="store", type=int, dest="bin_number", default=50, help="--bin_number/-n <int>:\t\tNumber of bins (default: 50)")
-    parser.add_argument("-s", "--bin_size", action="store", type=int, dest="bin_size", default=100, help="--bin_size/-s <int>:\t\tSize of bins (default: 100)")
-    parser.add_argument("--stranded_bigwigs", action="store_true", dest="stranded_bigwigs", default=False, help="--stranded_bigwigs:\t\tExpect stranded, paired bigwigs (default: False)")
-    parser.add_argument("--stranded_bed", action="store_true", dest="stranded_bed", default=False, help="--stranded_bigwigs:\t\tExpect stranded bed (default: False)")
-    parser.add_argument("--opposite_strand", action="store", type=str, dest="opposite_strand_fn", default=None, help="--opposite_strand <file name>:\tReport opposite strand coverage to file")
-    parser.add_argument("args", nargs=argparse.REMAINDER)
-    opts = parser.parse_args()
-    matrix = BedMatrix(
-        *opts.args,
-        anchor=opts.anchor, bin_start=opts.bin_start, bin_number=opts.bin_number,
-        bin_size=opts.bin_size, stranded_bigwigs=opts.stranded_bigwigs,
-        stranded_bed=opts.stranded_bed, opposite_strand_fn=opts.opposite_strand_fn)
+    cli()
