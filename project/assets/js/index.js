@@ -31,7 +31,12 @@ import SVList from   './containers/SortVector/List';
 import SVDetail from './containers/SortVector/Detail';
 import SVDelete from './containers/SortVector/Delete';
 
-import AnalysisApp from './containers/AnalysisApp';
+import ANApp from    './containers/Analysis/App';
+import ANForm from   './containers/Analysis/Form';
+import ANList from   './containers/Analysis/List';
+import ANDetail from './containers/Analysis/Detail';
+import ANDelete from './containers/Analysis/Delete';
+
 import reducer from './reducers';
 import urls from './constants/urls';
 import { loadConfig } from './actions/Config';
@@ -77,7 +82,13 @@ class Root extends React.Component {
                             <Route path=":id/update/" component={SVForm} />
                             <Route path=":id/delete/" component={SVDelete} />
                         </Route>
-                        <Route path={urls.analysis.url} component={AnalysisApp}></Route>
+                        <Route path={urls.analysis.url} component={ANApp}>
+                            <IndexRoute component={ANList} />
+                            <Route path="create/" component={ANForm} />
+                            <Route path=":id/" component={ANDetail} />
+                            <Route path=":id/update/" component={ANForm} />
+                            <Route path=":id/delete/" component={ANDelete} />
+                        </Route>
                     </ReduxRouter>
                 </Provider>
                 {renderDevTools(store)}

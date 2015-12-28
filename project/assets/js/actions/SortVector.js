@@ -145,10 +145,10 @@ export function initializeEditForm(id=null){
             object = _.extend({}, object);  // shallow-copy
         } else {
             object = {
-                id: undefined,
+                id: null,
                 name: '',
                 description: '',
-                feature_list: undefined,
+                feature_list: null,
                 text: '',
             };
         }

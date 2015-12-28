@@ -53,7 +53,7 @@ class Form extends React.Component {
             return false;
 
         if (id === null && model.editObject === null ||
-            id === null && model.editObject && model.editObject.id !== undefined)
+            id === null && model.editObject && model.editObject.id !== null)
             return false;
 
         return (model.itemsLoaded && model.editObject !== null);

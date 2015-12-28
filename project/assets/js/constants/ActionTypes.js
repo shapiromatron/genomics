@@ -27,3 +27,12 @@ export const SV_DELETE_OBJECT =         'SV_DELETE_OBJECT';
 export const SV_RESET_EDIT_OBJECT =     'SV_RESET_EDIT_OBJECT';
 export const SV_CREATE_EDIT_OBJECT =    'SV_CREATE_EDIT_OBJECT';
 export const SV_RECEIVE_EDIT_ERRORS =   'SV_RECEIVE_EDIT_ERRORS';
+
+// analysis (AN)
+export const AN_REQUEST =               'AN_REQUEST';
+export const AN_RECEIVE_OBJECTS =       'AN_RECEIVE_OBJECTS';
+export const AN_RECIEVE_OBJECT =        'AN_RECIEVE_OBJECT';
+export const AN_DELETE_OBJECT =         'AN_DELETE_OBJECT';
+export const AN_RESET_EDIT_OBJECT =     'AN_RESET_EDIT_OBJECT';
+export const AN_CREATE_EDIT_OBJECT =    'AN_CREATE_EDIT_OBJECT';
+export const AN_RECEIVE_EDIT_ERRORS =   'AN_RECEIVE_EDIT_ERRORS';
