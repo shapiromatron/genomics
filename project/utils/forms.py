@@ -1,5 +1,3 @@
-from django import forms
-
 from crispy_forms import helper as cf
 from crispy_forms import layout as cfl
 from crispy_forms import bootstrap as cfb
@@ -26,7 +24,7 @@ class BaseFormHelper(cf.FormHelper):
         if self.kwargs.get('cancelURL'):
             btns.append(
                 cfl.HTML(
-                    """<a role="button" class="btn btn-default" href="{}">Cancel</a>"""
+                    '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
                     .format(self.kwargs.get('cancelURL'))))
         if len(btns) > 0:
             self.layout.append(cfb.FormActions(*btns, css_class="formActions"))

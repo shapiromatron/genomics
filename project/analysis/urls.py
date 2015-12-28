@@ -14,7 +14,7 @@ router.register('sort-vector', api.SortVectorViewset, base_name='sort-vector')
 urlpatterns = [
 
     url(r'^api/',
-        include(router.urls, namespace="api")),
+        include(router.urls, namespace='api')),
 
     url(r'^',
         views.Dashboard.as_view(),

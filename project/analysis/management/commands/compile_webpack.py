@@ -11,5 +11,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         base = settings.PROJECT_PATH
-        cmd = ["./node_modules/.bin/webpack", "--config", "webpack.prod-config.js"]
+        cmd = [
+            './node_modules/.bin/webpack',
+            '--config',
+            'webpack.prod-config.js'
+        ]
         subprocess.call(cmd, cwd=base)

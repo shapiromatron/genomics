@@ -44,8 +44,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = "a-wv-x8(e&z!3kry8zq2-apy(u8%6m7k2b80%h8wb57zmo&6v0"
+SECRET_KEY = 'a-wv-x8(e&z!3kry8zq2-apy(u8%6m7k2b80%h8wb57zmo&6v0'
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
@@ -100,8 +99,8 @@ AUTH_USER_MODEL = 'myuser.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_SSL = True
-EMAIL_SUBJECT_PREFIX = "[genomics] "
-DEFAULT_FROM_EMAIL = "webmaster@genomics.com"
+EMAIL_SUBJECT_PREFIX = '[genomics] '
+DEFAULT_FROM_EMAIL = 'webmaster@genomics.com'
 
 LOGGING = {
     'version': 1,

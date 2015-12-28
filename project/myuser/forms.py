@@ -10,7 +10,7 @@ from utils.forms import BaseFormHelper
 from . import models
 
 
-PASSWORD_HELP = "Must have at least 8 characters"
+PASSWORD_HELP = 'Must have at least 8 characters'
 
 
 def check_password(pw):
@@ -33,7 +33,7 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = models.User
-        fields = ("email", )
+        fields = ('email', )
 
     def __init__(self, *args, **kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
@@ -41,16 +41,18 @@ class RegistrationForm(forms.ModelForm):
 
     def setHelper(self):
         inputs = {
-            "legend_text": u"Create an account"
+            'legend_text': 'Create an account'
         }
 
         helper = BaseFormHelper(self, **inputs)
-        helper.form_class = "loginForm"
+        helper.form_class = 'loginForm'
 
         helper.layout.append(
             cfb.FormActions(
                 cfl.Submit('login', 'Create account'),
-                cfl.HTML("""<a role="button" class="btn btn-default" href="{}">Cancel</a>""".format(reverse('user:login'))),
+                cfl.HTML(
+                    '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
+                    .format(reverse('user:login'))),
             )
         )
 
@@ -59,12 +61,12 @@ class RegistrationForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if models.User.objects.filter(email__iexact=email).count() > 0:
-            raise forms.ValidationError("User with this email already exists.")
+            raise forms.ValidationError('User with this email already exists.')
         return email
 
     def clean(self):
-        password1 = self.cleaned_data.get("password1")
-        password2 = self.cleaned_data.get("password2")
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
         if password1 and password2 and password1 != password2:
             msg = "Passwords don't match"
             self.add_error('password2', msg)
@@ -91,7 +93,7 @@ class LoginForm(AuthenticationForm):
     def setHelper(self):
 
         inputs = {
-            "legend_text": u"Login",
+            'legend_text': 'Login',
         }
 
         helper = BaseFormHelper(self, **inputs)
@@ -99,10 +101,16 @@ class LoginForm(AuthenticationForm):
         helper.layout.append(
             cfb.FormActions(
                 cfl.Submit('login', 'Login'),
-                cfl.HTML("""<a role="button" class="btn btn-default" href="{}">Cancel</a>""".format(reverse('home'))),
-                cfl.HTML("""<br><br>"""),
-                cfl.HTML("""<a href="{0}">Forgot your password?</a><br>""".format(reverse('user:password_reset'))),
-                cfl.HTML("""<a href="{0}">Create an account</a><br>""".format(reverse('user:register')))
+                cfl.HTML(
+                    '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
+                    .format(reverse('home'))),
+                cfl.HTML('<br><br>'),
+                cfl.HTML(
+                    '<a href="{0}">Forgot your password?</a><br>'
+                    .format(reverse('user:password_reset'))),
+                cfl.HTML(
+                    '<a href="{0}">Create an account</a><br>'
+                    .format(reverse('user:register'))),
             )
         )
 
@@ -118,8 +126,8 @@ class ResetPasswordEmailForm(PasswordResetForm):
     def setHelper(self):
 
         inputs = {
-            "legend_text": u"Password reset",
-            "help_text": u"""
+            'legend_text': 'Password reset',
+            'help_text': """
                 Forgotten your password, or creating a new
                 account? Enter your email address below, and we'll email
                 instructions for setting a new password.
@@ -131,7 +139,9 @@ class ResetPasswordEmailForm(PasswordResetForm):
         helper.layout.append(
             cfb.FormActions(
                 cfl.Submit('login', 'Login'),
-                cfl.HTML("""<a role="button" class="btn btn-default" href="{}">Cancel</a>""".format(reverse('user:login'))),
+                cfl.HTML(
+                    '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
+                    .format(reverse('user:login'))),
             )
         )
 
@@ -152,15 +162,15 @@ class ResetPasswordForm(SetPasswordForm):
 
     def setHelper(self):
         inputs = {
-            "legend_text": u"Update your password",
-            "help_text": u"""
+            'legend_text': 'Update your password',
+            'help_text': u"""
                 Please enter your new password twice so we can verify you
                 typed it in correctly.
             """
         }
 
         helper = BaseFormHelper(self, **inputs)
-        helper.form_class = "loginForm"
+        helper.form_class = 'loginForm'
 
         helper.layout.append(
             cfb.FormActions(

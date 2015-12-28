@@ -12,7 +12,8 @@ class Command(BaseCommand):
     help = HELP_TEXT
 
     def add_arguments(self, parser):
-        parser.add_argument('session_id',
+        parser.add_argument(
+            'session_id',
             help='Cookie for session of interest')
 
     def handle(self, *args, **options):
@@ -25,7 +26,7 @@ class Command(BaseCommand):
             Model = get_user_model()
             user = Model.objects.get(pk=session.get('_auth_user_id'))
             self.stdout.write(
-                "Session Found!\nFull name: {}\nEmail: {}\nID: {}".format(
+                'Session Found!\nFull name: {}\nEmail: {}\nID: {}'.format(
                     user.get_full_name(), user.email, user.id))
         else:
             self.stdout.write('Session not found; used session-id "{}"'.format(session_id))

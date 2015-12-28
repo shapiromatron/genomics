@@ -27,7 +27,7 @@ logger = get_task_logger(__name__)
 
 @periodic_task(
     run_every=(crontab(minute='*/1')),
-    name="debug_periodic_task",
+    name='debug_periodic_task',
     ignore_result=True)
 def debug_periodic_task():
     logger.info('Running periodic task..')

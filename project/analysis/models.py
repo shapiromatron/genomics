@@ -8,11 +8,11 @@ class Dataset(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
-        related_name="%(class)s",)
+        related_name='%(class)s',)
     borrowers = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         blank=True,
-        related_name="%(class)s_borrowers",
+        related_name='%(class)s_borrowers',
     )
     name = models.CharField(
         max_length=128)
@@ -161,10 +161,10 @@ class Analysis(models.Model):
 class FeatureListCountMatrix(models.Model):
     feature_list = models.ForeignKey(
         FeatureList,
-        related_name="intermediates")
+        related_name='intermediates')
     dataset = models.ForeignKey(
         GenomicDataset,
-        related_name="intermediates")
+        related_name='intermediates')
     matrix = models.FileField(
         max_length=256)
     created = models.DateTimeField(
