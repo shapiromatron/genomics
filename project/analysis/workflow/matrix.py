@@ -125,8 +125,8 @@ class BedMatrix(object):
         Open bed file, create a bed of bins.
         Return a dictionary with feature information.
         """
-        self.feature_bed = input_file
-        self.temp_bed_fn = output_file
+        input_file = self.feature_bed
+        output_file = self.temp_bed_fn
         feature_dict = {}
         with open(input_file, 'r') as f, \
                 open(output_file, "w") as OUTPUT:
