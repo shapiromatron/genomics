@@ -133,7 +133,7 @@ class Analysis(models.Model):
         GenomicDataset,
         through=AnalysisDatasets,
         through_fields=('analysis', 'dataset'))
-    features = models.ForeignKey(
+    feature_list = models.ForeignKey(
         FeatureList)
     sort_vector = models.ForeignKey(
         SortVector,
