@@ -25,7 +25,12 @@ import FLList from   './containers/FeatureList/List';
 import FLDetail from './containers/FeatureList/Detail';
 import FLDelete from './containers/FeatureList/Delete';
 
-import SortVectorApp from './containers/SortVectorApp';
+import SVApp from    './containers/SortVector/App';
+import SVForm from   './containers/SortVector/Form';
+import SVList from   './containers/SortVector/List';
+import SVDetail from './containers/SortVector/Detail';
+import SVDelete from './containers/SortVector/Delete';
+
 import AnalysisApp from './containers/AnalysisApp';
 import reducer from './reducers';
 import urls from './constants/urls';
@@ -65,7 +70,13 @@ class Root extends React.Component {
                             <Route path=":id/update/" component={FLForm} />
                             <Route path=":id/delete/" component={FLDelete} />
                         </Route>
-                        <Route path={urls.sort_vector.url} component={SortVectorApp}></Route>
+                        <Route path={urls.sort_vector.url} component={SVApp}>
+                            <IndexRoute component={SVList} />
+                            <Route path="create/" component={SVForm} />
+                            <Route path=":id/" component={SVDetail} />
+                            <Route path=":id/update/" component={SVForm} />
+                            <Route path=":id/delete/" component={SVDelete} />
+                        </Route>
                         <Route path={urls.analysis.url} component={AnalysisApp}></Route>
                     </ReduxRouter>
                 </Provider>

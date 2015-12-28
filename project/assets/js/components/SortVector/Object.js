@@ -4,12 +4,10 @@ import { Link } from 'react-router';
 import BreadcrumbBar from '../BreadcrumbBar';
 import urls from '../../constants/urls';
 
-import SVList from '../SortVector/List';
-
 import h from '../../utils/helpers';
 
 
-class Object_ extends React.Component {
+class _Object extends React.Component {
 
     renderDeleteConfirmation() {
         if (!this.props.isDelete) return null;
@@ -36,11 +34,11 @@ class Object_ extends React.Component {
 
     render() {
         let object = this.props.object;
-        const url = h.getObjectURL(urls.feature_list.url, object.id);
+        const url = h.getObjectURL(urls.sort_vector.url, object.id);
         return (
             <div>
                 <BreadcrumbBar
-                    paths={[urls.dashboard, urls.feature_list]}
+                    paths={[urls.dashboard, urls.sort_vector]}
                     current={object.name} />
 
                 <h2>
@@ -64,24 +62,15 @@ class Object_ extends React.Component {
                         {this.renderDetailRow('Description', object.description)}
                         {this.renderDetailRow('Public', h.booleanCheckbox(object.public))}
                         {this.renderDetailRow('Validated', h.booleanCheckbox(object.validated))}
-                        {this.renderDetailRow('Stranded', h.booleanCheckbox(object.stranded))}
+                        {this.renderDetailRow('Content', object.text)}
                         {this.renderDetailRow('Date created', h.datetimeFormat(object.created))}
                         {this.renderDetailRow('Date updated', h.datetimeFormat(object.last_updated))}
                     </tbody>
                 </table>
-
                 {this.renderDeleteConfirmation()}
-
-                <h3>Content</h3>
-                <pre style={{'maxHeight': '300px'}} >
-                    {object.text}
-                </pre>
-                <SVList
-                    parent_id={object.id}
-                    objects={this.props.sort_vectors}/>
             </div>
         );
     }
 }
 
-export default Object_;
+export default _Object;

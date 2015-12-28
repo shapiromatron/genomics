@@ -6,7 +6,7 @@ import urls from '../../constants/urls';
 import h from '../../utils/helpers';
 
 
-class FeatureListForm extends React.Component {
+class Form extends React.Component {
 
     constructor(props) {
         super(props);
@@ -132,4 +132,4 @@ class FeatureListForm extends React.Component {
     }
 }
 
-export default FeatureListForm;
+export default Form;

@@ -8,7 +8,7 @@ import BreadcrumbBar from '../BreadcrumbBar';
 import h from '../../utils/helpers';
 
 
-class FeatureListList extends React.Component {
+class List extends React.Component {
 
     renderObjectsTable() {
         return (
@@ -65,4 +65,4 @@ class FeatureListList extends React.Component {
     }
 }
 
-export default FeatureListList;
+export default List;

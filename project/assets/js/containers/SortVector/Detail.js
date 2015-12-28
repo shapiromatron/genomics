@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import Loading from '../../components/Loading';
 
-import FL from '../../components/FeatureList/Object';
+import SV from '../../components/SortVector/Object';
 
 
 class Detail extends React.Component {
@@ -21,8 +21,7 @@ class Detail extends React.Component {
         let object = this.getObject();
         if (_.isUndefined(object)) return <Loading />;
         return (
-            <FL object={object}
-                sort_vectors={this.props.sort_vector}
+            <SV object={object}
                 isDelete={false}
                 handleDeleteForm={null} />
         );
@@ -31,8 +30,7 @@ class Detail extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        objects: state.feature_list,
-        sort_vector: state.sort_vector,
+        objects: state.sort_vector,
     };
 }
 export default connect(mapStateToProps)(Detail);

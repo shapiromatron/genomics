@@ -18,3 +18,12 @@ export const UD_DELETE_OBJECT =         'UD_DELETE_OBJECT';
 export const UD_RESET_EDIT_OBJECT =     'UD_RESET_EDIT_OBJECT';
 export const UD_CREATE_EDIT_OBJECT =    'UD_CREATE_EDIT_OBJECT';
 export const UD_RECEIVE_EDIT_ERRORS =   'UD_RECEIVE_EDIT_ERRORS';
+
+// sort-vector (SV)
+export const SV_REQUEST =               'SV_REQUEST';
+export const SV_RECEIVE_OBJECTS =       'SV_RECEIVE_OBJECTS';
+export const SV_RECIEVE_OBJECT =        'SV_RECIEVE_OBJECT';
+export const SV_DELETE_OBJECT =         'SV_DELETE_OBJECT';
+export const SV_RESET_EDIT_OBJECT =     'SV_RESET_EDIT_OBJECT';
+export const SV_CREATE_EDIT_OBJECT =    'SV_CREATE_EDIT_OBJECT';
+export const SV_RECEIVE_EDIT_ERRORS =   'SV_RECEIVE_EDIT_ERRORS';

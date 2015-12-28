@@ -9,6 +9,7 @@ import BreadcrumbBar from '../components/BreadcrumbBar';
 
 @connect((state) => ({}))
 class Dashboard extends React.Component {
+    /* TODO: manage-data page should do all the fetchIfNeeded options */
 
     renderDashboard(){
         return (
@@ -26,8 +27,6 @@ class Dashboard extends React.Component {
                 <ul className="nav nav-pills">
                     <Link className="pill" to={urls.user_dataset.url}>{urls.user_dataset.name}</Link>
                     <Link className="pill" to={urls.feature_list.url}>{urls.feature_list.name}</Link>
-                    <Link className="pill" to={urls.sort_vector.url}>{urls.sort_vector.name}</Link>
-                    <Link className="pill" to={urls.analysis.url}>{urls.analysis.name}</Link>
                 </ul>
             </div>
         )

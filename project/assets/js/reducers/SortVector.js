@@ -15,19 +15,19 @@ export default function (state=defaultState, action) {
     let index, items;
     switch (action.type) {
 
-    case types.UD_REQUEST:
+    case types.SV_REQUEST:
         return Object.assign({}, state, {
             isFetching: true,
         });
 
-    case types.UD_RECEIVE_OBJECTS:
+    case types.SV_RECEIVE_OBJECTS:
         return Object.assign({}, state, {
             items: action.items,
             isFetching: false,
             itemsLoaded: true,
         });
 
-    case types.UD_RECIEVE_OBJECT:
+    case types.SV_RECIEVE_OBJECT:
         index = state.items.indexOf(
             _.findWhere(state.items, {id: action.item.id})
         );
@@ -48,7 +48,7 @@ export default function (state=defaultState, action) {
             items,
         });
 
-    case types.UD_DELETE_OBJECT:
+    case types.SV_DELETE_OBJECT:
         index = state.items.indexOf(
             _.findWhere(state.items, {id: action.id})
         );
@@ -64,19 +64,19 @@ export default function (state=defaultState, action) {
             items,
         });
 
-    case types.UD_RESET_EDIT_OBJECT:
+    case types.SV_RESET_EDIT_OBJECT:
         return Object.assign({}, state, {
             editObject: null,
             editObjectErrors: {},
         });
 
-    case types.UD_CREATE_EDIT_OBJECT:
+    case types.SV_CREATE_EDIT_OBJECT:
         return Object.assign({}, state, {
             editObject: action.object,
             editObjectErrors: {},
         });
 
-    case types.UD_RECEIVE_EDIT_ERRORS:
+    case types.SV_RECEIVE_EDIT_ERRORS:
         return Object.assign({}, state, {
             editObjectErrors: action.errors,
         });

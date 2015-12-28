@@ -4,16 +4,14 @@ import { connect } from 'react-redux';
 
 import Loading from '../../components/Loading';
 
-import { fetchObjectsIfNeeded as flFetchObjectsIfNeeded } from '../../actions/FeatureList';
-import { fetchObjectsIfNeeded as svFetchObjectsIfNeeded } from '../../actions/SortVector';
+import { fetchObjectsIfNeeded } from '../../actions/SortVector';
 
 
 @connect((state) => (state))
 class App extends React.Component {
 
     componentWillMount() {
-        this.props.dispatch(flFetchObjectsIfNeeded());
-        this.props.dispatch(svFetchObjectsIfNeeded());
+        this.props.dispatch(fetchObjectsIfNeeded());
     }
 
     render() {
