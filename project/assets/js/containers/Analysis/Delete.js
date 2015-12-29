@@ -29,7 +29,7 @@ class Container extends React.Component {
         dispatch(
             deleteObject(
                 this.getObject().id,
-                () => dispatch(pushState(null, urls.analysis.url))
+                () => dispatch(pushState(null, urls.dashboard.url))
             )
         );
     }
