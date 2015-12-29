@@ -183,6 +183,13 @@ class Form extends React.Component {
                         </div>
                     </div>
 
+                    <hr />
+                    <h3>User-uploaded genome datasets </h3>
+
+                    <hr />
+                    <h3>ENCODE data selection</h3>
+
+                    <hr />
                     <div className='form-actions'>
                         <div className='pull-right'>
                             <button className='btn btn-default' type='button' onClick={h.goBack}>Cancel</button>
