@@ -3,6 +3,10 @@ export default {
         name: 'Home',
         url: '/dashboard/',
     },
+    data_management: {
+        name: 'Data management',
+        url: '/dashboard/data-management/',
+    },
     user_dataset: {
         name: 'User datasets',
         url: '/dashboard/user-datasets/',

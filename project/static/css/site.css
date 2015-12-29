@@ -50,19 +50,13 @@ input[type=number] {
   -moz-appearance:textfield;
 }
 
-
+/* Fix bootstrap 3 pills */
 .pill {
   color: #fff;
   background-color: #337ab7;
-  border-radius: 4px;
-  padding: 10px 15px;
-  text-decoration: none;
-  margin: 0 0.2em;
-  box-shadow: 0 0 1.0em #fff;
 }
-
 .pill:hover {
+  background-color: #1C4468 !important;
   color: #fff;
   text-decoration: none;
-  box-shadow: 0 0 1.0em #337ab7;
 }

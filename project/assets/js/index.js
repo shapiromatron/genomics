@@ -12,6 +12,7 @@ import { createHistory } from 'history';
 import { devMiddleware, renderDevTools } from './utils/devTools';
 
 import Dashboard from './containers/Dashboard';
+import DataManagement from './containers/DataManagement';
 
 import UDApp from    './containers/UserDataset/App';
 import UDForm from   './containers/UserDataset/Form';
@@ -60,34 +61,37 @@ class Root extends React.Component {
             <div>
                 <Provider store={store}>
                     <ReduxRouter>
-                        <Route path={urls.dashboard.url} component={Dashboard}></Route>
-                        <Route path={urls.user_dataset.url} component={UDApp}>
-                            <IndexRoute component={UDList} />
-                            <Route path="create/" component={UDForm} />
-                            <Route path=":id/" component={UDDetail} />
-                            <Route path=":id/update/" component={UDForm} />
-                            <Route path=":id/delete/" component={UDDelete} />
-                        </Route>
-                        <Route path={urls.feature_list.url} component={FLApp}>
-                            <IndexRoute component={FLList} />
-                            <Route path="create/" component={FLForm} />
-                            <Route path=":id/" component={FLDetail} />
-                            <Route path=":id/update/" component={FLForm} />
-                            <Route path=":id/delete/" component={FLDelete} />
-                        </Route>
-                        <Route path={urls.sort_vector.url} component={SVApp}>
-                            <IndexRoute component={SVList} />
-                            <Route path="create/" component={SVForm} />
-                            <Route path=":id/" component={SVDetail} />
-                            <Route path=":id/update/" component={SVForm} />
-                            <Route path=":id/delete/" component={SVDelete} />
-                        </Route>
-                        <Route path={urls.analysis.url} component={ANApp}>
-                            <IndexRoute component={ANList} />
-                            <Route path="create/" component={ANForm} />
-                            <Route path=":id/" component={ANDetail} />
-                            <Route path=":id/update/" component={ANForm} />
-                            <Route path=":id/delete/" component={ANDelete} />
+                        <Route path={urls.dashboard.url} >
+                            <IndexRoute component={Dashboard} />
+                            <Route path={urls.data_management.url} component={DataManagement} />
+                            <Route path={urls.user_dataset.url} component={UDApp}>
+                                <IndexRoute component={UDList} />
+                                <Route path="create/" component={UDForm} />
+                                <Route path=":id/" component={UDDetail} />
+                                <Route path=":id/update/" component={UDForm} />
+                                <Route path=":id/delete/" component={UDDelete} />
+                            </Route>
+                            <Route path={urls.feature_list.url} component={FLApp}>
+                                <IndexRoute component={FLList} />
+                                <Route path="create/" component={FLForm} />
+                                <Route path=":id/" component={FLDetail} />
+                                <Route path=":id/update/" component={FLForm} />
+                                <Route path=":id/delete/" component={FLDelete} />
+                            </Route>
+                            <Route path={urls.sort_vector.url} component={SVApp}>
+                                <IndexRoute component={SVList} />
+                                <Route path="create/" component={SVForm} />
+                                <Route path=":id/" component={SVDetail} />
+                                <Route path=":id/update/" component={SVForm} />
+                                <Route path=":id/delete/" component={SVDelete} />
+                            </Route>
+                            <Route path={urls.analysis.url} component={ANApp}>
+                                <IndexRoute component={ANList} />
+                                <Route path="create/" component={ANForm} />
+                                <Route path=":id/" component={ANDetail} />
+                                <Route path=":id/update/" component={ANForm} />
+                                <Route path=":id/delete/" component={ANDelete} />
+                            </Route>
                         </Route>
                     </ReduxRouter>
                 </Provider>
