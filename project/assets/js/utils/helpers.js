@@ -63,7 +63,7 @@ var helpers = {
         return moment(dt).format('MMMM Do YYYY, h:mm:ss a');
     },
     goBack(e){
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
         window.history.back();
     },
     getInputDivClass(name, errors, extra=[]){

@@ -7,8 +7,6 @@ import { bindActionCreators } from 'redux';
 
 import h from '../../utils/helpers';
 
-import urls from '../../constants/urls';
-
 import { postObject, patchObject, initializeEditForm } from '../../actions/FeatureList';
 
 import FLForm from '../../components/FeatureList/Form';
@@ -35,7 +33,7 @@ class Form extends React.Component {
     handleSubmit(newObj){
         const { dispatch } = this.props;
         let id = this.getID(),
-            cb = () => dispatch(pushState(null, urls.feature_list.url));
+            cb = () => h.goBack();
         if (id){
             let patch = h.getPatch(this.getObject(), newObj);
             dispatch(patchObject(id, patch, cb));
