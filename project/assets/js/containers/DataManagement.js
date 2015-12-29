@@ -1,25 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { connect } from 'react-redux';
 
 import urls from '../constants/urls';
 import BreadcrumbBar from '../components/BreadcrumbBar';
 
+import DataManagement from '../components/DataManagement';
 
-class DataManagement extends React.Component {
+
+@connect((state) => (state))
+class Component extends React.Component {
 
     render() {
-        return (
-            <div>
-                <BreadcrumbBar
-                    paths={[urls.dashboard]}
-                    current={urls.data_management.name} />
-                <h1>Data management</h1>
-                <Link className="pill" to={urls.user_dataset.url}>{urls.user_dataset.name}</Link>
-                <Link className="pill" to={urls.feature_list.url}>{urls.feature_list.name}</Link>
-                <Link className="pill" to={urls.analysis.url}>{urls.analysis.name}</Link>
-            </div>
-        );
+        return <DataManagement
+            feature_list={this.props.feature_list}
+            sort_vector={this.props.sort_vector}
+            user_dataset={this.props.user_dataset} />
     }
 }
 
-export default DataManagement;
+export default Component;
