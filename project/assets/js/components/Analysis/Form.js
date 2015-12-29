@@ -13,6 +13,7 @@ class Form extends React.Component {
         super(props);
         this.state = props.object;
         this.setDefaultFeatureList(props);
+        this.state._expandedOptions = false;
     }
 
     componentWillReceiveProps(props){
@@ -87,6 +88,10 @@ class Form extends React.Component {
         return opts;
     }
 
+    handleOptionsExpander () {
+        this.setState({_expandedOptions: !this.state._expandedOptions});
+    }
+
     render() {
         let errs = this.props.errors || {};
         return (
@@ -156,13 +161,25 @@ class Form extends React.Component {
                         </div>
                     </div>
 
-                    <div className={h.getInputDivClass('public', errs)}>
-                        <label className='col-sm-2 control-label'>Public</label>
-                        <div className='col-sm-10'>
-                            <input type='checkbox' name='public'
-                                   checked={this.state.public}
-                                   onChange={this.handleChange.bind(this)} />
-                            <FormFieldError errors={errs.public} />
+                    <hr />
+                    <h3>
+                        Additional settings
+                        <div className='pull-right'
+                            title='Show/hide additional options'
+                            style={{cursor: 'pointer'}} onClick={this.handleOptionsExpander.bind(this)}>
+                            <i className={(this.state._expandedOptions) ? 'fa fa-minus-square-o' : 'fa fa-plus-square-o'} ></i>
+                        </div>
+                    </h3>
+                    <div className={(this.state._expandedOptions) ? '' : 'hidden'}>
+
+                        <div className={h.getInputDivClass('public', errs)}>
+                            <label className='col-sm-2 control-label'>Public</label>
+                            <div className='col-sm-10'>
+                                <input type='checkbox' name='public'
+                                       checked={this.state.public}
+                                       onChange={this.handleChange.bind(this)} />
+                                <FormFieldError errors={errs.public} />
+                            </div>
                         </div>
                     </div>
 
