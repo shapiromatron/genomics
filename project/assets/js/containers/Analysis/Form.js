@@ -65,6 +65,7 @@ class Container extends React.Component {
                 object={model.editObject}
                 feature_lists={this.props.feature_list}
                 sort_vectors={this.props.sort_vector}
+                user_datasets={this.props.user_dataset}
                 errors={model.editObjectErrors}
                 handleSubmit={this.handleSubmit.bind(this)}
             />
@@ -77,6 +78,7 @@ function mapStateToProps(state) {
         model: state.analysis,
         feature_list: state.feature_list.items,
         sort_vector: state.sort_vector.items,
+        user_dataset: state.user_dataset.items,
     };
 }
 function mapDispatchToProps(dispatch) {

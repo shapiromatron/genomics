@@ -36,6 +36,8 @@ var helpers = {
         switch(target.type){
         case 'checkbox':
             return target.checked;
+        case 'select-one':
+            return parseInt(target.value) || target.value;
         case 'text':
         case 'textarea':
         default:

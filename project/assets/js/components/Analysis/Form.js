@@ -92,6 +92,36 @@ class Form extends React.Component {
         this.setState({_expandedOptions: !this.state._expandedOptions});
     }
 
+    handleExecute (e) {
+        const isActive =this.refs.executeBtn.getAttribute('class').indexOf('disabled')===-1;
+        if (isActive){
+            alert('starting...');
+        }
+    }
+
+    renderUserDatasets () {
+        return (
+            <ul>
+                <li className='alert alert-danger'>TO DO ON WEDNESDAY</li>
+            {
+                this.props.user_datasets
+                .filter( (d) => {
+                    return d.genome_assembly === this.state.genome_assembly;
+                })
+                .map(function(d){
+                    return <li key={d.id}>{d.name}</li>;
+                })
+            }
+            </ul>
+        );
+    }
+
+    renderEncodeDataSelection () {
+        return (
+            <p className='help-block'>To add.. </p>
+        );
+    }
+
     render() {
         let errs = this.props.errors || {};
         return (
@@ -123,18 +153,6 @@ class Form extends React.Component {
                         </div>
                     </div>
 
-                    <div className={h.getInputDivClass('feature_list', errs)}>
-                        <label className='col-sm-2 control-label'>Feature list</label>
-                        <div className='col-sm-10'>
-                            <select name='feature_list' className='form-control' type='text'
-                                   value={this.state.feature_list}
-                                   onChange={this.handleChange.bind(this)}>
-                                {this.getFeatureListOptions()}
-                            </select>
-                            <FormFieldError errors={errs.feature_list} />
-                        </div>
-                    </div>
-
                     <div className={h.getInputDivClass('genome_assembly', errs)}>
                         <label className='col-sm-2 control-label'>Genomic assembly</label>
                         <div className='col-sm-10'>
@@ -146,6 +164,18 @@ class Form extends React.Component {
                                 <option value='2'>mm9</option>
                             </select>
                             <FormFieldError errors={errs.genome_assembly} />
+                        </div>
+                    </div>
+
+                    <div className={h.getInputDivClass('feature_list', errs)}>
+                        <label className='col-sm-2 control-label'>Feature list</label>
+                        <div className='col-sm-10'>
+                            <select name='feature_list' className='form-control' type='text'
+                                   value={this.state.feature_list}
+                                   onChange={this.handleChange.bind(this)}>
+                                {this.getFeatureListOptions()}
+                            </select>
+                            <FormFieldError errors={errs.feature_list} />
                         </div>
                     </div>
 
@@ -185,16 +215,23 @@ class Form extends React.Component {
 
                     <hr />
                     <h3>User-uploaded genome datasets </h3>
+                    {this.renderUserDatasets()}
 
                     <hr />
                     <h3>ENCODE data selection</h3>
+                    {this.renderEncodeDataSelection()}
 
                     <hr />
                     <div className='form-actions'>
                         <div className='pull-right'>
                             <button className='btn btn-default' type='button' onClick={h.goBack}>Cancel</button>
                             <span>&nbsp;</span>
-                            <button className='btn btn-primary'>Save</button>
+                            <button className='btn btn-primary'>Validate</button>
+                            <span>&nbsp;</span>
+                            <button ref='executeBtn'
+                                type='button'
+                                onClick={this.handleExecute.bind(this)}
+                                className='btn btn-success disabled'>Execute</button>
                         </div>
                     </div>
 
