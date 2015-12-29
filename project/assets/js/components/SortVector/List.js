@@ -75,11 +75,11 @@ class List extends React.Component {
         return (
             <div>
                 {this.getBreadcrumbs()}
-                <h3>Sort vectors
+                <h2>Sort vectors
                     <Link
                         className='pull-right btn btn-primary'
                         to={`${urls.sort_vector.url}create/${create_args}`}>Create new</Link>
-                </h3>
+                </h2>
                 {content}
             </div>
         );
