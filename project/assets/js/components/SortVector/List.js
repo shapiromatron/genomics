@@ -54,7 +54,7 @@ class List extends React.Component {
     }
 
     getBreadcrumbs() {
-        if (this.props.parent_id) return null;
+        if (this.props.parent_id || this.props.hideCrumbs) return null;
         let paths = [urls.dashboard];
         return <BreadcrumbBar paths={paths} current={urls.sort_vector.name} />;
     }

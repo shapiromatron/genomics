@@ -51,9 +51,14 @@ class List extends React.Component {
         } else {
             content = this.renderObjectsTable();
         }
+
+        let crumbs = (!this.props.hideCrumbs) ?
+             <BreadcrumbBar paths={[urls.dashboard]} current='User datasets' /> :
+             null;
+
         return (
             <div>
-                <BreadcrumbBar paths={[urls.dashboard]} current='User datasets' />
+                {crumbs}
                 <h1>User datasets
                     <Link
                         className='pull-right btn btn-primary'
