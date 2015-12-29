@@ -130,6 +130,20 @@ class Form extends React.Component {
                         </div>
                     </div>
 
+                    <div className={h.getInputDivClass('genome_assembly', errs)}>
+                        <label className='col-sm-2 control-label'>Genomic assembly</label>
+                        <div className='col-sm-10'>
+                            <select type='checkbox' className='form-control'
+                                    name='genome_assembly'
+                                    value={this.state.genome_assembly}
+                                    onChange={this.handleChange.bind(this)} >
+                                <option value='1'>hg19</option>
+                                <option value='2'>mm9</option>
+                            </select>
+                            <FormFieldError errors={errs.genome_assembly} />
+                        </div>
+                    </div>
+
                     <div className={h.getInputDivClass('sort_vector', errs)}>
                         <label className='col-sm-2 control-label'>Sort vector</label>
                         <div className='col-sm-10'>

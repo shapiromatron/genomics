@@ -150,6 +150,7 @@ export function initializeEditForm(id=null){
                 description: '',
                 public: false,
                 feature_list: null,
+                genome_assembly: 1,
                 sort_vector: null,
             };
         }

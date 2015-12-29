@@ -133,6 +133,8 @@ class Analysis(models.Model):
         GenomicDataset,
         through=AnalysisDatasets,
         through_fields=('analysis', 'dataset'))
+    genome_assembly = models.PositiveSmallIntegerField(
+        choices=GENOME_ASSEMBLY_CHOICES)
     feature_list = models.ForeignKey(
         FeatureList)
     sort_vector = models.ForeignKey(
