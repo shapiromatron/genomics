@@ -1,3 +1,4 @@
+import os
 import sys
 from django_project.settings.base import *
 
@@ -26,3 +27,9 @@ if 'test' in sys.argv:
         'django.contrib.auth.hashers.SHA1PasswordHasher',
         'django.contrib.auth.hashers.MD5PasswordHasher',
     )
+
+# to use jupyter, `add2virtualenv .` the project path
+NOTEBOOK_ARGUMENTS = [
+    '--notebook-dir',
+    os.path.join(PROJECT_ROOT, 'notebooks')
+]

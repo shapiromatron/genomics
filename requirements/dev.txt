@@ -1,7 +1,7 @@
 -r base.txt
 
 django-debug-toolbar==1.4
-django-extensions==1.5.9
+django-extensions==1.6.1
 
 jupyter==1.0.0
 
