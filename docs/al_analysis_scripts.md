@@ -34,5 +34,25 @@ Writes an opposite strand matrix file with the specified name.  Requires strande
 Sample usage:
 
     python generate_matrix.py --stranded_bed wgEncodeBroadHistoneA549CtcfEtoh02Sig.bigWig unt1hr.obsTSS.bed sample_output_matrix.txt
+matrix_by_matrix_analysis.py
+-
+Considering matrix files specified by a list, matrix_by_matrix_analysis.py performs cross-matrix correlative analysis.
 
+---
+Usage:
+
+    python matrix_by_matrix_analysis.py <Sort vector> <Matrix list> <Window start> <Bin number> <Bin size> <Output header>
+Arguments:
+
+    <Sort vector>
+A tab-delimited file with two columns, feature names and numeric values to be used in correlative analysis.
+
+    <Matrix list>
+List of matrix files to be considered in analysis.  Each row in the list corresponds to a matrix to be considered in the analysis.  The list contains two columns.  The first specifies the name to be given to a matrix.  The second specifies the path of the associated matrix file.
+
+    <Window start> <Bin number> <Bin size>
+These values specify the genomic space described by the matrix files.  Window start describes the first position of the analysis window relative to the features in the associated feature list.  Bin number and bin size describe the number of bins used and size of each bin, respectively.
+
+    <Output header>
+The script generates two output files.  The first, \*.matrix.txt, gives the matrix of cross-correlation values from the matrix-by-matrix analysis.  The second, \*.dendrogram.json, gives the dendrogram resulting from clustering of the correlation values.  The order of the rows in the \*.matrix.txt file respects the ordering in dendrogram.
 > Written with [StackEdit](https://stackedit.io/).
