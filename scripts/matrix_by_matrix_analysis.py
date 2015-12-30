@@ -23,7 +23,7 @@ def readInVector(input_file):
 ## RETURN LIST
 def findCorrForMatrix(vector, matrix_file, bin_num):
     corr_values = []
-    input_matrix = numpy.loadtxt(matrix_file, skiprows=1, usecols=tuple(xrange(1,bin_num+1,1)), unpack = True)
+    input_matrix = numpy.loadtxt(matrix_file, skiprows=1, usecols=tuple(range(1,bin_num+1,1)), unpack = True)
     for i in range(len(input_matrix)):
         corr_values.append(stats.spearmanr(vector, input_matrix[i])[0])
     return corr_values
