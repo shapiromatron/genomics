@@ -13,6 +13,7 @@ class UserDatasetSerializer(serializers.ModelSerializer):
 
 
 class FeatureListSerializer(serializers.ModelSerializer):
+    genome_assembly_display = serializers.ReadOnlyField(source='get_genome_assembly_display')
 
     class Meta:
         model = models.FeatureList

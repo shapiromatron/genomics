@@ -90,6 +90,8 @@ class EncodeDataset(GenomicDataset):
 
 
 class FeatureList(Dataset):
+    genome_assembly = models.PositiveSmallIntegerField(
+        choices=GENOME_ASSEMBLY_CHOICES)
     stranded = models.BooleanField(
         default=True)
     text = models.TextField(
