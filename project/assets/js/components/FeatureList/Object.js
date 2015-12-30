@@ -64,6 +64,7 @@ class Object_ extends React.Component {
                         {this.renderDetailRow('Description', object.description)}
                         {this.renderDetailRow('Public', h.booleanCheckbox(object.public))}
                         {this.renderDetailRow('Validated', h.booleanCheckbox(object.validated))}
+                        {this.renderDetailRow('Genome assembly', object.genome_assembly_display)}
                         {this.renderDetailRow('Stranded', h.booleanCheckbox(object.stranded))}
                         {this.renderDetailRow('Date created', h.datetimeFormat(object.created))}
                         {this.renderDetailRow('Date updated', h.datetimeFormat(object.last_updated))}

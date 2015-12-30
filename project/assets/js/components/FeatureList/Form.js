@@ -2,6 +2,7 @@ import React from 'react';
 
 import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
+import GenomeAssemblySelect from '../GenomeAssemblySelect';
 import urls from '../../constants/urls';
 import h from '../../utils/helpers';
 
@@ -96,6 +97,11 @@ class Form extends React.Component {
                             <FormFieldError errors={errs.public} />
                         </div>
                     </div>
+
+                    <GenomeAssemblySelect
+                        errors={errs}
+                        value={this.state.genome_assembly}
+                        handleChange={this.handleChange.bind(this)} />
 
                     <div className={h.getInputDivClass('stranded', errs)}>
                         <label className='col-sm-2 control-label'>Stranded</label>

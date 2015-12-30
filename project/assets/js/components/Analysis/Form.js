@@ -71,9 +71,9 @@ class Form extends React.Component {
     }
 
     getFeatureListOptions(){
-        return this.props.feature_lists.map(function(d){
-            return <option key={d.id} value={d.id}>{d.name}</option>;
-        });
+        return this.props.feature_lists
+            .filter((d) => d.genome_assembly===this.state.genome_assembly)
+            .map((d) => <option key={d.id} value={d.id}>{d.name}</option>);
     }
 
     getSortVectorOptions(){

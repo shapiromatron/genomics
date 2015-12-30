@@ -149,6 +149,7 @@ export function initializeEditForm(id=null){
                 name: '',
                 description: '',
                 public: false,
+                genome_assembly: 1,
                 stranded: true,
                 text: '',
             };
