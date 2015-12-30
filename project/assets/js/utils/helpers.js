@@ -73,6 +73,9 @@ var helpers = {
         if (errors && errors[name]) extra.push('has-error');
         return extra.join(' ');
     },
+    deepCopy(object){
+        return JSON.parse(JSON.stringify(object));
+    },
 };
 
 export default helpers;

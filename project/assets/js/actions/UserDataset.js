@@ -142,7 +142,7 @@ export function initializeEditForm(id=null){
             object;
         if (id){
             object = _.findWhere(state.user_dataset.items, {id});
-            object = _.extend({}, object);  // shallow-copy
+            object = h.deepCopy(object);
         } else {
             object = {
                 id: null,
