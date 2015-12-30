@@ -2,6 +2,7 @@ import React from 'react';
 
 import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
+import GenomeAssemblySelect from '../GenomeAssemblySelect';
 import urls from '../../constants/urls';
 import h from '../../utils/helpers';
 
@@ -97,19 +98,10 @@ class Form extends React.Component {
                         </div>
                     </div>
 
-                    <div className={h.getInputDivClass('genome_assembly', errs)}>
-                        <label className='col-sm-2 control-label'>Genomic assembly</label>
-                        <div className='col-sm-10'>
-                            <select type='checkbox' name='genome_assembly'
-                                   className='form-control'
-                                   value={this.state.genome_assembly}
-                                   onChange={this.handleChange.bind(this)} >
-                                <option value='1'>hg19</option>
-                                <option value='2'>mm9</option>
-                            </select>
-                            <FormFieldError errors={errs.genome_assembly} />
-                        </div>
-                    </div>
+                    <GenomeAssemblySelect
+                        errors={errs}
+                        value={this.state.genome_assembly}
+                        handleChange={this.handleChange.bind(this)} />
 
                     <div className='form-actions'>
                         <div className='pull-right'>
