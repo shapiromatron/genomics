@@ -3,6 +3,7 @@ import React from 'react';
 
 import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
+import UserDatasetFormRow from './UserDatasetFormRow';
 import urls from '../../constants/urls';
 import h from '../../utils/helpers';
 
@@ -99,20 +100,50 @@ class Form extends React.Component {
         }
     }
 
-    renderUserDatasets () {
-        return (
-            <ul>
-                <li className='alert alert-danger'>TO DO ON WEDNESDAY</li>
-            {
-                this.props.user_datasets
-                .filter( (d) => {
-                    return d.genome_assembly === this.state.genome_assembly;
-                })
-                .map(function(d){
-                    return <li key={d.id}>{d.name}</li>;
-                })
+    handleUserDatasetChange (include, dataset_id, display_name) {
+        let obj = _.findWhere(this.state.datasets, {dataset: dataset_id});
+        if (obj){
+            if (include){
+                obj.display_name = display_name;
+            } else {
+                this.state.datasets.pop(_.indexOf(this.state.datasets, obj));
             }
-            </ul>
+        } else {
+            this.state.datasets.push({
+                dataset: dataset_id,
+                display_name: display_name,
+            });
+        }
+    }
+
+    renderUserDatasets () {
+
+        let allDatasets = _.chain(this.props.user_datasets)
+            .filter((d) => d.genome_assembly === this.state.genome_assembly)
+            .value();
+        let selected = _.indexBy(this.state.datasets, (d) => d.dataset);
+
+        return (
+            <table className='table table-condensed'>
+                <thead>
+                    <tr>
+                        <th>Include? Dataset short-name</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {
+                    allDatasets.map((d) => {
+                        return <UserDatasetFormRow
+                            key={d.id}
+                            object={d}
+                            initial={selected[d.id] || null}
+                            handleChange={this.handleUserDatasetChange.bind(this)} />;
+                    })
+                }
+                </tbody>
+            </table>
         );
     }
 

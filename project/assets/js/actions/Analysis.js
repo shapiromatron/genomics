@@ -152,6 +152,7 @@ export function initializeEditForm(id=null){
                 feature_list: null,
                 genome_assembly: 1,
                 sort_vector: null,
+                datasets: [],
             };
         }
         dispatch(setEdititableObject(object));
