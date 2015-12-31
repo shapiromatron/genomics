@@ -23,6 +23,13 @@ function receiveObject(item){
     };
 }
 
+function receiveEncodeOpts(json){
+    return {
+        type: types.AN_RECIEVE_ENCODE_OPTIONS,
+        json,
+    };
+}
+
 function removeObject(id){
     return {
         type: types.AN_DELETE_OBJECT,
@@ -71,6 +78,18 @@ export function fetchObjectsIfNeeded() {
             .then(response => response.json())
             .then(json => dispatch(receiveObjects(json)))
             .catch((ex) => console.error('Analysis parsing failed', ex));
+    };
+}
+
+export function fetchEncodeOptionsIfNeeded(){
+    return (dispatch, getState) => {
+        let state = getState();
+        if (state.analysis.encodeOptions) return;
+        dispatch(requestContent());
+        return fetch(state.config.encode_dataset_options, h.fetchGet)
+            .then(response => response.json())
+            .then(json => dispatch(receiveEncodeOpts(json)))
+            .catch((ex) => console.error('Encode dataset options parsing failed', ex));
     };
 }
 

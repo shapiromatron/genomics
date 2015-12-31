@@ -5,6 +5,7 @@ import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
 import GenomeAssemblySelect from '../GenomeAssemblySelect';
 import UserDatasetFormRow from './UserDatasetFormRow';
+import EncodeDatasetFiltering from './EncodeDatasetFiltering';
 import urls from '../../constants/urls';
 import h from '../../utils/helpers';
 
@@ -150,7 +151,8 @@ class Form extends React.Component {
 
     renderEncodeDataSelection () {
         return (
-            <p className='help-block'>To add.. </p>
+            <EncodeDatasetFiltering
+                options={this.props.encode_options} />
         );
     }
 

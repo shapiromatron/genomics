@@ -8,6 +8,7 @@ let defaultState = {
     items: [],
     editObject: null,
     editObjectErrors: null,
+    encodeOptions: null,
 };
 
 
@@ -79,6 +80,11 @@ export default function (state=defaultState, action) {
     case types.AN_RECEIVE_EDIT_ERRORS:
         return Object.assign({}, state, {
             editObjectErrors: action.errors,
+        });
+
+    case types.AN_RECIEVE_ENCODE_OPTIONS:
+        return Object.assign({}, state, {
+            encodeOptions: action.json,
         });
 
     default:

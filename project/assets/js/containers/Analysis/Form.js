@@ -7,7 +7,10 @@ import { bindActionCreators } from 'redux';
 
 import h from '../../utils/helpers';
 
-import { postObject, patchObject, initializeEditForm } from '../../actions/Analysis';
+import {
+    postObject, patchObject,
+    initializeEditForm, fetchEncodeOptionsIfNeeded
+} from '../../actions/Analysis';
 
 import Component from '../../components/Analysis/Form';
 import Loading from '../../components/Loading';
@@ -18,6 +21,7 @@ class Container extends React.Component {
     componentWillMount() {
         let id = this.getID();
         this.props.dispatch(initializeEditForm(id));
+        this.props.dispatch(fetchEncodeOptionsIfNeeded());
     }
 
     getID() {
@@ -46,6 +50,8 @@ class Container extends React.Component {
         let id = this.getID(),
             model = this.props.model;
 
+        if (model.encodeOptions === null) return false;
+
         if (id && model.editObject === null ||
             id && model.editObject && id !== model.editObject.id)
             return false;
@@ -62,6 +68,7 @@ class Container extends React.Component {
         if (!this.isReadyToRender()) return <Loading />;
         return (
             <Component
+                encode_options={model.encodeOptions}
                 object={model.editObject}
                 feature_lists={this.props.feature_list}
                 sort_vectors={this.props.sort_vector}
