@@ -3,8 +3,8 @@ import { Link } from 'react-router';
 import { connect } from 'react-redux';
 
 import urls from '../constants/urls';
-import BreadcrumbBar from '../components/BreadcrumbBar';
 
+import BreadcrumbBar from '../components/BreadcrumbBar';
 import DataManagement from '../components/DataManagement';
 
 
