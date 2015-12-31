@@ -71,7 +71,7 @@ class EncodeDataset(GenomicDataset):
     data_type = models.CharField(
         max_length=16)
     cell_type = models.CharField(
-        max_length=16)
+        max_length=32)
     antibody = models.CharField(
         max_length=32,
         blank=True)
