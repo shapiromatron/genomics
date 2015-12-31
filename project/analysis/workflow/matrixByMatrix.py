@@ -84,6 +84,7 @@ class MatrixByMatrix():
 
         # build output rows
         rows = []
+
         row = ['', ]
         for i in range(self.bin_num):
             row.append('{}:{}'.format(
@@ -93,7 +94,7 @@ class MatrixByMatrix():
         rows.append('\t'.join(row))
 
         for i in dg['leaves']:
-            row = [row_names[i]]
+            row = [row_names[i], ]
             for j in range(len(output_matrix[i])):
                 row.append(str(output_matrix[i][j]))
             rows.append('\t'.join(row))
