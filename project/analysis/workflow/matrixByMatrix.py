@@ -82,19 +82,24 @@ class MatrixByMatrix():
         lnk = linkage(output_array)
         dg = dendrogram(lnk)
 
-        with open('{}.matrix.txt'.format(self.output_header), 'w') as f:
-            for i in range(self.bin_num):
-                f.write('\t{}:{}'.format(
-                    self.window_start + i * self.bin_size,
-                    self.window_start + (i + 1) * self.bin_size - 1
-                ))
-            f.write('\n')
+        # build output rows
+        rows = []
+        row = ['', ]
+        for i in range(self.bin_num):
+            row.append('{}:{}'.format(
+                self.window_start + i * self.bin_size,
+                self.window_start + (i + 1) * self.bin_size - 1
+            ))
+        rows.append('\t'.join(row))
 
-            for i in dg['leaves']:
-                f.write(row_names[i])
-                for j in range(len(output_matrix[i])):
-                    f.write('\t{}'.format(output_matrix[i][j]))
-                f.write('\n')
+        for i in dg['leaves']:
+            row = [row_names[i]]
+            for j in range(len(output_matrix[i])):
+                row.append(str(output_matrix[i][j]))
+            rows.append('\t'.join(row))
+
+        with open('{}.matrix.txt'.format(self.output_header), 'w') as f:
+            f.writelines(rows)
 
         with open('{}.dendrogram.json'.format(self.output_header), 'w') as f:
             json.dump(dg, f)
