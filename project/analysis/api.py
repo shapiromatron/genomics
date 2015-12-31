@@ -1,7 +1,9 @@
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
-from rest_framework import viewsets
-from utils.api import SiteMixin, OwnedButShareableMixin
+from rest_framework import viewsets, filters
+from rest_framework.decorators import list_route
+from rest_framework.response import Response
+from utils.api import SiteMixin, OwnedButShareableMixin, NoPagination
 from . import models, serializers
 
 
@@ -13,6 +15,17 @@ def owner_or_public(user):
 
 
 class EncodeDatasetViewset(SiteMixin, viewsets.ReadOnlyModelViewSet):
+    filter_backends = (filters.DjangoFilterBackend, )
+    filter_fields = (
+        'genome_assembly', '=data_type', '=cell_type',
+        '=antibody', '=rna_extract', '=treatment',
+        '=phase', '=localization',
+    )
+
+    @list_route()
+    def field_options(self, request):
+        opts = models.EncodeDataset.get_field_options()
+        return Response(opts)
 
     def get_serializer_class(self):
         return serializers.EncodeDatasetSerializer
@@ -22,6 +35,7 @@ class EncodeDatasetViewset(SiteMixin, viewsets.ReadOnlyModelViewSet):
 
 
 class UserDatasetViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
+    pagination_class = NoPagination
 
     def get_serializer_class(self):
         return serializers.UserDatasetSerializer
@@ -35,6 +49,7 @@ class UserDatasetViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
 
 
 class FeatureListViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
+    pagination_class = NoPagination
 
     def get_serializer_class(self):
         return serializers.FeatureListSerializer
@@ -48,6 +63,7 @@ class FeatureListViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
 
 
 class SortVectorViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
+    pagination_class = NoPagination
 
     def get_serializer_class(self):
         return serializers.SortVectorSerializer
@@ -61,6 +77,7 @@ class SortVectorViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
 
 
 class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
+    pagination_class = NoPagination
 
     def get_serializer_class(self):
         return serializers.AnalysisSerializer

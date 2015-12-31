@@ -33,7 +33,12 @@ class EncodeDatasetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.EncodeDataset
-        fields = '__all__'
+        exclude = (
+           'public', 'validated', 'owner',
+           'borrowers', 'created', 'last_updated',
+           'data_plus', 'data_minus', 'data_ambiguous',
+           'uuid',
+        )
 
 
 class AnalysisDatasetsSerializer(serializers.ModelSerializer):

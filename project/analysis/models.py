@@ -88,6 +88,22 @@ class EncodeDataset(GenomicDataset):
         max_length=32,
         blank=True)
 
+    @classmethod
+    def get_field_options(cls):
+        dicts = {}
+        fields = [
+            'data_type',
+            'cell_type',
+            'antibody',
+            'rna_extract',
+            'treatment',
+            'phase',
+            'localization',
+        ]
+        for fld in fields:
+            dicts[fld] = cls.objects.values_list(fld, flat=True).distinct().order_by(fld)
+        return dicts
+
 
 class FeatureList(Dataset):
     genome_assembly = models.PositiveSmallIntegerField(

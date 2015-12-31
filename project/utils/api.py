@@ -1,4 +1,14 @@
-from rest_framework import authentication, permissions
+from rest_framework import authentication, permissions, pagination
+
+
+class StandardResultsSetPagination(pagination.PageNumberPagination):
+    page_size = 500
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
+class NoPagination(pagination.PageNumberPagination):
+    page_size = None
 
 
 class SiteMixin(object):
@@ -6,6 +16,7 @@ class SiteMixin(object):
     Default settings for view authentication, permissions, filtering
     and pagination.
     """
+    pagination_class = StandardResultsSetPagination
     authentication_classes = (
         authentication.BasicAuthentication,
         authentication.SessionAuthentication,
@@ -13,9 +24,6 @@ class SiteMixin(object):
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
     )
-    paginate_by = 25
-    paginate_by_param = 'page_size'
-    max_paginate_by = 1000
 
 
 class OwnedButSharablePermission(permissions.BasePermission):
