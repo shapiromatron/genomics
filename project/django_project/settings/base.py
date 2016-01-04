@@ -98,7 +98,6 @@ INSTALLED_APPS = (
 AUTH_USER_MODEL = 'myuser.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_SSL = True
 EMAIL_SUBJECT_PREFIX = '[genomics] '
 DEFAULT_FROM_EMAIL = 'webmaster@genomics.com'
 
