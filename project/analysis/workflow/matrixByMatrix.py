@@ -13,19 +13,19 @@ class MatrixByMatrix():
     def __init__(self,
                  input_vector, matrix_list, window_start,
                  bin_number, bin_size, output_header):
-
-        assert os.path.exists(self.input_vector)
-        assert os.path.exists(self.matrix_list)
-        assert isinstance(window_start, int)
-        assert isinstance(bin_number, int)
-        assert isinstance(bin_size, int)
-
+        
         self.input_vector = input_vector
         self.matrix_list = matrix_list
         self.window_start = window_start
         self.bin_number = bin_number
         self.bin_size = bin_size
         self.output_header = output_header
+        
+        assert os.path.exists(self.input_vector)
+        assert os.path.exists(self.matrix_list)
+        assert isinstance(window_start, int)
+        assert isinstance(bin_number, int)
+        assert isinstance(bin_size, int)
 
         self.execute()
 
@@ -74,7 +74,7 @@ class MatrixByMatrix():
 
         for matrix_entry in matrix_list:
             output_matrix.append(
-                self.findCorrForMatrix(vector, matrix_entry[1], self.bin_num)
+                self.findCorrForMatrix(vector, matrix_entry[1], self.bin_number)
             )
             row_names.append(matrix_entry[0])
 
@@ -86,7 +86,7 @@ class MatrixByMatrix():
         rows = []
 
         row = ['', ]
-        for i in range(self.bin_num):
+        for i in range(self.bin_number):
             row.append('{}:{}'.format(
                 self.window_start + i * self.bin_size,
                 self.window_start + (i + 1) * self.bin_size - 1
