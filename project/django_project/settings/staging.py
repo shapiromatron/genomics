@@ -18,9 +18,10 @@ DATABASES['default']['USER'] = os.environ.get('DB_USER')
 DATABASES['default']['PASSWORD'] = os.environ.get('DB_PASSWORD')
 
 EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST')
-EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_PASSWORD')
+EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_USER', None)
+EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_PASSWORD', None)
 EMAIL_PORT = os.environ.get('DJANGO_EMAIL_PORT')
+DEFAULT_FROM_EMAIL = os.environ.get('DJANGO_FROM_USER')
 
 PUBLIC_ROOT = os.environ.get('DJANGO_PUBLIC_PATH')
 STATIC_ROOT = os.path.join(PUBLIC_ROOT, 'static')
