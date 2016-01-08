@@ -59,6 +59,10 @@ class _Object extends React.Component {
 
                 <table className='table table-condensed' style={{tableLayout: 'fixed'}}>
                     <tbody>
+                        {this.renderDetailRow('Anchor', object.anchor_display)}
+                        {this.renderDetailRow('Bin start', object.bin_start)}
+                        {this.renderDetailRow('Bin size', object.bin_size)}
+                        {this.renderDetailRow('Bin number', object.bin_number)}
                         {this.renderDetailRow('Description', object.description)}
                         {this.renderDetailRow('Public', h.booleanCheckbox(object.public))}
                         {this.renderDetailRow('Validated', h.booleanCheckbox(object.validated))}

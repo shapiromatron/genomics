@@ -178,6 +178,10 @@ export function initializeEditForm(id=null){
                 genome_assembly: 1,
                 sort_vector: null,
                 datasets: [],
+                anchor: 1,
+                bin_start: -2500,
+                bin_number: 50,
+                bin_size: 100,
             };
         }
         dispatch(setEdititableObject(object));

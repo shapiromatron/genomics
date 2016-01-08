@@ -236,6 +236,61 @@ class Form extends React.Component {
                                 <FormFieldError errors={errs.public} />
                             </div>
                         </div>
+
+                        <div className={h.getInputDivClass('anchor', errs)}>
+                            <label className='col-sm-2 control-label'>Anchor</label>
+                            <div className='col-sm-10'>
+                                <select className='form-control'
+                                       name='anchor'
+                                       value={this.state.anchor}
+                                       onChange={this.handleChange.bind(this)} >
+                                    <option value="0">Start</option>
+                                    <option value="1">Center</option>
+                                    <option value="2">End</option>
+                                </select>
+                                <FormFieldError errors={errs.anchor} />
+                            </div>
+                        </div>
+
+                        <div className={h.getInputDivClass('bin_start', errs)}>
+                            <label className='col-sm-2 control-label'>Bin start</label>
+                            <div className='col-sm-10'>
+                                <input className='form-control'
+                                       type='number' name='bin_start'
+                                       value={this.state.bin_start}
+                                       onChange={this.handleChange.bind(this)} />
+                                <p className='help-block'>Relative bin-start from item in feature-list.</p>
+                                <FormFieldError errors={errs.bin_start} />
+                            </div>
+                        </div>
+
+                        <div className={h.getInputDivClass('bin_size', errs)}>
+                            <label className='col-sm-2 control-label'>Bin size</label>
+                            <div className='col-sm-10'>
+                                <input className='form-control'
+                                       min={1}
+                                       type='number' name='bin_size'
+                                       value={this.state.bin_size}
+                                       onChange={this.handleChange.bind(this)} />
+                                <p className='help-block'>Bin-size (minimum: 1)</p>
+                                <FormFieldError errors={errs.bin_size} />
+                            </div>
+                        </div>
+
+                        <div className={h.getInputDivClass('bin_number', errs)}>
+                            <label className='col-sm-2 control-label'>Bin number</label>
+                            <div className='col-sm-10'>
+                                <input className='form-control'
+                                       type='number' name='bin_number'
+                                       min={1}
+                                       max={250}
+                                       value={this.state.bin_number}
+                                       onChange={this.handleChange.bind(this)} />
+                                <p className='help-block'>Number of bins [1 - 250]</p>
+                                <FormFieldError errors={errs.bin_number} />
+                            </div>
+                        </div>
+
                     </div>
 
                     <hr />
