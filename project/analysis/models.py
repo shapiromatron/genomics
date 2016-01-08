@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Dataset(models.Model):
@@ -140,7 +141,34 @@ class AnalysisDatasets(models.Model):
         verbose_name_plural = 'Analysis datasets'
 
 
-class Analysis(models.Model):
+ANCHOR_START = 0
+ANCHOR_CENTER = 1
+ANCHOR_END = 2
+ANCHOR_CHOICES = (
+    (ANCHOR_START, 'start'),
+    (ANCHOR_CENTER, 'center'),
+    (ANCHOR_END, 'end'),
+)
+
+
+class GenomicBinSettings(models.Model):
+    anchor = models.PositiveSmallIntegerField(
+        choices=ANCHOR_CHOICES,
+        default=ANCHOR_CENTER)
+    bin_start = models.SmallIntegerField(
+        default=-2500)
+    bin_number = models.PositiveSmallIntegerField(
+        default=50,
+        validators=[MinValueValidator(50), MaxValueValidator(250)])
+    bin_size = models.PositiveSmallIntegerField(
+        default=100,
+        validators=[MinValueValidator(1)])
+
+    class Meta:
+        abstract = True
+
+
+class Analysis(GenomicBinSettings):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL)
     name = models.CharField(
@@ -178,7 +206,7 @@ class Analysis(models.Model):
         verbose_name_plural = 'Analyses'
 
 
-class FeatureListCountMatrix(models.Model):
+class FeatureListCountMatrix(GenomicBinSettings):
     feature_list = models.ForeignKey(
         FeatureList,
         related_name='intermediates')
