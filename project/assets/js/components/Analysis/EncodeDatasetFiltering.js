@@ -54,6 +54,16 @@ class EncodeDatasetFiltering extends React.Component {
                     </select>
                 </div>
 
+
+                <div className='col-sm-4'>
+                    <label className='control-label'>Antibody</label>
+                    <select size='10' className='form-control' multiple={true}>
+                        {opts.antibody.map(
+                           (d) => <option key={d} value={d}>{d}</option>
+                        )}
+                    </select>
+                </div>
+
             </div>
         );
     }
