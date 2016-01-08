@@ -36,8 +36,11 @@ var helpers = {
         switch(target.type){
         case 'checkbox':
             return target.checked;
-        case 'select-one':
-            return parseInt(target.value) || target.value;
+        case 'number':
+            return parseFloat(target.value);
+        case 'select-one':  // use isFinite in-case value is 0
+            let val = parseInt(target.value);
+            return (_.isFinite(val)) ? val : target.value;
         case 'text':
         case 'textarea':
         default:
