@@ -9,6 +9,12 @@ function requestContent() {
     };
 }
 
+function requestEncodeContent() {
+    return {
+        type: types.AN_REQUEST_ENCODE,
+    };
+}
+
 function receiveObjects(json) {
     return {
         type: types.AN_RECEIVE_OBJECTS,
@@ -85,7 +91,7 @@ export function fetchEncodeOptionsIfNeeded(){
     return (dispatch, getState) => {
         let state = getState();
         if (state.analysis.encodeOptions) return;
-        dispatch(requestContent());
+        dispatch(requestEncodeContent());
         return fetch(state.config.encode_dataset_options, h.fetchGet)
             .then(response => response.json())
             .then(json => dispatch(receiveEncodeOpts(json)))

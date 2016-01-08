@@ -8,6 +8,7 @@ let defaultState = {
     items: [],
     editObject: null,
     editObjectErrors: null,
+    isFetchingEncode: false,
     encodeOptions: null,
 };
 
@@ -19,6 +20,11 @@ export default function (state=defaultState, action) {
     case types.AN_REQUEST:
         return Object.assign({}, state, {
             isFetching: true,
+        });
+
+    case types.AN_REQUEST_ENCODE:
+        return Object.assign({}, state, {
+            isFetchingEncode: true,
         });
 
     case types.AN_RECEIVE_OBJECTS:
@@ -85,6 +91,7 @@ export default function (state=defaultState, action) {
     case types.AN_RECIEVE_ENCODE_OPTIONS:
         return Object.assign({}, state, {
             encodeOptions: action.json,
+            isFetchingEncode: false,
         });
 
     default:

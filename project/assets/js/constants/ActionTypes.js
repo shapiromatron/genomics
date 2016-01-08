@@ -30,6 +30,7 @@ export const SV_RECEIVE_EDIT_ERRORS =   'SV_RECEIVE_EDIT_ERRORS';
 
 // analysis (AN)
 export const AN_REQUEST =               'AN_REQUEST';
+export const AN_REQUEST_ENCODE =        'AN_REQUEST_ENCODE';
 export const AN_RECEIVE_OBJECTS =       'AN_RECEIVE_OBJECTS';
 export const AN_RECIEVE_OBJECT =        'AN_RECIEVE_OBJECT';
 export const AN_DELETE_OBJECT =         'AN_DELETE_OBJECT';
