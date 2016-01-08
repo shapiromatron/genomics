@@ -28,9 +28,12 @@ urlpatterns = [
 
 # server media-only in debug mode
 if settings.DEBUG:
+
+    from django.views.static import serve
+
     urlpatterns += [
         url(r'^media/(?P<path>.*)$',
-            'django.views.static.serve',
+            serve,
             {'document_root': settings.MEDIA_ROOT, }),
         url(r'^403/$', TemplateView.as_view(template_name='403.html')),
         url(r'^404/$', TemplateView.as_view(template_name='404.html')),
