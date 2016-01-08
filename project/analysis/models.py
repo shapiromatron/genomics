@@ -155,12 +155,12 @@ class GenomicBinSettings(models.Model):
     anchor = models.PositiveSmallIntegerField(
         choices=ANCHOR_CHOICES,
         default=ANCHOR_CENTER)
-    bin_start = models.SmallIntegerField(
+    bin_start = models.IntegerField(
         default=-2500)
-    bin_number = models.PositiveSmallIntegerField(
+    bin_number = models.PositiveIntegerField(
         default=50,
         validators=[MinValueValidator(50), MaxValueValidator(250)])
-    bin_size = models.PositiveSmallIntegerField(
+    bin_size = models.PositiveIntegerField(
         default=100,
         validators=[MinValueValidator(1)])
 
