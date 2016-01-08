@@ -114,11 +114,13 @@ class BedMatrix(object):
     def make_bed(self):
         """
         Open bed file, create a bed of bins.
-        Return a dictionary with feature information.
+        Create a dictionary with feature information.
+        Create list with order of features in bed file.
         """
         input_file = self.feature_bed
         output_file = self.temp_bed_fn
         feature_dict = {}
+        feature_list = []
         with open(input_file, 'r') as f, \
                 open(output_file, "w") as OUTPUT:
             total_valid_lines = self.countValidBedLines(input_file)
@@ -136,6 +138,7 @@ class BedMatrix(object):
                         name = line.strip().split()[3]
                     else:
                         name = self.generateFeatureName("feature", count, total_valid_lines)
+                    feature_list.append(name)
                     if self.stranded_bed:
                         if bed_fields >= 6:  # Contains strand information?
                             strand = line.strip().split()[5]
@@ -187,7 +190,7 @@ class BedMatrix(object):
                             )
                             OUTPUT.write(str_)
                             start -= self.bin_size
-
+        self.feature_order = feature_list
         self.feature_info = feature_dict
 
     def bigwig_average_over_bed(self):
@@ -225,29 +228,29 @@ class BedMatrix(object):
         with open(self.temp_int_unstranded_fn, 'r') as f, \
                 open(self.output_matrix, 'w') as OUTPUT:
 
-            # Make header
+            # Make header, write to output
             for i in range(self.bin_number):
                 str_ = "\t{}:{}".format(
                     self.bin_start+i*self.bin_size,
                     self.bin_start+(i+1)*self.bin_size-1
                 )
                 OUTPUT.write(str_)
+            OUTPUT.write("\n")
 
-            # Make features
-            last_feature = None
+            # Make features, add to dictionary
+            row_dict = dict()
             for line in f:
                 tab_name, size, covered, bed_sum, bed_mean_zero, bed_mean = \
                     line.strip().split()
                 bed_sum = self.checkInt(bed_sum)
                 feature_name = self.readTabName(tab_name)
-                if feature_name == last_feature:
-                    OUTPUT.write("\t" + str(bed_sum))
-                else:
-                    OUTPUT.write("\n")
-                    OUTPUT.write(feature_name + "\t" + str(bed_sum))
-                    last_feature = feature_name
+                if feature_name not in row_dict:
+                    row_dict[feature_name] = ""
+                row_dict[feature_name] += "\t" + str(bed_sum)
 
-            OUTPUT.write("\n")
+            # Write to output based on order in feature list
+            for feature_name in self.feature_order:
+                OUTPUT.write(feature_name + row_dict[feature_name] + "\n")
 
     def make_stranded_matrix(self):
         """
@@ -278,8 +281,10 @@ class BedMatrix(object):
             if OPPOSITE:
                 OPPOSITE.write("\n")
 
-            last_feature = None
+            #last_feature = None
 
+            same_dict = dict()
+            opposite_dict = dict()
             for plus_line, minus_line in zip(plus_file, minus_file):
 
                 plus_tab_name, size, plus_covered, \
@@ -306,38 +311,39 @@ class BedMatrix(object):
                 if plus_feature_name != minus_feature_name:
                     raise ValueError("Stranded feature names in intersection files do not agree by line")
 
-                # Start new line if new feature name
-                if plus_feature_name != last_feature:
 
-                    if last_feature:
-                        OUTPUT.write("\n")
-                        if OPPOSITE:
-                            OPPOSITE.write("\n")
-
-                    OUTPUT.write(plus_feature_name)
-                    if OPPOSITE:
-                        OPPOSITE.write(plus_feature_name)
-                    last_feature = plus_feature_name
+                if plus_feature_name not in same_dict:
+                    same_dict[plus_feature_name] = ""
+                if OPPOSITE:
+                    if plus_feature_name not in opposite_dict:
+                        opposite_dict[plus_feature_name] = ""
 
                 # Write values, observing strandedness if specified
                 if self.stranded_bed:
                     if self.feature_info[plus_feature_name]["strand"] == "+":
-                        same_value = plus_sum
-                        opposite_value = minus_sum
+                        #same_value = plus_sum
+                        #opposite_value = minus_sum
+                        same_dict[plus_feature_name] += "\t" + plus_sum
+                        if OPPOSITE:
+                            opposite_dict[plus_feature_name] += "\t" + minus_sum
                     elif self.feature_info[plus_feature_name]["strand"] == "-":
-                        same_value = minus_sum
-                        opposite_value = plus_sum
+                        #same_value = minus_sum
+                        #opposite_value = plus_sum
+                        same_dict[plus_feature_name] += "\t" + minus_sum
+                        if OPPOSITE:
+                            opposite_dict[plus_feature_name] += "\t" + plus_sum
 
-                    OUTPUT.write("\t" + same_value)
-                    if OPPOSITE:
-                        OPPOSITE.write("\t" + opposite_value)
+
                 else:
-                    OUTPUT.write("\t{}".format(
-                        self.checkInt(float(plus_sum)+float(minus_sum))))
+                    same_dict[plus_feature_name] += "\t{}".format(
+                        self.checkInt(float(plus_sum)+float(minus_sum)))
 
-            OUTPUT.write("\n")
-            if OPPOSITE:
-                OPPOSITE.write("\n")
+
+            
+            for feature_name in self.feature_order:
+                OUTPUT.write(feature_name + same_dict[feature_name] + "\n")
+                if OPPOSITE:
+                    OPPOSITE.write(feature_name + opposite_dict[feature_name] + "\n")
 
 
 @click.command()
