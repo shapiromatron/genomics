@@ -124,7 +124,10 @@ class BinValueCheck(object):
         return True
     
     def checkValues(self):
-        return(self.checkNegatives() and self.checkIfOutside() and self.checkWindowSize() and self.checkBinNumber())
+        self.checkNegatives()
+        self.checkIfOutside()
+        self.checkWindowSize()
+        self.checkBinNumber()
 
 @click.command()
 @click.argument('bin_anchor', type=click.Choice(BinValueCheck.ANCHOR_OPTIONS))

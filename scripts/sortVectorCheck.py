@@ -49,7 +49,8 @@ class SortVectorCheck(object):
         return True
     
     def check_sort_vector(self):
-        return self.check_columns() and self.check_ids()
+        self.check_columns()
+        self.check_ids()
 
 @click.command()
 @click.argument('feature_bed')
