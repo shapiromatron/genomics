@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.postgres.fields import JSONField
 
 
 class Dataset(models.Model):
@@ -88,6 +89,7 @@ class EncodeDataset(GenomicDataset):
     localization = models.CharField(
         max_length=32,
         blank=True)
+    extra_content = JSONField(default=dict)
 
     @classmethod
     def get_field_options(cls):
