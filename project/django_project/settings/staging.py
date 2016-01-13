@@ -29,3 +29,11 @@ STATIC_ROOT = os.path.join(PUBLIC_ROOT, 'static')
 MEDIA_ROOT = os.path.join(PUBLIC_ROOT, 'media')
 
 LOGGING['handlers']['file']['filename'] = os.environ.get('DJANGO_LOG_FULLPATH')
+
+# to use jupyter, `add2virtualenv .` the project path
+NOTEBOOK_ARGUMENTS = [
+    '--no-browser',
+    '--port=8765',
+    '--notebook-dir',
+    os.path.join(PROJECT_ROOT, 'notebooks')
+]

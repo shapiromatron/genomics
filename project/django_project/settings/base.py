@@ -95,6 +95,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'rest_framework',
     'webpack_loader',
+    'django_extensions',
     # Custom apps
     'utils',
     'myuser',

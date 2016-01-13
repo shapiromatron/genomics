@@ -12,3 +12,5 @@ numpy==1.10.1
 pandas==0.17.0
 XlsxWriter==0.7.7
 xlrd==0.9.4
+jupyter==1.0.0
+django-extensions==1.6.1
