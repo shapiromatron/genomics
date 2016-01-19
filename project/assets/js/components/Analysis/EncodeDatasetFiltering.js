@@ -12,34 +12,35 @@ class EncodeDatasetFiltering extends React.Component {
             filters: {},
             numSelected: 0,
             numIncludedSelected: 0,
-            selected: [],
+            selected: {},
         };
     }
 
     handleAddSelected(){
         let selected = this.state.selected;
         $(this.refs.available).find('option:selected').each((i, el)=>{
-            selected.push(this.availableKeys[parseInt(el.value)]);
+            selected[parseInt(el.value)] = this.availableKeys[parseInt(el.value)];
         });
         this.setState({selected});
     }
 
     handleAddAll(){
-        let selected = this.state.selected;
-        selected.push.apply(selected, this.props.availableDatasets);
+        let selected = Object.assign({},
+            this.state.selected,
+            this.props.availableDatasets);
         this.setState({selected});
     }
 
     handleRemoveSelected(){
-        let selected = _.indexBy(this.state.selected, 'id');
+        let selected = this.state.selected;
         $(this.refs.selected).find('option:selected').each(function(i, el){
             delete selected[parseInt(el.value)];
         });
-        this.setState({selected: _.values(selected)});
+        this.setState(selected);
     }
 
     handleRemoveAll(){
-        this.setState({selected: []});
+        this.setState({selected: {}});
     }
 
     handleApplyFilters(){
@@ -189,6 +190,7 @@ class EncodeDatasetFiltering extends React.Component {
     }
 
     renderIncludedDatasets(){
+        let selected = _.values(this.state.selected);
         return (
             <div className='col-md-5'>
                 <h4>Included datasets</h4>
@@ -197,9 +199,9 @@ class EncodeDatasetFiltering extends React.Component {
                     size='10'
                     ref='selected'
                     className='form-control' multiple={true}>
-                    {this.state.selected.map(this.renderDatsetOption)}
+                    {selected.map(this.renderDatsetOption)}
                 </select>
-                <p><strong>Included:</strong> <span>{this.state.selected.length}</span></p>
+                <p><strong>Included:</strong> <span>{selected.length}</span></p>
                 <p><strong>Selected:</strong> <span>{this.state.numIncludedSelected}</span></p>
             </div>
         );
