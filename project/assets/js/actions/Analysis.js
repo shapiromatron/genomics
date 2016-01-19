@@ -196,7 +196,7 @@ export function initializeEditForm(id=null){
                 description: '',
                 public: false,
                 feature_list: null,
-                genome_assembly: 1,
+                genome_assembly: null,
                 sort_vector: null,
                 datasets: [],
                 anchor: 1,
