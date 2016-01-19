@@ -8,7 +8,9 @@ import h from '../../utils/helpers';
 class EncodeDatasetFiltering extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            filters: {},
+        };
     }
 
     handleAddSelected(){
@@ -28,20 +30,19 @@ class EncodeDatasetFiltering extends React.Component {
     }
 
     handleApplyFilters(){
-        let filters = _.pick(h.deepCopy(this.state), _.identity); // remove null
+        let filters = _.pick(h.deepCopy(this.state.filters), _.identity); // remove null
         this.props.handleApplyFilters(filters);
     }
 
     handleFilterChange(e){
-        let obj = {};
+        let obj = this.state.filters;
         obj[e.target.name] = $(e.target).val();
         this.setState(obj);
     }
 
     render() {
         let opts = this.props.options,
-            vals = this.state;
-
+            vals = this.state.filters;
         return (
             <div>
             <div className='row'>
@@ -111,13 +112,7 @@ class EncodeDatasetFiltering extends React.Component {
 
             </div>
             <div className='row'>
-                <div className='col-md-5'>
-                    <h4>Available datasets (after filtering)</h4>
-                    <select size='10' className='form-control' multiple={true}>
-                    </select>
-                    <p><strong>Available:</strong> <span ref='nAvailable'>0</span></p>
-                    <p><strong>Selected:</strong> <span ref='nAvailSelected'>0</span></p>
-                </div>
+                {this.renderAvailableDatasets()}
                 <div className='col-md-2 text-center'>
                     <h4>&nbsp;</h4>
                     <button style={{marginTop: '1em'}}
@@ -155,10 +150,26 @@ class EncodeDatasetFiltering extends React.Component {
             </div>
         );
     }
+
+    renderAvailableDatasets(){
+        return (
+            <div className='col-md-5'>
+                <h4>Available datasets (after filtering)</h4>
+                <select
+                    ref='available'
+                    size='10'
+                    className='form-control' multiple={true}>
+                    {this.props.availableDatasets.map(this.renderDatsetOption)}
+                </select>
+            </div>
+        );
+    }
 }
 
 EncodeDatasetFiltering.propTypes = {
     options: React.PropTypes.object.isRequired,
+    handleApplyFilters: React.PropTypes.func.isRequired,
+    availableDatasets: React.PropTypes.array.isRequired,
 };
 
 export default EncodeDatasetFiltering;

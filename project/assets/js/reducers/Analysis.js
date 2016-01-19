@@ -10,6 +10,7 @@ let defaultState = {
     editObjectErrors: null,
     isFetchingEncode: false,
     encodeOptions: null,
+    encodeDatasetsAvailable: [],
 };
 
 
@@ -92,6 +93,11 @@ export default function (state=defaultState, action) {
         return Object.assign({}, state, {
             encodeOptions: action.json,
             isFetchingEncode: false,
+        });
+
+    case types.AN_RECIEVE_ENCODE_DATASETS:
+        return Object.assign({}, state, {
+            encodeDatasetsAvailable: action.json,
         });
 
     default:

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import {
     fetchEncodeOptionsIfNeeded,
+    requestEncodeDatasets,
 } from '../../actions/Analysis';
 
 import Loading from '../../components/Loading';
@@ -16,7 +17,7 @@ class Container extends React.Component {
     }
 
     handleApplyFilters(filters){
-        console.log(filters);
+        this.props.dispatch(requestEncodeDatasets(filters));
     }
 
     isReadyToRender(){
@@ -30,6 +31,7 @@ class Container extends React.Component {
             <Component
                 options={model.encodeOptions}
                 handleApplyFilters={this.handleApplyFilters.bind(this)}
+                availableDatasets={model.encodeDatasetsAvailable}
             />
         );
     }

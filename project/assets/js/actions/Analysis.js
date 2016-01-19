@@ -1,3 +1,4 @@
+import $ from 'jQuery';
 import _ from 'underscore';
 import * as types from '../constants/ActionTypes';
 import h from '../utils/helpers';
@@ -32,6 +33,13 @@ function receiveObject(item){
 function receiveEncodeOpts(json){
     return {
         type: types.AN_RECIEVE_ENCODE_OPTIONS,
+        json,
+    };
+}
+
+function receiveEncodeDatasets(json){
+    return {
+        type: types.AN_RECIEVE_ENCODE_DATASETS,
         json,
     };
 }
@@ -96,6 +104,19 @@ export function fetchEncodeOptionsIfNeeded(){
             .then(response => response.json())
             .then(json => dispatch(receiveEncodeOpts(json)))
             .catch((ex) => console.error('Encode dataset options parsing failed', ex));
+    };
+}
+
+export function requestEncodeDatasets(query){
+    return (dispatch, getState) => {
+        let state = getState(),
+            opts = $.param(query, false),
+            url = `${state.config.encode_dataset}?${opts}`;
+        console.log(url);
+        return fetch(url, h.fetchGet)
+            .then(response => response.json())
+            .then(json => dispatch(receiveEncodeDatasets(json.results)))
+            .catch((ex) => console.error('Encode dataset parsing failed', ex));
     };
 }
 
