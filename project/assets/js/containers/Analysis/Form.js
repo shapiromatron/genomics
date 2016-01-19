@@ -50,8 +50,6 @@ class Container extends React.Component {
         let id = this.getID(),
             model = this.props.model;
 
-        if (model.encodeOptions === null) return false;
-
         if (id && model.editObject === null ||
             id && model.editObject && id !== model.editObject.id)
             return false;
@@ -68,7 +66,6 @@ class Container extends React.Component {
         if (!this.isReadyToRender()) return <Loading />;
         return (
             <Component
-                encode_options={model.encodeOptions}
                 object={model.editObject}
                 feature_lists={this.props.feature_list}
                 sort_vectors={this.props.sort_vector}

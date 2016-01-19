@@ -5,7 +5,7 @@ import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
 import GenomeAssemblySelect from '../GenomeAssemblySelect';
 import UserDatasetFormRow from './UserDatasetFormRow';
-import EncodeDatasetFiltering from './EncodeDatasetFiltering';
+import EncodeDatasetFiltering from '../../containers/Analysis/EncodeDatasetFiltering';
 import urls from '../../constants/urls';
 import h from '../../utils/helpers';
 
@@ -146,13 +146,6 @@ class Form extends React.Component {
                 }
                 </tbody>
             </table>
-        );
-    }
-
-    renderEncodeDataSelection () {
-        return (
-            <EncodeDatasetFiltering
-                options={this.props.encode_options} />
         );
     }
 
@@ -299,7 +292,7 @@ class Form extends React.Component {
 
                     <hr />
                     <h3>ENCODE data selection</h3>
-                    {this.renderEncodeDataSelection()}
+                    <EncodeDatasetFiltering />
 
                     <hr />
                     <div className='form-actions'>

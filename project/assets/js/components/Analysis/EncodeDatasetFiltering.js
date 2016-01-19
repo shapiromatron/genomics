@@ -1,16 +1,14 @@
+import _ from 'underscore';
 import $ from 'jQuery';
 import React from 'react';
 import EncodeFilterSelect from './EncodeFilterSelect';
+import h from '../../utils/helpers';
 
 
 class EncodeDatasetFiltering extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};
-    }
-
-    handleApplyFilters(){
-        console.log('apply filters');
     }
 
     handleAddSelected(){
@@ -29,6 +27,11 @@ class EncodeDatasetFiltering extends React.Component {
         console.log('remove all');
     }
 
+    handleApplyFilters(){
+        let filters = _.pick(h.deepCopy(this.state), _.identity); // remove null
+        this.props.handleApplyFilters(filters);
+    }
+
     handleFilterChange(e){
         let obj = {};
         obj[e.target.name] = $(e.target).val();
@@ -44,7 +47,7 @@ class EncodeDatasetFiltering extends React.Component {
             <div className='row'>
                 <div className='col-md-12'>
                     <button type='button'
-                            onClick={this.handleApplyFilters}
+                            onClick={this.handleApplyFilters.bind(this)}
                             className='btn btn-primary pull-right'>
                             <i className='fa fa-filter'></i> Apply filters</button>
                     <p className='help-block'>
