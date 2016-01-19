@@ -10,23 +10,36 @@ class EncodeDatasetFiltering extends React.Component {
         super(props);
         this.state = {
             filters: {},
+            numSelected: 0,
+            numIncludedSelected: 0,
+            selected: [],
         };
     }
 
     handleAddSelected(){
-        console.log('add selected');
+        let selected = this.state.selected;
+        $(this.refs.available).find('option:selected').each((i, el)=>{
+            selected.push(this.availableKeys[parseInt(el.value)]);
+        });
+        this.setState({selected});
     }
 
     handleAddAll(){
-        console.log('add all');
+        let selected = this.state.selected;
+        selected.push.apply(selected, this.props.availableDatasets);
+        this.setState({selected});
     }
 
     handleRemoveSelected(){
-        console.log('remove selected');
+        let selected = _.indexBy(this.state.selected, 'id');
+        $(this.refs.selected).find('option:selected').each(function(i, el){
+            delete selected[parseInt(el.value)];
+        });
+        this.setState({selected: _.values(selected)});
     }
 
     handleRemoveAll(){
-        console.log('remove all');
+        this.setState({selected: []});
     }
 
     handleApplyFilters(){
@@ -40,7 +53,20 @@ class EncodeDatasetFiltering extends React.Component {
         this.setState(obj);
     }
 
+    handleAvailableSelectedChange(e){
+        let vals = $(e.target).val(),
+            count = (vals) ? vals.length: 0;
+        this.setState({numSelected: count});
+    }
+
+    handleIncludedSelectedChange(e){
+        let vals = $(e.target).val(),
+            count = (vals) ? vals.length: 0;
+        this.setState({numIncludedSelected: count});
+    }
+
     render() {
+        this.availableKeys = _.indexBy(this.props.availableDatasets, 'id');
         let opts = this.props.options,
             vals = this.state.filters;
         return (
@@ -117,35 +143,29 @@ class EncodeDatasetFiltering extends React.Component {
                     <h4>&nbsp;</h4>
                     <button style={{marginTop: '1em'}}
                             type='button'
-                            onClick={this.handleAddAll}
+                            onClick={this.handleAddAll.bind(this)}
                             className='btn btn-default'>
                         Add all <i className='fa fa-angle-double-right'></i></button>
                     <br></br>
                     <button type='button'
-                            onClick={this.handleAddSelected}
+                            onClick={this.handleAddSelected.bind(this)}
                             className='btn btn-default'>
                         Add <i className='fa fa-angle-right'></i></button>
                     <br></br>
                     <br></br>
                     <button type='button'
-                            onClick={this.handleRemoveSelected}
+                            onClick={this.handleRemoveSelected.bind(this)}
                             className='btn btn-default'>
                         <i className='fa fa-angle-left'></i> Remove</button>
                     <br></br>
                     <button type='button'
-                            onClick={this.handleRemoveAll}
+                            onClick={this.handleRemoveAll.bind(this)}
                             className='btn btn-default'>
                         <i className='fa fa-angle-double-left'></i> Remove all</button>
                     <br></br>
 
                 </div>
-                <div className='col-md-5'>
-                    <h4>Included datasets</h4>
-                    <select size='10' className='form-control' multiple={true}>
-                    </select>
-                    <p><strong>Total included:</strong> <span ref='nIncluded'>0</span></p>
-                    <p><strong>Total included:</strong> <span ref='nIncSelected'>0</span></p>
-                </div>
+                {this.renderIncludedDatasets()}
             </div>
             </div>
         );
@@ -156,13 +176,37 @@ class EncodeDatasetFiltering extends React.Component {
             <div className='col-md-5'>
                 <h4>Available datasets (after filtering)</h4>
                 <select
+                    onChange={this.handleAvailableSelectedChange.bind(this)}
                     ref='available'
                     size='10'
                     className='form-control' multiple={true}>
                     {this.props.availableDatasets.map(this.renderDatsetOption)}
                 </select>
+                <p><strong>Available:</strong> <span>{this.props.availableDatasets.length}</span></p>
+                <p><strong>Selected:</strong> <span>{this.state.numSelected}</span></p>
             </div>
         );
+    }
+
+    renderIncludedDatasets(){
+        return (
+            <div className='col-md-5'>
+                <h4>Included datasets</h4>
+                <select
+                    onChange={this.handleIncludedSelectedChange.bind(this)}
+                    size='10'
+                    ref='selected'
+                    className='form-control' multiple={true}>
+                    {this.state.selected.map(this.renderDatsetOption)}
+                </select>
+                <p><strong>Included:</strong> <span>{this.state.selected.length}</span></p>
+                <p><strong>Selected:</strong> <span>{this.state.numIncludedSelected}</span></p>
+            </div>
+        );
+    }
+
+    renderDatsetOption(d){
+        return <option key={d.id} value={d.id}>{d.name}</option>;
     }
 }
 
