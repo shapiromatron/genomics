@@ -63,7 +63,7 @@ class EncodeDatasetFiltering extends React.Component {
                 <EncodeFilterSelect
                     label='Data type'
                     name='data_type'
-                    initiallyVisibile={true}
+                    initiallyVisible={true}
                     options={opts.data_type}
                     values={vals.data_type || []}
                     handleChange={this.handleFilterChange.bind(this)} />
@@ -71,7 +71,7 @@ class EncodeDatasetFiltering extends React.Component {
                 <EncodeFilterSelect
                     label='Cell type'
                     name='cell_type'
-                    initiallyVisibile={true}
+                    initiallyVisible={true}
                     options={opts.cell_type}
                     values={vals.cell_type || []}
                     handleChange={this.handleFilterChange.bind(this)} />
@@ -79,7 +79,7 @@ class EncodeDatasetFiltering extends React.Component {
                 <EncodeFilterSelect
                     label='Treatment'
                     name='treatment'
-                    initiallyVisibile={true}
+                    initiallyVisible={true}
                     options={opts.treatment}
                     values={vals.treatment || []}
                     handleChange={this.handleFilterChange.bind(this)} />
@@ -88,7 +88,7 @@ class EncodeDatasetFiltering extends React.Component {
                 <EncodeFilterSelect
                     label='Antibody'
                     name='antibody'
-                    initiallyVisibile={false}
+                    initiallyVisible={false}
                     options={opts.antibody}
                     values={vals.antibody || []}
                     handleChange={this.handleFilterChange.bind(this)} />
@@ -96,7 +96,7 @@ class EncodeDatasetFiltering extends React.Component {
                 <EncodeFilterSelect
                     label='Phase'
                     name='phase'
-                    initiallyVisibile={false}
+                    initiallyVisible={false}
                     options={opts.phase}
                     values={vals.phase || []}
                     handleChange={this.handleFilterChange.bind(this)} />
@@ -104,7 +104,7 @@ class EncodeDatasetFiltering extends React.Component {
                 <EncodeFilterSelect
                     label='RNA extract'
                     name='rna_extract'
-                    initiallyVisibile={false}
+                    initiallyVisible={false}
                     options={opts.rna_extract}
                     values={[]}
                     handleChange={this.handleFilterChange.bind(this)} />

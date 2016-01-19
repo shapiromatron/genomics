@@ -5,7 +5,7 @@ class EncodeFilterSelect extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {display: this.props.initiallyVisibile};
+        this.state = {display: this.props.initiallyVisible};
     }
 
     handleVisibility() {
@@ -40,7 +40,7 @@ class EncodeFilterSelect extends React.Component {
 }
 
 EncodeFilterSelect.propTypes = {
-    initiallyVisibile: React.PropTypes.bool.isRequired,
+    initiallyVisible: React.PropTypes.bool.isRequired,
     label: React.PropTypes.string.isRequired,
     name: React.PropTypes.string.isRequired,
     options: React.PropTypes.array.isRequired,
