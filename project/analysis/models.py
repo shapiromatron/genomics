@@ -71,24 +71,31 @@ class UserDataset(GenomicDataset):
 
 class EncodeDataset(GenomicDataset):
     data_type = models.CharField(
-        max_length=16)
+        max_length=16,
+        db_index=True)
     cell_type = models.CharField(
-        max_length=32)
+        max_length=32,
+        db_index=True)
     antibody = models.CharField(
         max_length=32,
-        blank=True)
+        blank=True,
+        db_index=True)
     rna_extract = models.CharField(
         max_length=32,
-        blank=True)
+        blank=True,
+        db_index=True)
     treatment = models.CharField(
         max_length=32,
-        blank=True)
+        blank=True,
+        db_index=True)
     phase = models.CharField(
         max_length=32,
-        blank=True)
+        blank=True,
+        db_index=True)
     localization = models.CharField(
         max_length=32,
-        blank=True)
+        blank=True,
+        db_index=True)
     extra_content = JSONField(default=dict)
 
     @classmethod
