@@ -1,7 +1,13 @@
+import $ from 'jQuery';
 import React from 'react';
+import EncodeFilterSelect from './EncodeFilterSelect';
 
 
 class EncodeDatasetFiltering extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
 
     handleApplyFilters(){
         console.log('apply filters');
@@ -23,8 +29,16 @@ class EncodeDatasetFiltering extends React.Component {
         console.log('remove all');
     }
 
+    handleFilterChange(e){
+        let obj = {};
+        obj[e.target.name] = $(e.target).val();
+        this.setState(obj);
+    }
+
     render() {
-        let opts = this.props.options;
+        let opts = this.props.options,
+            vals = this.state;
+
         return (
             <div>
             <div className='row'>
@@ -42,60 +56,47 @@ class EncodeDatasetFiltering extends React.Component {
                     </p>
                 </div>
 
-                <div className='col-md-4'>
-                    <label className='control-label'>Data type</label>
-                    <button className='pull-right btn btn-xs' type='button'>All</button>
-                    <select size='10' className='form-control' multiple={true}>
-                        {opts.data_type.map(
-                           (d, i) => <option key={i} value={d}>{d || '-'}</option>
-                        )}
-                    </select>
-                </div>
+                <EncodeFilterSelect
+                    label='Data type'
+                    name='data_type'
+                    options={opts.data_type}
+                    values={vals.data_type || []}
+                    handleChange={this.handleFilterChange.bind(this)} />
 
-                <div className='col-md-4'>
-                    <label className='control-label'>Cell type</label>
-                    <select size='10' className='form-control' multiple={true}>
-                        {opts.data_type.map(
-                           (d, i) => <option key={i} value={d}>{d || '-'}</option>
-                        )}
-                    </select>
-                </div>
+                <EncodeFilterSelect
+                    label='Cell type'
+                    name='cell_type'
+                    options={opts.cell_type}
+                    values={vals.cell_type || []}
+                    handleChange={this.handleFilterChange.bind(this)} />
 
-                <div className='col-md-4'>
-                    <label className='control-label'>Treatment</label>
-                    <select size='10' className='form-control' multiple={true}>
-                        {opts.treatment.map(
-                           (d, i) => <option key={i} value={d}>{d || '-'}</option>
-                        )}
-                    </select>
-                </div>
+                <EncodeFilterSelect
+                    label='Treatment'
+                    name='treatment'
+                    options={opts.treatment}
+                    values={vals.treatment || []}
+                    handleChange={this.handleFilterChange.bind(this)} />
 
-                <div className='col-md-4'>
-                    <label className='control-label'>Antibody</label>
-                    <select size='10' className='form-control' multiple={true}>
-                        {opts.antibody.map(
-                           (d, i) => <option key={i} value={d}>{d}</option>
-                        )}
-                    </select>
-                </div>
+                <EncodeFilterSelect
+                    label='Antibody'
+                    name='antibody'
+                    options={opts.antibody}
+                    values={vals.antibody || []}
+                    handleChange={this.handleFilterChange.bind(this)} />
 
-                <div className='col-md-4'>
-                    <label className='control-label'>Phase</label>
-                    <select size='10' className='form-control' multiple={true}>
-                        {opts.phase.map(
-                           (d, i) => <option key={i} value={d}>{d || '-'}</option>
-                        )}
-                    </select>
-                </div>
+                <EncodeFilterSelect
+                    label='Phase'
+                    name='phase'
+                    options={opts.phase}
+                    values={vals.phase || []}
+                    handleChange={this.handleFilterChange.bind(this)} />
 
-                <div className='col-md-4'>
-                    <label className='control-label'>RNA extract</label>
-                    <select size='10' className='form-control' multiple={true}>
-                        {opts.rna_extract.map(
-                           (d, i) => <option key={i} value={d}>{d || '-'}</option>
-                        )}
-                    </select>
-                </div>
+                <EncodeFilterSelect
+                    label='RNA extract'
+                    name='rna_extract'
+                    options={opts.rna_extract}
+                    values={[]}
+                    handleChange={this.handleFilterChange.bind(this)} />
 
             </div>
             <div className='row'>
