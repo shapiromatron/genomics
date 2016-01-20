@@ -198,7 +198,7 @@ export function initializeEditForm(id=null){
                 feature_list: null,
                 genome_assembly: null,
                 sort_vector: null,
-                datasets: [],
+                analysis_user_datasets: [],
                 anchor: 1,
                 bin_start: -2500,
                 bin_number: 50,

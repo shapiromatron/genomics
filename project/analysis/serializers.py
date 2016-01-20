@@ -1,3 +1,4 @@
+from itertools import chain
 from rest_framework import serializers
 
 from . import models
@@ -61,6 +62,7 @@ class AnalysisSerializer(serializers.ModelSerializer):
         read_only_fields = ('validated', 'start_time', 'end_time', 'owner')
 
     def create_analysis_datasets(self, analysis, datasets):
+        # todo - don't delete existing because data is attached post-analysis
         analysis.analysisdatasets_set.all().delete()
         objects = [
             models.AnalysisDatasets(
@@ -72,13 +74,19 @@ class AnalysisSerializer(serializers.ModelSerializer):
         models.AnalysisDatasets.objects.bulk_create(objects)
 
     def create(self, validated_data):
-        datasets = validated_data.pop('analysisdatasets_set', [])
+        datasets = chain(
+            validated_data.pop('analysis_user_datasets', []),
+            validated_data.pop('analysis_encode_datasets', [])
+        )
         instance = super().create(validated_data)
         self.create_analysis_datasets(instance, datasets)
         return instance
 
     def update(self, instance, validated_data):
-        datasets = validated_data.pop('analysisdatasets_set', [])
+        datasets = chain(
+            validated_data.pop('analysis_user_datasets', []),
+            validated_data.pop('analysis_encode_datasets', [])
+        )
         instance = super().update(instance, validated_data)
         self.create_analysis_datasets(instance, datasets)
         return instance

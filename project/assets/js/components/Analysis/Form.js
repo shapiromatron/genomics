@@ -103,15 +103,15 @@ class Form extends React.Component {
     }
 
     handleUserDatasetChange (include, dataset_id, display_name) {
-        let obj = _.findWhere(this.state.datasets, {dataset: dataset_id});
+        let obj = _.findWhere(this.state.analysis_user_datasets, {dataset: dataset_id});
         if (obj){
             if (include){
                 obj.display_name = display_name;
             } else {
-                this.state.datasets.pop(_.indexOf(this.state.datasets, obj));
+                this.state.analysis_user_datasets.pop(_.indexOf(this.state.analysis_user_datasets, obj));
             }
         } else {
-            this.state.datasets.push({
+            this.state.analysis_user_datasets.push({
                 dataset: dataset_id,
                 display_name: display_name,
             });
@@ -123,7 +123,7 @@ class Form extends React.Component {
         let allDatasets = _.chain(this.props.user_datasets)
             .filter((d) => d.genome_assembly === this.state.genome_assembly)
             .value();
-        let selected = _.indexBy(this.state.datasets, (d) => d.dataset);
+        let selected = _.indexBy(this.state.analysis_user_datasets, (d) => d.dataset);
 
         return (
             <table className='table table-condensed'>
