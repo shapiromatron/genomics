@@ -2,6 +2,7 @@ import React from 'react';
 
 import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
+import NonFieldError from '../NonFieldError';
 import GenomeAssemblySelect from '../GenomeAssemblySelect';
 import urls from '../../constants/urls';
 import h from '../../utils/helpers';
@@ -46,17 +47,6 @@ class Form extends React.Component {
             'Create user dataset';
     }
 
-    renderNonFieldErrors(errs){
-        if (!errs.non_field_errors) return null;
-        return (
-            <div className='form-group'>
-                <div className='col-sm-12 alert alert-danger has-error'>
-                    <FormFieldError errors={errs.non_field_errors} />
-                </div>
-            </div>
-        );
-    }
-
     render() {
         let errs = this.props.errors || {};
         return (
@@ -66,7 +56,7 @@ class Form extends React.Component {
 
                 <form className='form-horizontal' onSubmit={this.handleSubmit.bind(this)}>
 
-                    {this.renderNonFieldErrors(errs)}
+                    <NonFieldError errors={errs} />
 
                     <div className={h.getInputDivClass('name', errs)}>
                         <label className='col-sm-2 control-label'>Name</label>

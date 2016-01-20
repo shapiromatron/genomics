@@ -2,6 +2,7 @@ import React from 'react';
 
 import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
+import NonFieldError from '../NonFieldError';
 import urls from '../../constants/urls';
 import h from '../../utils/helpers';
 
@@ -51,17 +52,6 @@ class Form extends React.Component {
             'Add sort vector';
     }
 
-    renderNonFieldErrors(errs){
-        if (!errs.non_field_errors) return null;
-        return (
-            <div className='form-group'>
-                <div className='col-sm-12 alert alert-danger has-error'>
-                    <FormFieldError errors={errs.non_field_errors} />
-                </div>
-            </div>
-        );
-    }
-
     getFeatureListOptions(){
         return this.props.feature_lists.map(function(d){
             return <option key={d.id} value={d.id}>{d.name}</option>;
@@ -77,7 +67,7 @@ class Form extends React.Component {
 
                 <form className='form-horizontal' onSubmit={this.handleSubmit.bind(this)}>
 
-                    {this.renderNonFieldErrors(errs)}
+                    <NonFieldError errors={errs} />
 
                     <div className={h.getInputDivClass('feature_list', errs)}>
                         <label className='col-sm-2 control-label'>Feature list</label>
