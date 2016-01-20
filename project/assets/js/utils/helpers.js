@@ -50,7 +50,15 @@ var helpers = {
     getPatch(originalObj, newObj){
         let patch = {};
         _.each(newObj, function(v, k){
-            if (originalObj[k] !== v) patch[k] = v;
+            if (originalObj[k] !== v){
+                if (v instanceof Array || v instanceof Object){
+                    if (JSON.stringify(originalObj[k]) != JSON.stringify(v)){
+                        patch[k] = v;
+                    }
+                } else {
+                    patch[k] = v;
+                }
+            }
         });
         return patch;
     },
