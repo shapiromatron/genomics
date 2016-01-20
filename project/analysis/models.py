@@ -211,6 +211,22 @@ class Analysis(GenomicBinSettings):
     last_updated = models.DateTimeField(
         auto_now=True)
 
+    @property
+    def user_datasets(self):
+        return UserDataset.objects.filter(id__in=self.datasets.values_list('id', flat=True))
+
+    @property
+    def encode_datasets(self):
+        return EncodeDataset.objects.filter(id__in=self.datasets.values_list('id' ,flat=True))
+
+    @property
+    def analysis_user_datasets(self):
+        return self.analysisdatasets_set.filter(dataset__in=self.user_datasets)
+
+    @property
+    def analysis_encode_datasets(self):
+        return self.analysisdatasets_set.filter(dataset__in=self.encode_datasets)
+
     class Meta:
         verbose_name_plural = 'Analyses'
 
