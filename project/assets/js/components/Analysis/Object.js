@@ -32,6 +32,27 @@ class _Object extends React.Component {
         );
     }
 
+    renderUserDatasets(){
+        let datasets = this.props.object.analysis_user_datasets;
+        return (
+            <tr>
+                <th style={{width:'15%'}}>User datasets</th>
+                <td style={{width:'85%'}}>
+                    <ul>
+                    {datasets.map((d)=>{
+                        let url = h.getObjectURL(urls.user_dataset.url, d.id);
+                        return (
+                            <li key={d.id}>
+                                <Link to={url}>{d.display_name}</Link>
+                            </li>
+                        );
+                    })}
+                    </ul>
+                </td>
+            </tr>
+        );
+    }
+
     render() {
         let object = this.props.object;
         const url = h.getObjectURL(urls.analysis.url, object.id);
@@ -69,6 +90,7 @@ class _Object extends React.Component {
                         {this.renderDetailRow('Genome assembly', object.genome_assembly_display)}
                         {this.renderDetailRow('Date created', h.datetimeFormat(object.created))}
                         {this.renderDetailRow('Date updated', h.datetimeFormat(object.last_updated))}
+                        {this.renderUserDatasets()}
                     </tbody>
                 </table>
                 {this.renderDeleteConfirmation()}
