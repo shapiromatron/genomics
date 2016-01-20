@@ -4,7 +4,7 @@ import React from 'react';
 import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
 import GenomeAssemblySelect from '../GenomeAssemblySelect';
-import UserDatasetFormRow from './UserDatasetFormRow';
+import UserDatasetSelection from './UserDatasetSelection';
 import EncodeDatasetFiltering from '../../containers/Analysis/EncodeDatasetFiltering';
 import urls from '../../constants/urls';
 import h from '../../utils/helpers';
@@ -116,37 +116,6 @@ class Form extends React.Component {
                 display_name: display_name,
             });
         }
-    }
-
-    renderUserDatasets () {
-
-        let allDatasets = _.chain(this.props.user_datasets)
-            .filter((d) => d.genome_assembly === this.state.genome_assembly)
-            .value();
-        let selected = _.indexBy(this.state.analysis_user_datasets, (d) => d.dataset);
-
-        return (
-            <table className='table table-condensed'>
-                <thead>
-                    <tr>
-                        <th>Include? Dataset short-name</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {
-                    allDatasets.map((d) => {
-                        return <UserDatasetFormRow
-                            key={d.id}
-                            object={d}
-                            initial={selected[d.id] || null}
-                            handleChange={this.handleUserDatasetChange.bind(this)} />;
-                    })
-                }
-                </tbody>
-            </table>
-        );
     }
 
     render() {
@@ -288,7 +257,11 @@ class Form extends React.Component {
 
                     <hr />
                     <h3>User-uploaded genome datasets </h3>
-                    {this.renderUserDatasets()}
+                    <UserDatasetSelection
+                        user_datasets={this.props.user_datasets}
+                        genome_assembly={this.state.genome_assembly}
+                        analysis_user_datasets={this.state.analysis_user_datasets}
+                        handleUserDatasetChange={this.handleUserDatasetChange.bind(this)}/>
 
                     <hr />
                     <h3>ENCODE data selection</h3>
