@@ -89,7 +89,6 @@ function mapStateToProps(state) {
         model: state.analysis,
         feature_list: state.feature_list.items,
         sort_vector: state.sort_vector.items,
-        user_dataset: state.user_dataset.items,
     };
 }
 function mapDispatchToProps(dispatch) {

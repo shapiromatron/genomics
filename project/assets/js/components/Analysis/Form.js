@@ -5,7 +5,7 @@ import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
 import NonFieldError from '../NonFieldError';
 import GenomeAssemblySelect from '../GenomeAssemblySelect';
-import UserDatasetSelection from './UserDatasetSelection';
+import UserDatasetSelection from '../../containers/Analysis/UserDatasetSelection';
 import EncodeDatasetFiltering from '../../containers/Analysis/EncodeDatasetFiltering';
 import urls from '../../constants/urls';
 import h from '../../utils/helpers';
@@ -15,7 +15,6 @@ class Form extends React.Component {
 
     constructor(props) {
         super(props);
-        this.setDefaultFeatureList(props);
         this.state = {
             _expandedOptions: false,
         };
@@ -78,25 +77,9 @@ class Form extends React.Component {
     }
 
     handleExecute (e) {
-        const isActive =this.refs.executeBtn.getAttribute('class').indexOf('disabled')===-1;
+        const isActive = this.refs.executeBtn.getAttribute('class').indexOf('disabled')===-1;
         if (isActive){
             alert('starting...');
-        }
-    }
-
-    handleUserDatasetChange (include, dataset_id, display_name) {
-        let obj = _.findWhere(this.state.analysis_user_datasets, {dataset: dataset_id});
-        if (obj){
-            if (include){
-                obj.display_name = display_name;
-            } else {
-                this.state.analysis_user_datasets.pop(_.indexOf(this.state.analysis_user_datasets, obj));
-            }
-        } else {
-            this.state.analysis_user_datasets.push({
-                dataset: dataset_id,
-                display_name: display_name,
-            });
         }
     }
 
@@ -240,7 +223,7 @@ class Form extends React.Component {
 
                     <hr />
                     <h3>User-uploaded genome datasets </h3>
-
+                    <UserDatasetSelection />
 
                     <hr />
                     <h3>ENCODE data selection</h3>
@@ -266,5 +249,14 @@ class Form extends React.Component {
         );
     }
 }
+
+Form.propTypes = {
+    object: React.PropTypes.object.isRequired,
+    feature_lists: React.PropTypes.array.isRequired,
+    sort_vectors: React.PropTypes.array.isRequired,
+    errors: React.PropTypes.object.isRequired,
+    handleSubmit: React.PropTypes.func.isRequired,
+    handleModelChange: React.PropTypes.func.isRequired,
+};
 
 export default Form;

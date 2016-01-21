@@ -7,34 +7,32 @@ import h from '../../utils/helpers';
 
 class UserDatasetFormRow extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = (props.initial) ?
-            Object.assign({}, props.initial, {selected: true})
-        : {
-            selected: false,
-            dataset: props.object.id,
-            display_name: props.object.name,
+    handleChange (e) {
+        let includes = null,
+            removes = null;
+        if(this.refs.checkBox.checked){
+            includes = {
+                dataset: this.props.object.id,
+                display_name: this.refs.displayName.value,
+            };
+        } else {
+            removes = this.props.object.id;
+        }
+        this.props.handleChange(includes, removes);
+    }
+
+    getFormProps (object) {
+        return (this.props.initial)? this.props.initial: {
+            dataset: false,
+            display_name: object.name,
         };
     }
 
-    handleChange (e) {
-        if(e.target === this.refs.checkBox)
-            this.setState({selected: e.target.checked});
-
-        if(e.target === this.refs.displayName)
-            this.setState({display_name: e.target.value});
-
-        this.props.handleChange(
-            this.refs.checkBox.checked,
-            this.props.object.id,
-            this.refs.displayName.value
-        );
-    }
-
     render () {
-        let d = this.props.object,
-            url = h.getObjectURL(urls.user_dataset.url, d.id);
+        let object = this.props.object,
+            formValues = this.getFormProps(object),
+            url = h.getObjectURL(urls.user_dataset.url, object.id),
+            showInput = (formValues.dataset) ? '1' : '0.3';
         return (
             <tr>
                 <td style={{width:'30%'}}>
@@ -43,22 +41,23 @@ class UserDatasetFormRow extends React.Component {
                             <input
                                 ref='checkBox'
                                 type='checkbox'
-                                checked={this.state.selected}
+                                checked={formValues.dataset}
                                 onChange={this.handleChange.bind(this)}/>
                         </span>
                         <input
+                            style={{opacity: showInput}}
                             ref='displayName'
                             type='text'
-                            value={this.state.display_name}
+                            value={formValues.display_name}
                             onChange={this.handleChange.bind(this)}
                             className='form-control' />
                     </div>
                 </td>
                 <td style={{width:'25%'}}>
-                    <Link to={url}>{d.name}</Link>
+                    <Link to={url}>{object.name}</Link>
                 </td>
                 <td style={{width:'45%'}}>
-                    {d.description}
+                    {object.description}
                 </td>
             </tr>
         );

@@ -7,11 +7,10 @@ import UserDatasetFormRow from './UserDatasetFormRow';
 class UserDatasetSelection extends React.Component {
 
     render() {
-
-        let allDatasets = _.chain(this.props.user_datasets)
-            .filter((d) => d.genome_assembly === this.props.genome_assembly)
+        let allDatasets = _.chain(this.props.allDatasets)
+            .filter(d => d.genome_assembly === this.props.genome_assembly)
             .value();
-        let selected = _.indexBy(this.props.analysis_user_datasets, (d) => d.dataset);
+        let selected = _.indexBy(this.props.selectedDatasets, 'dataset');
 
         return (
             <table className='table table-condensed'>
@@ -28,7 +27,7 @@ class UserDatasetSelection extends React.Component {
                         return <UserDatasetFormRow
                             key={d.id}
                             object={d}
-                            initial={selected[d.id] || null}
+                            initial={selected[d.id]}
                             handleChange={this.props.handleUserDatasetChange} />;
                     })
                 }
@@ -41,9 +40,9 @@ class UserDatasetSelection extends React.Component {
 export default UserDatasetSelection;
 
 UserDatasetSelection.propTypes = {
-    user_datasets: React.PropTypes.array.isRequired,
+    allDatasets: React.PropTypes.array.isRequired,
+    selectedDatasets: React.PropTypes.array.isRequired,
     genome_assembly: React.PropTypes.number.isRequired,
-    analysis_user_datasets: React.PropTypes.array.isRequired,
     handleUserDatasetChange: React.PropTypes.func.isRequired,
 };
 
