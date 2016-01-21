@@ -53,6 +53,22 @@ class _Object extends React.Component {
         );
     }
 
+    renderEncodeDatasets(){
+        let datasets = this.props.object.analysis_encode_datasets;
+        return (
+            <tr>
+                <th style={{width:'15%'}}>ENCODE datasets</th>
+                <td style={{width:'85%'}}>
+                    <ul>
+                    {datasets.map((d) =>
+                        <li key={d.dataset}>{d.display_name}</li>
+                    )}
+                    </ul>
+                </td>
+            </tr>
+        );
+    }
+
     render() {
         let object = this.props.object;
         const url = h.getObjectURL(urls.analysis.url, object.id);
@@ -91,6 +107,7 @@ class _Object extends React.Component {
                         {this.renderDetailRow('Date created', h.datetimeFormat(object.created))}
                         {this.renderDetailRow('Date updated', h.datetimeFormat(object.last_updated))}
                         {this.renderUserDatasets()}
+                        {this.renderEncodeDatasets()}
                     </tbody>
                 </table>
                 {this.renderDeleteConfirmation()}
