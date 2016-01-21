@@ -1,5 +1,6 @@
 import _ from 'underscore';
 import * as types from '../constants/ActionTypes';
+import h from '../utils/helpers';
 
 
 let defaultState = {
@@ -88,6 +89,11 @@ export default function (state=defaultState, action) {
         return Object.assign({}, state, {
             editObjectErrors: action.errors,
         });
+
+    case types.AN_CHANGE_EDIT_OBJECT:
+        let editObject = h.deepCopy(state.editObject);
+        editObject[action.key] = action.value;
+        return Object.assign({}, state, {editObject});
 
     case types.AN_RECIEVE_ENCODE_OPTIONS:
         return Object.assign({}, state, {

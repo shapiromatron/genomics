@@ -12,35 +12,42 @@ class EncodeDatasetFiltering extends React.Component {
             filters: {},
             numSelected: 0,
             numIncludedSelected: 0,
-            selected: {},
         };
     }
 
+    getEncodeDataFormats($els){
+        return $els.map((i, el) => {
+            return {
+                dataset: parseInt(el.value),
+                display_name: el.textContent,
+            };
+        }).get();
+    }
+
     handleAddSelected(){
-        let selected = this.state.selected;
-        $(this.refs.available).find('option:selected').each((i, el)=>{
-            selected[parseInt(el.value)] = this.availableKeys[parseInt(el.value)];
-        });
-        this.setState({selected});
+        let additions = this.getEncodeDataFormats(
+            $(this.refs.available).find('option:selected'));
+        this.props.handleSelectionChange(additions, null);
     }
 
     handleAddAll(){
-        let selected = Object.assign({},
-            this.state.selected,
-            this.props.availableDatasets);
-        this.setState({selected});
+        let additions = this.getEncodeDataFormats(
+            $(this.refs.available).children());
+        this.props.handleSelectionChange(additions, null);
     }
 
     handleRemoveSelected(){
-        let selected = this.state.selected;
-        $(this.refs.selected).find('option:selected').each(function(i, el){
-            delete selected[parseInt(el.value)];
-        });
-        this.setState(selected);
+        let removals = this.getEncodeDataFormats(
+            $(this.refs.selected).find('option:selected'));
+        this.props.handleSelectionChange(null, removals);
+        this.setState({numIncludedSelected: 0});
     }
 
     handleRemoveAll(){
-        this.setState({selected: {}});
+        let removals = this.getEncodeDataFormats(
+            $(this.refs.selected).children());
+        this.props.handleSelectionChange(null, removals);
+        this.setState({numIncludedSelected: 0});
     }
 
     handleApplyFilters(){
@@ -190,7 +197,7 @@ class EncodeDatasetFiltering extends React.Component {
     }
 
     renderIncludedDatasets(){
-        let selected = _.values(this.state.selected);
+        let selected = this.props.selectedDatasets;
         return (
             <div className='col-md-5'>
                 <h4>Included datasets</h4>
@@ -199,12 +206,16 @@ class EncodeDatasetFiltering extends React.Component {
                     size='10'
                     ref='selected'
                     className='form-control' multiple={true}>
-                    {selected.map(this.renderDatsetOption)}
+                    {selected.map(this.renderSelectedOption)}
                 </select>
                 <p><strong>Included:</strong> <span>{selected.length}</span></p>
                 <p><strong>Selected:</strong> <span>{this.state.numIncludedSelected}</span></p>
             </div>
         );
+    }
+
+    renderSelectedOption(d){
+        return <option key={d.dataset} value={d.dataset}>{d.display_name}</option>;
     }
 
     renderDatsetOption(d){
@@ -216,6 +227,8 @@ EncodeDatasetFiltering.propTypes = {
     options: React.PropTypes.object.isRequired,
     handleApplyFilters: React.PropTypes.func.isRequired,
     availableDatasets: React.PropTypes.array.isRequired,
+    handleSelectionChange: React.PropTypes.func.isRequired,
+    selectedDatasets: React.PropTypes.array.isRequired,
 };
 
 export default EncodeDatasetFiltering;

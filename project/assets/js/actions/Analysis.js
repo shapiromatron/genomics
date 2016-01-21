@@ -199,6 +199,7 @@ export function initializeEditForm(id=null){
                 genome_assembly: null,
                 sort_vector: null,
                 analysis_user_datasets: [],
+                analysis_encode_datasets: [],
                 anchor: 1,
                 bin_start: -2500,
                 bin_number: 50,
@@ -206,5 +207,15 @@ export function initializeEditForm(id=null){
             };
         }
         dispatch(setEdititableObject(object));
+    };
+}
+
+export function changeEditObject(key, value){
+    return (dispatch, getState) => {
+        dispatch({
+            type: types.AN_CHANGE_EDIT_OBJECT,
+            key,
+            value,
+        });
     };
 }
