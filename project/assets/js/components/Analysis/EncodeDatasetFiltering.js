@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import $ from 'jQuery';
+import $ from 'jquery';
 import React from 'react';
 import EncodeFilterSelect from './EncodeFilterSelect';
 import h from '../../utils/helpers';
