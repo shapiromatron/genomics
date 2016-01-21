@@ -28,7 +28,7 @@ class GenomeAssemblySelect extends React.Component {
 
 GenomeAssemblySelect.propTypes = {
     errors: React.PropTypes.object,
-    value: React.PropTypes.number.isRequired,
+    value: React.PropTypes.number,
     handleChange: React.PropTypes.func.isRequired,
 };
 

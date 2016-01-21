@@ -32,7 +32,7 @@ class UserDatasetFormRow extends React.Component {
         let object = this.props.object,
             formValues = this.getFormProps(object),
             url = h.getObjectURL(urls.user_dataset.url, object.id),
-            showInput = (formValues.dataset) ? '1' : '0.3';
+            showInput = (formValues.dataset) ? 1 : 0.7;
         return (
             <tr>
                 <td style={{width:'30%'}}>

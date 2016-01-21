@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import React from 'react';
 
 import BreadcrumbBar from '../BreadcrumbBar';
@@ -52,20 +51,15 @@ class Form extends React.Component {
 
     getFeatureListOptions(){
         return this.props.feature_lists
-            .filter((d) => d.genome_assembly===this.state.genome_assembly)
+            .filter((d) => d.genome_assembly===this.props.object.genome_assembly)
             .map((d) => <option key={d.id} value={d.id}>{d.name}</option>);
     }
 
     getSortVectorOptions(){
-        let opts = [
-            <option key='' value=''>---</option>,
-        ];
-        let fl = parseInt(this.state.feature_list);
-        let additions = this.props.sort_vectors.filter(function(d){
-            return d.feature_list === fl;
-        }).map(function(d){
-            return <option key={d.id} value={d.id}>{d.name}</option>;
-        });
+        let opts = [<option key='' value=''>---</option>],
+            additions = this.props.sort_vectors
+                .filter((d) => d.feature_list === this.props.object.feature_list)
+                .map((d) => <option key={d.id} value={d.id}>{d.name}</option>);
         opts.push.apply(opts, additions);
         return opts;
     }
