@@ -15,29 +15,19 @@ class Form extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = props.object;
         this.setDefaultFeatureList(props);
-        this.state._expandedOptions = false;
-    }
-
-    componentWillReceiveProps(props){
-        this.setDefaultFeatureList(props);
-    }
-
-    setDefaultFeatureList(props){
-        if (props.feature_lists.length > 0 && !this.state.feature_list)
-            this.state.feature_list = props.feature_lists[0].id;
+        this.state = {
+            _expandedOptions: false,
+        };
     }
 
     handleChange(e){
-        let obj = {};
-        obj[e.target.name] = h.getValue(e.target);
-        this.setState(obj);
+        this.props.handleModelChange(e.target.name, h.getValue(e.target));
     }
 
     handleSubmit(e){
         e.preventDefault();
-        this.props.handleSubmit(this.state);
+        this.props.handleSubmit();
     }
 
     getBreadcrumbs() {
@@ -82,7 +72,9 @@ class Form extends React.Component {
     }
 
     handleOptionsExpander () {
-        this.setState({_expandedOptions: !this.state._expandedOptions});
+        this.setState({
+            _expandedOptions: !this.state._expandedOptions,
+        });
     }
 
     handleExecute (e) {
@@ -109,7 +101,8 @@ class Form extends React.Component {
     }
 
     render() {
-        let errs = this.props.errors || {};
+        let obj = this.props.object,
+            errs = this.props.errors || {};
         return (
             <div>
                 {this.getBreadcrumbs()}
@@ -123,7 +116,7 @@ class Form extends React.Component {
                         <label className='col-sm-2 control-label'>Name</label>
                         <div className='col-sm-10'>
                             <input name='name' className='form-control' type='text'
-                                   value={this.state.name}
+                                   value={obj.name}
                                    onChange={this.handleChange.bind(this)} />
                             <FormFieldError errors={errs.name} />
                         </div>
@@ -133,7 +126,7 @@ class Form extends React.Component {
                         <label className='col-sm-2 control-label'>Description</label>
                         <div className='col-sm-10'>
                             <textarea name='description' className='form-control'
-                                   value={this.state.description}
+                                   value={obj.description}
                                    onChange={this.handleChange.bind(this)} />
                             <FormFieldError errors={errs.description} />
                         </div>
@@ -141,14 +134,14 @@ class Form extends React.Component {
 
                     <GenomeAssemblySelect
                         errors={errs}
-                        value={this.state.genome_assembly}
+                        value={obj.genome_assembly}
                         handleChange={this.handleChange.bind(this)} />
 
                     <div className={h.getInputDivClass('feature_list', errs)}>
                         <label className='col-sm-2 control-label'>Feature list</label>
                         <div className='col-sm-10'>
                             <select name='feature_list' className='form-control' type='text'
-                                   value={this.state.feature_list}
+                                   value={obj.feature_list}
                                    onChange={this.handleChange.bind(this)}>
                                 {this.getFeatureListOptions()}
                             </select>
@@ -160,7 +153,7 @@ class Form extends React.Component {
                         <label className='col-sm-2 control-label'>Sort vector</label>
                         <div className='col-sm-10'>
                             <select name='sort_vector' className='form-control' type='text'
-                                   value={this.state.sort_vector}
+                                   value={obj.sort_vector}
                                    onChange={this.handleChange.bind(this)}>
                                 {this.getSortVectorOptions()}
                             </select>
@@ -183,7 +176,7 @@ class Form extends React.Component {
                             <label className='col-sm-2 control-label'>Public</label>
                             <div className='col-sm-10'>
                                 <input type='checkbox' name='public'
-                                       checked={this.state.public}
+                                       checked={obj.public}
                                        onChange={this.handleChange.bind(this)} />
                                 <FormFieldError errors={errs.public} />
                             </div>
@@ -194,7 +187,7 @@ class Form extends React.Component {
                             <div className='col-sm-10'>
                                 <select className='form-control'
                                        name='anchor'
-                                       value={this.state.anchor}
+                                       value={obj.anchor}
                                        onChange={this.handleChange.bind(this)} >
                                     <option value="0">Start</option>
                                     <option value="1">Center</option>
@@ -209,7 +202,7 @@ class Form extends React.Component {
                             <div className='col-sm-10'>
                                 <input className='form-control'
                                        type='number' name='bin_start'
-                                       value={this.state.bin_start}
+                                       value={obj.bin_start}
                                        onChange={this.handleChange.bind(this)} />
                                 <p className='help-block'>Relative bin-start from item in feature-list.</p>
                                 <FormFieldError errors={errs.bin_start} />
@@ -222,7 +215,7 @@ class Form extends React.Component {
                                 <input className='form-control'
                                        min={1}
                                        type='number' name='bin_size'
-                                       value={this.state.bin_size}
+                                       value={obj.bin_size}
                                        onChange={this.handleChange.bind(this)} />
                                 <p className='help-block'>Bin-size (minimum: 1)</p>
                                 <FormFieldError errors={errs.bin_size} />
@@ -236,7 +229,7 @@ class Form extends React.Component {
                                        type='number' name='bin_number'
                                        min={1}
                                        max={250}
-                                       value={this.state.bin_number}
+                                       value={obj.bin_number}
                                        onChange={this.handleChange.bind(this)} />
                                 <p className='help-block'>Number of bins [1 - 250]</p>
                                 <FormFieldError errors={errs.bin_number} />
@@ -247,11 +240,7 @@ class Form extends React.Component {
 
                     <hr />
                     <h3>User-uploaded genome datasets </h3>
-                    <UserDatasetSelection
-                        user_datasets={this.props.user_datasets}
-                        genome_assembly={this.state.genome_assembly}
-                        analysis_user_datasets={this.state.analysis_user_datasets}
-                        handleUserDatasetChange={this.handleUserDatasetChange.bind(this)}/>
+
 
                     <hr />
                     <h3>ENCODE data selection</h3>

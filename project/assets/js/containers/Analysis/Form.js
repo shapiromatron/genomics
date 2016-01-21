@@ -9,7 +9,8 @@ import h from '../../utils/helpers';
 
 import {
     postObject, patchObject,
-    initializeEditForm, fetchEncodeOptionsIfNeeded
+    initializeEditForm, fetchEncodeOptionsIfNeeded,
+    changeEditObject,
 } from '../../actions/Analysis';
 
 import Component from '../../components/Analysis/Form';
@@ -34,9 +35,10 @@ class Container extends React.Component {
         return null;
     }
 
-    handleSubmit(newObj){
+    handleSubmit(){
         const { dispatch } = this.props;
-        let id = this.getID(),
+        let newObj = this.props.model.editObject,
+            id = this.getID(),
             cb = () => h.goBack();
         if (id){
             let patch = h.getPatch(this.getObject(), newObj);
@@ -44,6 +46,10 @@ class Container extends React.Component {
         } else {
             dispatch(postObject(newObj, cb));
         }
+    }
+
+    handleModelChange(key, value){
+        this.props.dispatch(changeEditObject(key, value));
     }
 
     isReadyToRender(){
@@ -72,6 +78,7 @@ class Container extends React.Component {
                 user_datasets={this.props.user_dataset}
                 errors={model.editObjectErrors}
                 handleSubmit={this.handleSubmit.bind(this)}
+                handleModelChange={this.handleModelChange.bind(this)}
             />
         );
     }
