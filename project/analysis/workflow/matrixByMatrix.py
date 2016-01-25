@@ -4,6 +4,7 @@ import click
 import numpy
 from scipy import stats
 from scipy.cluster.hierarchy import linkage, dendrogram
+from scipy.spatial.distance import squareform
 import os
 import json
 
@@ -111,10 +112,10 @@ class MatrixByMatrix():
                 output_matrix.append([])
                 for j in range(len(matrix_list)):
                     if i == j:
-                        output_matrix[-1].append(1)
+                        output_matrix[-1].append(0)
                     else:
                         output_matrix[-1].append(
-                            self.findMatrixMatrixCorr(matrix_list[i][1],
+                            1 - self.findMatrixMatrixCorr(matrix_list[i][1],
                             matrix_list[j][1], self.bin_number)
                         )
         
@@ -122,7 +123,10 @@ class MatrixByMatrix():
             row_names.append(matrix_entry[0])
         
         output_array = numpy.array(output_matrix)
-        lnk = linkage(output_array)
+        if self.sort_vector:
+            lnk = linkage(output_array)
+        else:
+            lnk = linkage(squareform(output_array))
         dg = dendrogram(lnk)
 
         # build output rows
