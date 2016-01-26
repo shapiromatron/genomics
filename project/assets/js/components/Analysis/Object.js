@@ -32,6 +32,43 @@ class _Object extends React.Component {
         );
     }
 
+    renderUserDatasets(){
+        let datasets = this.props.object.analysis_user_datasets;
+        return (
+            <tr>
+                <th style={{width:'15%'}}>User datasets</th>
+                <td style={{width:'85%'}}>
+                    <ul>
+                    {datasets.map((d)=>{
+                        let url = h.getObjectURL(urls.user_dataset.url, d.id);
+                        return (
+                            <li key={d.id}>
+                                <Link to={url}>{d.display_name}</Link>
+                            </li>
+                        );
+                    })}
+                    </ul>
+                </td>
+            </tr>
+        );
+    }
+
+    renderEncodeDatasets(){
+        let datasets = this.props.object.analysis_encode_datasets;
+        return (
+            <tr>
+                <th style={{width:'15%'}}>ENCODE datasets</th>
+                <td style={{width:'85%'}}>
+                    <ul>
+                    {datasets.map((d) =>
+                        <li key={d.dataset}>{d.display_name}</li>
+                    )}
+                    </ul>
+                </td>
+            </tr>
+        );
+    }
+
     render() {
         let object = this.props.object;
         const url = h.getObjectURL(urls.analysis.url, object.id);
@@ -59,12 +96,18 @@ class _Object extends React.Component {
 
                 <table className='table table-condensed' style={{tableLayout: 'fixed'}}>
                     <tbody>
+                        {this.renderDetailRow('Anchor', object.anchor_display)}
+                        {this.renderDetailRow('Bin start', object.bin_start)}
+                        {this.renderDetailRow('Bin size', object.bin_size)}
+                        {this.renderDetailRow('Bin number', object.bin_number)}
                         {this.renderDetailRow('Description', object.description)}
                         {this.renderDetailRow('Public', h.booleanCheckbox(object.public))}
                         {this.renderDetailRow('Validated', h.booleanCheckbox(object.validated))}
                         {this.renderDetailRow('Genome assembly', object.genome_assembly_display)}
                         {this.renderDetailRow('Date created', h.datetimeFormat(object.created))}
                         {this.renderDetailRow('Date updated', h.datetimeFormat(object.last_updated))}
+                        {this.renderUserDatasets()}
+                        {this.renderEncodeDatasets()}
                     </tbody>
                 </table>
                 {this.renderDeleteConfirmation()}

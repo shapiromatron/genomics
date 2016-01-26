@@ -1,5 +1,6 @@
 import _ from 'underscore';
 import * as types from '../constants/ActionTypes';
+import h from '../utils/helpers';
 
 
 let defaultState = {
@@ -8,7 +9,9 @@ let defaultState = {
     items: [],
     editObject: null,
     editObjectErrors: null,
+    isFetchingEncode: false,
     encodeOptions: null,
+    encodeDatasetsAvailable: [],
 };
 
 
@@ -19,6 +22,11 @@ export default function (state=defaultState, action) {
     case types.AN_REQUEST:
         return Object.assign({}, state, {
             isFetching: true,
+        });
+
+    case types.AN_REQUEST_ENCODE:
+        return Object.assign({}, state, {
+            isFetchingEncode: true,
         });
 
     case types.AN_RECEIVE_OBJECTS:
@@ -82,9 +90,20 @@ export default function (state=defaultState, action) {
             editObjectErrors: action.errors,
         });
 
+    case types.AN_CHANGE_EDIT_OBJECT:
+        let editObject = h.deepCopy(state.editObject);
+        editObject[action.key] = action.value;
+        return Object.assign({}, state, {editObject});
+
     case types.AN_RECIEVE_ENCODE_OPTIONS:
         return Object.assign({}, state, {
             encodeOptions: action.json,
+            isFetchingEncode: false,
+        });
+
+    case types.AN_RECIEVE_ENCODE_DATASETS:
+        return Object.assign({}, state, {
+            encodeDatasetsAvailable: action.json,
         });
 
     default:

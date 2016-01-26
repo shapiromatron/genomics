@@ -36,8 +36,11 @@ var helpers = {
         switch(target.type){
         case 'checkbox':
             return target.checked;
-        case 'select-one':
-            return parseInt(target.value) || target.value;
+        case 'number':
+            return parseFloat(target.value);
+        case 'select-one':  // use isFinite in-case value is 0
+            let val = parseInt(target.value);
+            return (_.isFinite(val)) ? val : target.value;
         case 'text':
         case 'textarea':
         default:
@@ -47,7 +50,15 @@ var helpers = {
     getPatch(originalObj, newObj){
         let patch = {};
         _.each(newObj, function(v, k){
-            if (originalObj[k] !== v) patch[k] = v;
+            if (originalObj[k] !== v){
+                if (v instanceof Array || v instanceof Object){
+                    if (JSON.stringify(originalObj[k]) != JSON.stringify(v)){
+                        patch[k] = v;
+                    }
+                } else {
+                    patch[k] = v;
+                }
+            }
         });
         return patch;
     },

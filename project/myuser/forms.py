@@ -138,7 +138,7 @@ class ResetPasswordEmailForm(PasswordResetForm):
 
         helper.layout.append(
             cfb.FormActions(
-                cfl.Submit('login', 'Login'),
+                cfl.Submit('submit', 'Submit'),
                 cfl.HTML(
                     '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
                     .format(reverse('user:login'))),

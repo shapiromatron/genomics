@@ -17,6 +17,19 @@ class BaseFormHelper(cf.FormHelper):
             self.layout = self.build_default_layout(form)
             self.addButtons()
 
+    def build_default_layout(self, form):
+        layout = cfl.Layout(*form.fields.keys())
+
+        if self.kwargs.get('legend_text'):
+            layout.insert(0, cfl.HTML(u"<legend>{}</legend>".format(
+                self.kwargs.get('legend_text'))))
+
+        if self.kwargs.get('help_text'):
+            layout.insert(1, cfl.HTML("""<p class="help-block">{}</p><br>""".format(
+                self.kwargs.get('help_text'))))
+
+        return layout
+
     def addButtons(self):
         btns = []
         if self.kwargs.get('submit'):

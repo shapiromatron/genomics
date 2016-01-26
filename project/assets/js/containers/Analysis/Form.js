@@ -9,7 +9,8 @@ import h from '../../utils/helpers';
 
 import {
     postObject, patchObject,
-    initializeEditForm, fetchEncodeOptionsIfNeeded
+    initializeEditForm, fetchEncodeOptionsIfNeeded,
+    changeEditObject,
 } from '../../actions/Analysis';
 
 import Component from '../../components/Analysis/Form';
@@ -34,9 +35,10 @@ class Container extends React.Component {
         return null;
     }
 
-    handleSubmit(newObj){
+    handleSubmit(){
         const { dispatch } = this.props;
-        let id = this.getID(),
+        let newObj = this.props.model.editObject,
+            id = this.getID(),
             cb = () => h.goBack();
         if (id){
             let patch = h.getPatch(this.getObject(), newObj);
@@ -46,11 +48,13 @@ class Container extends React.Component {
         }
     }
 
+    handleModelChange(key, value){
+        this.props.dispatch(changeEditObject(key, value));
+    }
+
     isReadyToRender(){
         let id = this.getID(),
             model = this.props.model;
-
-        if (model.encodeOptions === null) return false;
 
         if (id && model.editObject === null ||
             id && model.editObject && id !== model.editObject.id)
@@ -68,13 +72,13 @@ class Container extends React.Component {
         if (!this.isReadyToRender()) return <Loading />;
         return (
             <Component
-                encode_options={model.encodeOptions}
                 object={model.editObject}
                 feature_lists={this.props.feature_list}
                 sort_vectors={this.props.sort_vector}
                 user_datasets={this.props.user_dataset}
                 errors={model.editObjectErrors}
                 handleSubmit={this.handleSubmit.bind(this)}
+                handleModelChange={this.handleModelChange.bind(this)}
             />
         );
     }
@@ -85,7 +89,6 @@ function mapStateToProps(state) {
         model: state.analysis,
         feature_list: state.feature_list.items,
         sort_vector: state.sort_vector.items,
-        user_dataset: state.user_dataset.items,
     };
 }
 function mapDispatchToProps(dispatch) {

@@ -17,9 +17,9 @@ def owner_or_public(user):
 class EncodeDatasetViewset(SiteMixin, viewsets.ReadOnlyModelViewSet):
     filter_backends = (filters.DjangoFilterBackend, )
     filter_fields = (
-        'genome_assembly', '=data_type', '=cell_type',
-        '=antibody', '=rna_extract', '=treatment',
-        '=phase', '=localization',
+        'genome_assembly', 'data_type', 'cell_type',
+        'antibody', 'rna_extract', 'treatment',
+        'phase', 'localization',
     )
 
     @list_route()

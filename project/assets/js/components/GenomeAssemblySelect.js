@@ -14,6 +14,7 @@ class GenomeAssemblySelect extends React.Component {
                         name='genome_assembly'
                         value={this.props.value}
                         onChange={this.props.handleChange} >
+                    <option value=''>---</option>
                     <option value='1'>hg19</option>
                     <option value='2'>mm9</option>
                 </select>
@@ -27,7 +28,7 @@ class GenomeAssemblySelect extends React.Component {
 
 GenomeAssemblySelect.propTypes = {
     errors: React.PropTypes.object,
-    value: React.PropTypes.number.isRequired,
+    value: React.PropTypes.number,
     handleChange: React.PropTypes.func.isRequired,
 };
 

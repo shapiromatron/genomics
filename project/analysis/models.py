@@ -2,6 +2,8 @@ import uuid
 
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.postgres.fields import JSONField
 
 
 class Dataset(models.Model):
@@ -69,24 +71,32 @@ class UserDataset(GenomicDataset):
 
 class EncodeDataset(GenomicDataset):
     data_type = models.CharField(
-        max_length=16)
+        max_length=16,
+        db_index=True)
     cell_type = models.CharField(
-        max_length=32)
+        max_length=32,
+        db_index=True)
     antibody = models.CharField(
         max_length=32,
-        blank=True)
+        blank=True,
+        db_index=True)
     rna_extract = models.CharField(
         max_length=32,
-        blank=True)
+        blank=True,
+        db_index=True)
     treatment = models.CharField(
         max_length=32,
-        blank=True)
+        blank=True,
+        db_index=True)
     phase = models.CharField(
         max_length=32,
-        blank=True)
+        blank=True,
+        db_index=True)
     localization = models.CharField(
         max_length=32,
-        blank=True)
+        blank=True,
+        db_index=True)
+    extra_content = JSONField(default=dict)
 
     @classmethod
     def get_field_options(cls):
@@ -140,7 +150,34 @@ class AnalysisDatasets(models.Model):
         verbose_name_plural = 'Analysis datasets'
 
 
-class Analysis(models.Model):
+ANCHOR_START = 0
+ANCHOR_CENTER = 1
+ANCHOR_END = 2
+ANCHOR_CHOICES = (
+    (ANCHOR_START, 'start'),
+    (ANCHOR_CENTER, 'center'),
+    (ANCHOR_END, 'end'),
+)
+
+
+class GenomicBinSettings(models.Model):
+    anchor = models.PositiveSmallIntegerField(
+        choices=ANCHOR_CHOICES,
+        default=ANCHOR_CENTER)
+    bin_start = models.IntegerField(
+        default=-2500)
+    bin_number = models.PositiveIntegerField(
+        default=50,
+        validators=[MinValueValidator(50), MaxValueValidator(250)])
+    bin_size = models.PositiveIntegerField(
+        default=100,
+        validators=[MinValueValidator(1)])
+
+    class Meta:
+        abstract = True
+
+
+class Analysis(GenomicBinSettings):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL)
     name = models.CharField(
@@ -174,11 +211,27 @@ class Analysis(models.Model):
     last_updated = models.DateTimeField(
         auto_now=True)
 
+    @property
+    def user_datasets(self):
+        return UserDataset.objects.filter(id__in=self.datasets.values_list('id', flat=True))
+
+    @property
+    def encode_datasets(self):
+        return EncodeDataset.objects.filter(id__in=self.datasets.values_list('id' ,flat=True))
+
+    @property
+    def analysis_user_datasets(self):
+        return self.analysisdatasets_set.filter(dataset__in=self.user_datasets)
+
+    @property
+    def analysis_encode_datasets(self):
+        return self.analysisdatasets_set.filter(dataset__in=self.encode_datasets)
+
     class Meta:
         verbose_name_plural = 'Analyses'
 
 
-class FeatureListCountMatrix(models.Model):
+class FeatureListCountMatrix(GenomicBinSettings):
     feature_list = models.ForeignKey(
         FeatureList,
         related_name='intermediates')

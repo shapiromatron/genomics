@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import _ from 'underscore';
 import * as types from '../constants/ActionTypes';
 import h from '../utils/helpers';
@@ -6,6 +7,12 @@ import h from '../utils/helpers';
 function requestContent() {
     return {
         type: types.AN_REQUEST,
+    };
+}
+
+function requestEncodeContent() {
+    return {
+        type: types.AN_REQUEST_ENCODE,
     };
 }
 
@@ -26,6 +33,13 @@ function receiveObject(item){
 function receiveEncodeOpts(json){
     return {
         type: types.AN_RECIEVE_ENCODE_OPTIONS,
+        json,
+    };
+}
+
+function receiveEncodeDatasets(json){
+    return {
+        type: types.AN_RECIEVE_ENCODE_DATASETS,
         json,
     };
 }
@@ -85,11 +99,24 @@ export function fetchEncodeOptionsIfNeeded(){
     return (dispatch, getState) => {
         let state = getState();
         if (state.analysis.encodeOptions) return;
-        dispatch(requestContent());
+        dispatch(requestEncodeContent());
         return fetch(state.config.encode_dataset_options, h.fetchGet)
             .then(response => response.json())
             .then(json => dispatch(receiveEncodeOpts(json)))
             .catch((ex) => console.error('Encode dataset options parsing failed', ex));
+    };
+}
+
+export function requestEncodeDatasets(query){
+    return (dispatch, getState) => {
+        let state = getState(),
+            opts = $.param(query, false),
+            url = `${state.config.encode_dataset}?${opts}`;
+        console.log(url);
+        return fetch(url, h.fetchGet)
+            .then(response => response.json())
+            .then(json => dispatch(receiveEncodeDatasets(json.results)))
+            .catch((ex) => console.error('Encode dataset parsing failed', ex));
     };
 }
 
@@ -169,11 +196,26 @@ export function initializeEditForm(id=null){
                 description: '',
                 public: false,
                 feature_list: null,
-                genome_assembly: 1,
+                genome_assembly: null,
                 sort_vector: null,
-                datasets: [],
+                analysis_user_datasets: [],
+                analysis_encode_datasets: [],
+                anchor: 1,
+                bin_start: -2500,
+                bin_number: 50,
+                bin_size: 100,
             };
         }
         dispatch(setEdititableObject(object));
+    };
+}
+
+export function changeEditObject(key, value){
+    return (dispatch, getState) => {
+        dispatch({
+            type: types.AN_CHANGE_EDIT_OBJECT,
+            key,
+            value,
+        });
     };
 }
