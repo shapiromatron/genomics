@@ -49,6 +49,7 @@ GENOME_ASSEMBLY_CHOICES = (
 
 class GenomicDataset(Dataset):
     genome_assembly = models.PositiveSmallIntegerField(
+        db_index=True,
         choices=GENOME_ASSEMBLY_CHOICES)
     data_ambiguous = models.FileField(
         blank=True,

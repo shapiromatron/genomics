@@ -19,6 +19,7 @@ class Container extends React.Component {
     }
 
     handleApplyFilters(filters){
+        filters.genome_assembly = this.props.editObject.genome_assembly;
         this.props.dispatch(requestEncodeDatasets(filters));
     }
 
@@ -57,6 +58,7 @@ class Container extends React.Component {
 function mapStateToProps(state) {
     return {
         model: state.analysis,
+        editObject: state.analysis.editObject,
     };
 }
 export default connect(mapStateToProps)(Container);

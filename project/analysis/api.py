@@ -16,11 +16,6 @@ def owner_or_public(user):
 
 class EncodeDatasetViewset(SiteMixin, viewsets.ReadOnlyModelViewSet):
     filter_backends = (filters.DjangoFilterBackend, )
-    filter_fields = (
-        'genome_assembly', 'data_type', 'cell_type',
-        'antibody', 'rna_extract', 'treatment',
-        'phase', 'localization',
-    )
 
     @list_route()
     def field_options(self, request):
@@ -30,8 +25,42 @@ class EncodeDatasetViewset(SiteMixin, viewsets.ReadOnlyModelViewSet):
     def get_serializer_class(self):
         return serializers.EncodeDatasetSerializer
 
+    def get_filters(self, params):
+        query = Q()
+
+        genome_assembly = params.get('genome_assembly')
+        if genome_assembly:
+            query &= Q(genome_assembly=genome_assembly)
+
+        data_type = params.getlist('data_type[]')
+        if data_type:
+            query &= Q(data_type__in=data_type)
+
+        cell_type = params.getlist('cell_type[]')
+        if cell_type:
+            query &= Q(cell_type__in=cell_type)
+
+        treatment = params.getlist('treatment[]')
+        if treatment:
+            query &= Q(treatment__in=treatment)
+
+        antibody = params.getlist('antibody[]')
+        if antibody:
+            query &= Q(antibody__in=antibody)
+
+        phase = params.getlist('phase[]')
+        if phase:
+            query &= Q(phase__in=phase)
+
+        rna_extract = params.getlist('rna_extract[]')
+        if rna_extract:
+            query &= Q(rna_extract__in=rna_extract)
+
+        return query
+
     def get_queryset(self):
-        return models.EncodeDataset.objects.all()
+        filters = self.get_filters(self.request.query_params)
+        return models.EncodeDataset.objects.filter(filters)
 
 
 class UserDatasetViewset(OwnedButShareableMixin, viewsets.ModelViewSet):

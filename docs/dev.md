@@ -83,7 +83,7 @@ If interested in the [ipython/jupyter notebooks](http://jupyter.org/) , you can 
 
 ```
 workon genomics
-ipython notebook --no-browser --notebook-dir=/path/to/application/notebooks
+python manage.py shell_plus --notebook
 ```
 
 Then, navigate to [localhost:8888](http://127.0.0.1:8888/) to view the notebooks.
