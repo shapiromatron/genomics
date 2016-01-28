@@ -12,6 +12,8 @@ class EncodeDatasetFiltering extends React.Component {
             filters: {},
             numSelected: 0,
             numIncludedSelected: 0,
+            popupVisible: false,
+            popupItem: null,
         };
     }
 
@@ -73,12 +75,32 @@ class EncodeDatasetFiltering extends React.Component {
         this.setState({numIncludedSelected: count});
     }
 
+    handleDatasetMouseOver(e) {
+        let object = this.props.availableDatasets[parseInt(e.target.value)];
+        let loc = e.target.getBoundingClientRect();
+        this.setState({
+            popupVisible: true,
+            popupItem: {
+                x: window.scrollX + loc.right,
+                y: window.scrollY + loc.top - 5,
+                object: object,
+            },
+        });
+    }
+
+    handleDatasetMouseOut(e) {
+        this.setState({
+            popupVisible: false,
+            popupItem: null,
+        });
+    }
+
     render() {
-        this.availableKeys = _.indexBy(this.props.availableDatasets, 'id');
         let opts = this.props.options,
             vals = this.state.filters;
         return (
             <div>
+            {this.renderDatasetDetailPopup()}
             <div className='row'>
                 <div className='col-md-12'>
                     <button type='button'
@@ -180,17 +202,19 @@ class EncodeDatasetFiltering extends React.Component {
     }
 
     renderAvailableDatasets(){
+        let datasets = _.values(this.props.availableDatasets);
         return (
             <div className='col-md-5'>
                 <h4>Available datasets (after filtering)</h4>
                 <select
                     onChange={this.handleAvailableSelectedChange.bind(this)}
+                    onMouseOut={this.handleDatasetMouseOut.bind(this)}
                     ref='available'
                     size='10'
-                    className='form-control' multiple={true}>
-                    {this.props.availableDatasets.map(this.renderDatsetOption)}
+                    className='form-control encodeDatasetSelect' multiple={true}>
+                    {datasets.map(this.renderDatsetOption.bind(this))}
                 </select>
-                <p><strong>Available:</strong> <span>{this.props.availableDatasets.length}</span></p>
+                <p><strong>Available:</strong> <span>{datasets.length}</span></p>
                 <p><strong>Selected:</strong> <span>{this.state.numSelected}</span></p>
             </div>
         );
@@ -219,14 +243,48 @@ class EncodeDatasetFiltering extends React.Component {
     }
 
     renderDatsetOption(d){
-        return <option key={d.id} value={d.id}>{d.name}</option>;
+        return <option
+            onMouseOver={this.handleDatasetMouseOver.bind(this)}
+            key={d.id}
+            value={d.id}>{d.name}</option>;
+    }
+
+    renderDatasetDetailPopup(){
+        if (!this.state.popupVisible) return null;
+        let item = this.state.popupItem,
+            object = item.object;
+        return (
+            <div
+                className="popover right datasetPopover"
+                style={{top: `${item.y}px`, left: `${item.x}px`, display: 'block'}}>
+                <div className="arrow"
+                    style={{top: '13px'}}></div>
+                <h3 className="popover-title">{object.name}</h3>
+                <div className="popover-content">
+                    <table className='table table-condensed table-hover'>
+                        <thead>
+                            <th>Field</th>
+                            <th>Value</th>
+                        </thead>
+                        <tbody>
+                            <tr><td>Data type</td><td>{object.data_type}</td></tr>
+                            <tr><td>Cell type</td><td>{object.cell_type}</td></tr>
+                            <tr><td>Treatment</td><td>{object.treatment}</td></tr>
+                            <tr><td>Antibody</td><td>{object.antibody}</td></tr>
+                            <tr><td>Phase</td><td>{object.phase}</td></tr>
+                            <tr><td>RNA extract</td><td>{object.rna_extract}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
     }
 }
 
 EncodeDatasetFiltering.propTypes = {
     options: React.PropTypes.object.isRequired,
     handleApplyFilters: React.PropTypes.func.isRequired,
-    availableDatasets: React.PropTypes.array.isRequired,
+    availableDatasets: React.PropTypes.object.isRequired,
     handleSelectionChange: React.PropTypes.func.isRequired,
     selectedDatasets: React.PropTypes.array.isRequired,
 };

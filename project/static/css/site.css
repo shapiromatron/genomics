@@ -60,3 +60,16 @@ input[type=number] {
   color: #fff;
   text-decoration: none;
 }
+
+
+/* encode dataset */
+.encodeDatasetSelect option:hover {
+  background-color: #f7f7f7;
+}
+.datasetPopover {
+  max-width: none;
+  max-height: 300px;
+}
+.datasetPopover.popover>.arrow:after {
+    border-right-color: #f7f7f7;
+}

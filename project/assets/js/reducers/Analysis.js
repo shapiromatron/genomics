@@ -103,7 +103,7 @@ export default function (state=defaultState, action) {
 
     case types.AN_RECIEVE_ENCODE_DATASETS:
         return Object.assign({}, state, {
-            encodeDatasetsAvailable: action.json,
+            encodeDatasetsAvailable: _.indexBy(action.json, 'id'),
         });
 
     default:
