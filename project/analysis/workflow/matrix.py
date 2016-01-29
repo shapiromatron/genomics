@@ -3,7 +3,7 @@
 import click
 import os
 from subprocess import call
-
+from six import string_types
 
 class BedMatrix(object):
 
@@ -14,59 +14,50 @@ class BedMatrix(object):
     temp_int_minus_fn = "temp_intersection.minus.tab"
     temp_int_unstranded_fn = "temp_intersection.tab"
 
-    def __init__(self, *args,
-                 anchor='center', bin_start=-2500, bin_number=50,
-                 bin_size=100, opposite_strand_fn=None):
-
-        if len(args) == 3:
-            self.stranded_bigwigs = False
-            self.stranded_bed = False
-        elif len(args) == 4:
-            self.stranded_bigwigs = True
-            self.stranded_bed = True
-        else:
-            raise ValueError("Unknown argument number")
-
-        # Type checks
-        assert anchor in self.ANCHOR_OPTIONS
-        assert isinstance(bin_start, int)
-        assert isinstance(bin_number, int)
-        assert isinstance(bin_size, int)
-        if opposite_strand_fn is not None:
-            assert isinstance(opposite_strand_fn, str)
-            assert os.path.exists(os.path.dirname(opposite_strand_fn))
-            if not self.stranded_bed:
-                raise ValueError("Cannot report opposite strand coverage without stranded_bed flag!!")
-
-        plus_bigwig = None
-        minus_bigwig = None
-        unstranded_bigwig = None
-        feature_bed = None
-        output_matrix = None
-
-        if self.stranded_bigwigs:
-            plus_bigwig, minus_bigwig, feature_bed, output_matrix = args
-            assert os.path.exists(plus_bigwig)
-            assert os.path.exists(minus_bigwig)
-        else:
-            unstranded_bigwig, feature_bed, output_matrix = args
-            assert os.path.exists(unstranded_bigwig)
-
-        assert os.path.exists(feature_bed)
-        assert os.path.exists(os.path.dirname(output_matrix))
-
+    def __init__(self, bigwigs, feature_bed, output_matrix, anchor, bin_start,
+        bin_number, bin_size, opposite_strand_fn, stranded_bigwigs,
+        stranded_bed):
+        
         # Set instance variables
+        self.feature_bed = feature_bed
+        self.output_matrix = output_matrix
         self.anchor = anchor
         self.bin_start = bin_start
         self.bin_number = bin_number
         self.bin_size = bin_size
         self.opposite_strand_fn = opposite_strand_fn
-        self.plus_bigwig = plus_bigwig
-        self.minus_bigwig = minus_bigwig
-        self.unstranded_bigwig = unstranded_bigwig
-        self.feature_bed = feature_bed
-        self.output_matrix = output_matrix
-
+        self.stranded_bigwigs = stranded_bigwigs
+        if self.stranded_bigwigs:
+            if len(bigwigs) != 2:
+                raise ValueError("Two paired bigwig files are expected!!")
+            self.plus_bigwig = bigwigs[0]
+            self.minus_bigwig = bigwigs[1]
+        else:
+            if len(bigwigs) != 1:
+                raise ValueError("One unstranded bigwig file is expected!!")
+            self.unstranded_bigwig = bigwigs[0]
+        self.stranded_bed = stranded_bed
+        
+        # Type checks
+        assert anchor in self.ANCHOR_OPTIONS
+        assert isinstance(self.bin_start, int)
+        assert isinstance(self.bin_number, int)
+        assert isinstance(self.bin_size, int)
+        if self.opposite_strand_fn is not None:
+            assert isinstance(self.opposite_strand_fn, string_types)
+            if os.path.dirname(self.output_matrix) != "":
+                assert os.path.exists(os.path.dirname(self.opposite_strand_fn))
+            if not self.stranded_bed:
+                raise ValueError("Cannot report opposite strand coverage without stranded_bed flag!!")
+        if self.stranded_bigwigs:
+            assert os.path.exists(self.plus_bigwig)
+            assert os.path.exists(self.minus_bigwig)
+        else:
+            assert os.path.exists(self.unstranded_bigwig)
+        assert os.path.exists(self.feature_bed)
+        if os.path.dirname(self.output_matrix) != "":
+            assert os.path.exists(os.path.dirname(self.output_matrix))
+        
         # Execute
         self.make_bed()
         self.bigwig_average_over_bed()
@@ -123,11 +114,13 @@ class BedMatrix(object):
     def make_bed(self):
         """
         Open bed file, create a bed of bins.
-        Return a dictionary with feature information.
+        Create a dictionary with feature information.
+        Create list with order of features in bed file.
         """
         input_file = self.feature_bed
         output_file = self.temp_bed_fn
         feature_dict = {}
+        feature_list = []
         with open(input_file, 'r') as f, \
                 open(output_file, "w") as OUTPUT:
             total_valid_lines = self.countValidBedLines(input_file)
@@ -145,6 +138,7 @@ class BedMatrix(object):
                         name = line.strip().split()[3]
                     else:
                         name = self.generateFeatureName("feature", count, total_valid_lines)
+                    feature_list.append(name)
                     if self.stranded_bed:
                         if bed_fields >= 6:  # Contains strand information?
                             strand = line.strip().split()[5]
@@ -196,7 +190,7 @@ class BedMatrix(object):
                             )
                             OUTPUT.write(str_)
                             start -= self.bin_size
-
+        self.feature_order = feature_list
         self.feature_info = feature_dict
 
     def bigwig_average_over_bed(self):
@@ -225,38 +219,38 @@ class BedMatrix(object):
     def make_matrix(self):
         # Create output matrix files
         if self.stranded_bigwigs:
-            self.make_unstranded_matrix()
-        else:
             self.make_stranded_matrix()
+        else:
+            self.make_unstranded_matrix()
 
     def make_unstranded_matrix(self):
         # Create output matrix for unstranded bigwig
         with open(self.temp_int_unstranded_fn, 'r') as f, \
                 open(self.output_matrix, 'w') as OUTPUT:
 
-            # Make header
+            # Make header, write to output
             for i in range(self.bin_number):
                 str_ = "\t{}:{}".format(
                     self.bin_start+i*self.bin_size,
                     self.bin_start+(i+1)*self.bin_size-1
                 )
                 OUTPUT.write(str_)
+            OUTPUT.write("\n")
 
-            # Make features
-            last_feature = None
+            # Make features, add to dictionary
+            row_dict = dict()
             for line in f:
                 tab_name, size, covered, bed_sum, bed_mean_zero, bed_mean = \
                     line.strip().split()
                 bed_sum = self.checkInt(bed_sum)
                 feature_name = self.readTabName(tab_name)
-                if feature_name == last_feature:
-                    OUTPUT.write("\t" + str(bed_sum))
-                else:
-                    OUTPUT.write("\n")
-                    OUTPUT.write(feature_name + "\t" + str(bed_sum))
-                    last_feature = feature_name
+                if feature_name not in row_dict:
+                    row_dict[feature_name] = ""
+                row_dict[feature_name] += "\t" + str(bed_sum)
 
-            OUTPUT.write("\n")
+            # Write to output based on order in feature list
+            for feature_name in self.feature_order:
+                OUTPUT.write(feature_name + row_dict[feature_name] + "\n")
 
     def make_stranded_matrix(self):
         """
@@ -287,8 +281,10 @@ class BedMatrix(object):
             if OPPOSITE:
                 OPPOSITE.write("\n")
 
-            last_feature = None
+            #last_feature = None
 
+            same_dict = dict()
+            opposite_dict = dict()
             for plus_line, minus_line in zip(plus_file, minus_file):
 
                 plus_tab_name, size, plus_covered, \
@@ -315,65 +311,43 @@ class BedMatrix(object):
                 if plus_feature_name != minus_feature_name:
                     raise ValueError("Stranded feature names in intersection files do not agree by line")
 
-                # Start new line if new feature name
-                if plus_feature_name != last_feature:
 
-                    if last_feature:
-                        OUTPUT.write("\n")
-                        if OPPOSITE:
-                            OPPOSITE.write("\n")
-
-                    OUTPUT.write(plus_feature_name)
-                    if OPPOSITE:
-                        OPPOSITE.write(plus_feature_name)
-                    last_feature = plus_feature_name
+                if plus_feature_name not in same_dict:
+                    same_dict[plus_feature_name] = ""
+                if OPPOSITE:
+                    if plus_feature_name not in opposite_dict:
+                        opposite_dict[plus_feature_name] = ""
 
                 # Write values, observing strandedness if specified
                 if self.stranded_bed:
                     if self.feature_info[plus_feature_name]["strand"] == "+":
-                        same_value = plus_sum
-                        opposite_value = minus_sum
+                        #same_value = plus_sum
+                        #opposite_value = minus_sum
+                        same_dict[plus_feature_name] += "\t" + plus_sum
+                        if OPPOSITE:
+                            opposite_dict[plus_feature_name] += "\t" + minus_sum
                     elif self.feature_info[plus_feature_name]["strand"] == "-":
-                        same_value = minus_sum
-                        opposite_value = plus_sum
+                        #same_value = minus_sum
+                        #opposite_value = plus_sum
+                        same_dict[plus_feature_name] += "\t" + minus_sum
+                        if OPPOSITE:
+                            opposite_dict[plus_feature_name] += "\t" + plus_sum
 
-                    OUTPUT.write("\t" + same_value)
-                    if OPPOSITE:
-                        OPPOSITE.write("\t" + opposite_value)
+
                 else:
-                    OUTPUT.write("\t{}".format(
-                        self.checkInt(float(plus_sum)+float(minus_sum))))
-
-            OUTPUT.write("\n")
-            if OPPOSITE:
-                OPPOSITE.write("\n")
+                    same_dict[plus_feature_name] += "\t{}".format(
+                        self.checkInt(float(plus_sum)+float(minus_sum)))
 
 
-@click.group()
-def cli():
-    """
-    Generate matrices for stranded or unstranded bigWig matrices
-    """
+            
+            for feature_name in self.feature_order:
+                OUTPUT.write(feature_name + same_dict[feature_name] + "\n")
+                if OPPOSITE:
+                    OPPOSITE.write(feature_name + opposite_dict[feature_name] + "\n")
 
 
-@cli.command('unstranded')
-@click.argument('unstranded_bigwig')
-@click.argument('feature_bed')
-@click.argument('output_matrix')
-@click.option('-a', '--anchor', default='center', help='Bin anchor', type=click.Choice(BedMatrix.ANCHOR_OPTIONS))
-@click.option('-b', '--bin_start', default=-2500, help='Relative bin start', type=int)
-@click.option('-n', '--bin_number', default=50, help='Number of bins', type=int)
-@click.option('-s', '--bin_size', default=100, help='Size of bins', type=int)
-def unstranded(unstranded_bigwig, feature_bed, output_matrix, **kwargs):
-    """
-    Run with unstranded matrix
-    """
-    BedMatrix(unstranded_bigwig, feature_bed, output_matrix, **kwargs)
-
-
-@cli.command('stranded')
-@click.argument('plus_bigwig')
-@click.argument('minus_bigwig')
+@click.command()
+@click.argument('bigwigs', nargs=-1)
 @click.argument('feature_bed')
 @click.argument('output_matrix')
 @click.option('-a', '--anchor', default='center', help='Bin anchor', type=click.Choice(BedMatrix.ANCHOR_OPTIONS))
@@ -381,12 +355,17 @@ def unstranded(unstranded_bigwig, feature_bed, output_matrix, **kwargs):
 @click.option('-n', '--bin_number', default=50, help='Number of bins', type=int)
 @click.option('-s', '--bin_size', default=100, help='Size of bins', type=int)
 @click.option('--opposite_strand_fn', type=str, help='Output filename for opposite strand coverage')
-def stranded(plus_bigwig, minus_bigwig, feature_bed, output_matrix, **kwargs):
-    """
-    Run with stranded matrix
-    """
-    BedMatrix(plus_bigwig, minus_bigwig, feature_bed, output_matrix, **kwargs)
+@click.option('--stranded_bigwigs', is_flag=True, help='Expect stranded, paired bigwigs with plus/forward strand first')
+@click.option('--stranded_bed', is_flag=True, help='Expect stranded bed')
 
+def cli(bigwigs, feature_bed, output_matrix, anchor, bin_start, bin_number,
+    bin_size, opposite_strand_fn, stranded_bigwigs, stranded_bed):
+    """
+    Generate matrices for stranded or unstranded bigWig matrices
+    """
+    BedMatrix(bigwigs, feature_bed, output_matrix, anchor, bin_start,
+        bin_number, bin_size, opposite_strand_fn, stranded_bigwigs,
+        stranded_bed)
 
 if __name__ == '__main__':
     cli()
