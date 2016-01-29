@@ -29,7 +29,7 @@ STATIC_ROOT = os.path.join(PUBLIC_ROOT, 'static')
 MEDIA_ROOT = os.path.join(PUBLIC_ROOT, 'media')
 
 LOGGING['handlers']['file']['filename'] = os.environ.get('DJANGO_LOG_FULLPATH')
-LOGGING['handlers']['file']['celery_file'] = os.environ.get('CELERY_LOG_FULLPATH')
+LOGGING['handlers']['celery_file']['filename'] = os.environ.get('CELERY_LOG_FULLPATH')
 
 BROKER_URL = os.environ.get('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
