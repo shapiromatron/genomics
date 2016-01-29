@@ -115,6 +115,7 @@ class MatrixByMatrix():
                         output_matrix[-1].append(0)
                     else:
                         output_matrix[-1].append(
+                            # Subtracting from one to create distance metric
                             1 - self.findMatrixMatrixCorr(matrix_list[i][1],
                             matrix_list[j][1], self.bin_number)
                         )
@@ -154,7 +155,7 @@ class MatrixByMatrix():
                     row.append(str(output_matrix[i][j]))
             else:
                 for j in dg['leaves']:
-                    row.append(str(output_matrix[i][j]))
+                    row.append(str(1 + output_matrix[i][j])) # Converts from distance to correlation value
             row.append('\n')
             rows.append('\t'.join(row))
 
