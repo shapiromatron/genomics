@@ -15,7 +15,7 @@ CACHES['default']['BACKEND'] = 'django.core.cache.backends.locmem.LocMemCache'
 
 LOGGING['loggers']['']['handlers'] = ['console']
 
-# execute celery-tasks locally instead of sending to queue
+# Celery settings
 CELERY_ALWAYS_EAGER = True
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 

@@ -184,7 +184,7 @@ CACHES = {
     }
 }
 
-# CELERY
+# Celery settings
 CELERYD_HIJACK_ROOT_LOGGER = False
 BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
