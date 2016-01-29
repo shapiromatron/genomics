@@ -4,6 +4,8 @@ from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
+from .tasks import debug_task
+
 
 class Home(TemplateView):
     template_name = 'analysis/home.html'
@@ -20,3 +22,9 @@ class Dashboard(TemplateView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
+
+
+class CeleryTester(Home):
+    def get(self, request, *args, **kwargs):
+        debug_task.delay()
+        return super().get(request, *args, **kwargs)

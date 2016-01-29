@@ -137,7 +137,15 @@ LOGGING = {
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'basic',
             'filename': os.path.join(PROJECT_ROOT, 'genomics.log'),
-            'maxBytes': 10 * 1024 * 1024,  # 10 MB
+            'maxBytes': 100 * 1024 * 1024,  # 10 MB
+            'backupCount': 10,
+        },
+        'celery_file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'basic',
+            'filename': os.path.join(PROJECT_ROOT, 'celery.log'),
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
             'backupCount': 10,
         },
     },
@@ -149,6 +157,10 @@ LOGGING = {
         },
         '': {
             'handlers': ['file'],
+            'level': 'INFO',
+        },
+        'celery.task': {
+            'handlers': ['celery_file', 'console'],
             'level': 'INFO',
         },
     }
@@ -173,6 +185,7 @@ CACHES = {
 }
 
 # CELERY
+CELERYD_HIJACK_ROOT_LOGGER = False
 BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']

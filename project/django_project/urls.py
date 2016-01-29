@@ -23,6 +23,10 @@ urlpatterns = [
         include('myuser.urls',
                 namespace='user')),
 
+    url(r'^celery/$',
+        views.CeleryTester.as_view(),
+        name='celery'),
+
 ]
 
 
