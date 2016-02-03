@@ -5,6 +5,11 @@ from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.postgres.fields import JSONField
 
+from utils.models import ReadOnlyFileSystemStorage
+
+
+encode_store = ReadOnlyFileSystemStorage.create_store(settings.ENCODE_PATH)
+
 
 class Dataset(models.Model):
     owner = models.ForeignKey(
@@ -51,6 +56,9 @@ class GenomicDataset(Dataset):
     genome_assembly = models.PositiveSmallIntegerField(
         db_index=True,
         choices=GENOME_ASSEMBLY_CHOICES)
+
+
+class UserDataset(GenomicDataset):
     data_ambiguous = models.FileField(
         blank=True,
         max_length=256)
@@ -60,9 +68,6 @@ class GenomicDataset(Dataset):
     data_minus = models.FileField(
         blank=True,
         max_length=256)
-
-
-class UserDataset(GenomicDataset):
     url = models.URLField(
         max_length=256,
         null=True)
@@ -71,6 +76,18 @@ class UserDataset(GenomicDataset):
 
 
 class EncodeDataset(GenomicDataset):
+    data_ambiguous = models.FileField(
+        blank=True,
+        max_length=256,
+        storage=encode_store)
+    data_plus = models.FileField(
+        blank=True,
+        max_length=256,
+        storage=encode_store)
+    data_minus = models.FileField(
+        blank=True,
+        max_length=256,
+        storage=encode_store)
     data_type = models.CharField(
         max_length=16,
         db_index=True)

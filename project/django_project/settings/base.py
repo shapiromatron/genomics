@@ -196,6 +196,8 @@ CELERY_TIMEZONE = 'US/Eastern'
 # Application settings
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
+ENCODE_PATH = os.path.join(PROJECT_ROOT, 'data', 'encode')
+
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',

@@ -34,6 +34,9 @@ LOGGING['handlers']['celery_file']['filename'] = os.environ.get('CELERY_LOG_FULL
 BROKER_URL = os.environ.get('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
 
+# root path to where ENCODE files are located
+ENCODE_PATH = os.environ.get('ENCODE_PATH')
+
 # to use jupyter, `add2virtualenv .` the project path
 NOTEBOOK_ARGUMENTS = [
     '--no-browser',
