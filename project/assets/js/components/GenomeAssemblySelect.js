@@ -1,6 +1,8 @@
 import React from 'react';
+
+import h from 'utils/helpers';
+
 import FormFieldError from './FormFieldError';
-import h from '../utils/helpers';
 
 
 class GenomeAssemblySelect extends React.Component {

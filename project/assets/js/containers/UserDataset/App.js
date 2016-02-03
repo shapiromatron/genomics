@@ -2,9 +2,8 @@ import _ from 'underscore';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Loading from '../../components/Loading';
-
-import { fetchObjectsIfNeeded } from '../../actions/UserDataset';
+import { fetchObjectsIfNeeded } from 'actions/UserDataset';
+import Loading from 'components/Loading';
 
 
 @connect((state) => (state))

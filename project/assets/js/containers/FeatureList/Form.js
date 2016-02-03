@@ -5,12 +5,16 @@ import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
 import { bindActionCreators } from 'redux';
 
-import h from '../../utils/helpers';
+import h from 'utils/helpers';
 
-import { postObject, patchObject, initializeEditForm } from '../../actions/FeatureList';
+import {
+    postObject,
+    patchObject,
+    initializeEditForm
+} from 'actions/FeatureList';
 
-import FLForm from '../../components/FeatureList/Form';
-import Loading from '../../components/Loading';
+import FLForm from 'components/FeatureList/Form';
+import Loading from 'components/Loading';
 
 
 class Form extends React.Component {

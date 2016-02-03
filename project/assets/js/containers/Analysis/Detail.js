@@ -1,11 +1,9 @@
 import _ from 'underscore';
 import React from 'react';
-
 import { connect } from 'react-redux';
 
-import Loading from '../../components/Loading';
-
-import Component from '../../components/Analysis/Object';
+import Loading from 'components/Loading';
+import Component from 'components/Analysis/Object';
 
 
 class Container extends React.Component {

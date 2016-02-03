@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import Loading from '../Loading';
-import urls from '../../constants/urls';
-import BreadcrumbBar from '../BreadcrumbBar';
+import h from 'utils/helpers';
+import urls from 'constants/urls';
 
-import h from '../../utils/helpers';
+import Loading from '../Loading';
+import BreadcrumbBar from '../BreadcrumbBar';
 
 
 class List extends React.Component {

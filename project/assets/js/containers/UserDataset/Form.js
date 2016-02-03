@@ -1,16 +1,17 @@
 import _ from 'underscore';
 import React from 'react';
-
 import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
 import { bindActionCreators } from 'redux';
 
-import h from '../../utils/helpers';
-
-import { postObject, patchObject, initializeEditForm } from '../../actions/UserDataset';
-
-import FLForm from '../../components/UserDataset/Form';
-import Loading from '../../components/Loading';
+import {
+    postObject,
+    patchObject,
+    initializeEditForm,
+} from 'actions/UserDataset';
+import FLForm from 'components/UserDataset/Form';
+import Loading from 'components/Loading';
+import h from 'utils/helpers';
 
 
 class Form extends React.Component {

@@ -1,7 +1,7 @@
 import React from 'react';
-
 import { devTools } from 'redux-devtools';
 import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
+
 
 var devMiddleware;
 if (__DEBUG__) {

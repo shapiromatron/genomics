@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import SV from '../../components/SortVector/List';
+import SV from 'components/SortVector/List';
 
 
 class List extends React.Component {

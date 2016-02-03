@@ -1,13 +1,14 @@
 import React from 'react';
 
+import UserDatasetSelection from 'containers/Analysis/UserDatasetSelection';
+import EncodeDatasetFiltering from 'containers/Analysis/EncodeDatasetFiltering';
+import urls from 'constants/urls';
+import h from 'utils/helpers';
+
 import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
 import NonFieldError from '../NonFieldError';
 import GenomeAssemblySelect from '../GenomeAssemblySelect';
-import UserDatasetSelection from '../../containers/Analysis/UserDatasetSelection';
-import EncodeDatasetFiltering from '../../containers/Analysis/EncodeDatasetFiltering';
-import urls from '../../constants/urls';
-import h from '../../utils/helpers';
 
 
 class Form extends React.Component {

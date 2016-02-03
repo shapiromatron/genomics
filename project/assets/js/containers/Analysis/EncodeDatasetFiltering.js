@@ -6,10 +6,10 @@ import {
     fetchEncodeOptionsIfNeeded,
     requestEncodeDatasets,
     changeEditObject,
-} from '../../actions/Analysis';
+} from 'actions/Analysis';
 
-import Loading from '../../components/Loading';
-import Component from '../../components/Analysis/EncodeDatasetFiltering';
+import Loading from 'components/Loading';
+import Component from 'components/Analysis/EncodeDatasetFiltering';
 
 
 class Container extends React.Component {

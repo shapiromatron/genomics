@@ -1,12 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router';
 
+import h from 'utils/helpers';
+import urls from 'constants/urls';
+
 import BreadcrumbBar from '../BreadcrumbBar';
-import urls from '../../constants/urls';
-
 import SVList from '../SortVector/List';
-
-import h from '../../utils/helpers';
 
 
 class Object_ extends React.Component {

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import urls from '../constants/urls';
+import urls from 'constants/urls';
+
 import BreadcrumbBar from './BreadcrumbBar';
 import Loading from './Loading';
 import CompleteTable from './Analysis/CompleteTable';

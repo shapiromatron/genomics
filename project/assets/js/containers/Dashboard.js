@@ -2,15 +2,14 @@ import React from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 
-import urls from '../constants/urls';
-import BreadcrumbBar from '../components/BreadcrumbBar';
-import Loading from '../components/Loading';
-import Dashboard from '../components/Dashboard';
-
-import { fetchObjectsIfNeeded as anFetchObjectsIfNeeded } from '../actions/Analysis';
-import { fetchObjectsIfNeeded as flFetchObjectsIfNeeded } from '../actions/FeatureList';
-import { fetchObjectsIfNeeded as svFetchObjectsIfNeeded } from '../actions/SortVector';
-import { fetchObjectsIfNeeded as udFetchObjectsIfNeeded } from '../actions/UserDataset';
+import { fetchObjectsIfNeeded as anFetchObjectsIfNeeded } from 'actions/Analysis';
+import { fetchObjectsIfNeeded as flFetchObjectsIfNeeded } from 'actions/FeatureList';
+import { fetchObjectsIfNeeded as svFetchObjectsIfNeeded } from 'actions/SortVector';
+import { fetchObjectsIfNeeded as udFetchObjectsIfNeeded } from 'actions/UserDataset';
+import urls from 'constants/urls';
+import BreadcrumbBar from 'components/BreadcrumbBar';
+import Loading from 'components/Loading';
+import Dashboard from 'components/Dashboard';
 
 
 @connect((state) => (state))

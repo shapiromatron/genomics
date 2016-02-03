@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Component from '../../components/Analysis/List';
+import Component from 'components/Analysis/List';
 
 
 class Container extends React.Component {

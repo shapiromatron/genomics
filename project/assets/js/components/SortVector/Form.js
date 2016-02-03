@@ -1,10 +1,11 @@
 import React from 'react';
 
+import urls from 'constants/urls';
+import h from 'utils/helpers';
+
 import BreadcrumbBar from '../BreadcrumbBar';
 import FormFieldError from '../FormFieldError';
 import NonFieldError from '../NonFieldError';
-import urls from '../../constants/urls';
-import h from '../../utils/helpers';
 
 
 class Form extends React.Component {

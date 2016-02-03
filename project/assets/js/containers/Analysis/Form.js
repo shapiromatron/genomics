@@ -1,20 +1,19 @@
 import _ from 'underscore';
 import React from 'react';
-
 import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
 import { bindActionCreators } from 'redux';
 
-import h from '../../utils/helpers';
+import h from 'utils/helpers';
 
 import {
     postObject, patchObject,
     initializeEditForm, fetchEncodeOptionsIfNeeded,
     changeEditObject,
-} from '../../actions/Analysis';
+} from 'actions/Analysis';
 
-import Component from '../../components/Analysis/Form';
-import Loading from '../../components/Loading';
+import Component from 'components/Analysis/Form';
+import Loading from 'components/Loading';
 
 
 class Container extends React.Component {

@@ -1,11 +1,9 @@
 import _ from 'underscore';
 import React from 'react';
-
 import { connect } from 'react-redux';
 
-import Loading from '../../components/Loading';
-
-import SV from '../../components/SortVector/Object';
+import Loading from 'components/Loading';
+import SV from 'components/SortVector/Object';
 
 
 class Detail extends React.Component {

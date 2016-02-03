@@ -1,8 +1,8 @@
 import React from 'react';
 
-import urls from '../constants/urls';
-import BreadcrumbBar from './BreadcrumbBar';
+import urls from 'constants/urls';
 
+import BreadcrumbBar from './BreadcrumbBar';
 import FL from './FeatureList/List';
 import SV from './SortVector/List';
 import UD from './UserDataset/List';

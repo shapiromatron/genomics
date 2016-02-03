@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import FL from '../../components/UserDataset/List';
+import FL from 'components/UserDataset/List';
 
 
 class List extends React.Component {

@@ -1,46 +1,48 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
 import { createStore, compose, applyMiddleware } from 'redux';
 import { ReduxRouter, reduxReactRouter } from 'redux-router';
 import thunk from 'redux-thunk';
-
 import { Route, IndexRoute } from 'react-router';
 import { Provider } from 'react-redux';
 import { createHistory } from 'history';
 
-import { devMiddleware, renderDevTools } from './utils/devTools';
+import { loadConfig } from 'actions/Config';
 
-import Dashboard from './containers/Dashboard';
-import DataManagement from './containers/DataManagement';
+import urls from 'constants/urls';
 
-import UDApp from    './containers/UserDataset/App';
-import UDForm from   './containers/UserDataset/Form';
-import UDList from   './containers/UserDataset/List';
-import UDDetail from './containers/UserDataset/Detail';
-import UDDelete from './containers/UserDataset/Delete';
+import Dashboard from 'containers/Dashboard';
+import DataManagement from 'containers/DataManagement';
 
-import FLApp from    './containers/FeatureList/App';
-import FLForm from   './containers/FeatureList/Form';
-import FLList from   './containers/FeatureList/List';
-import FLDetail from './containers/FeatureList/Detail';
-import FLDelete from './containers/FeatureList/Delete';
+import UDApp from    'containers/UserDataset/App';
+import UDForm from   'containers/UserDataset/Form';
+import UDList from   'containers/UserDataset/List';
+import UDDetail from 'containers/UserDataset/Detail';
+import UDDelete from 'containers/UserDataset/Delete';
 
-import SVApp from    './containers/SortVector/App';
-import SVForm from   './containers/SortVector/Form';
-import SVList from   './containers/SortVector/List';
-import SVDetail from './containers/SortVector/Detail';
-import SVDelete from './containers/SortVector/Delete';
+import FLApp from    'containers/FeatureList/App';
+import FLForm from   'containers/FeatureList/Form';
+import FLList from   'containers/FeatureList/List';
+import FLDetail from 'containers/FeatureList/Detail';
+import FLDelete from 'containers/FeatureList/Delete';
 
-import ANApp from    './containers/Analysis/App';
-import ANForm from   './containers/Analysis/Form';
-import ANList from   './containers/Analysis/List';
-import ANDetail from './containers/Analysis/Detail';
-import ANDelete from './containers/Analysis/Delete';
+import SVApp from    'containers/SortVector/App';
+import SVForm from   'containers/SortVector/Form';
+import SVList from   'containers/SortVector/List';
+import SVDetail from 'containers/SortVector/Detail';
+import SVDelete from 'containers/SortVector/Delete';
 
-import reducer from './reducers';
-import urls from './constants/urls';
-import { loadConfig } from './actions/Config';
+import ANApp from    'containers/Analysis/App';
+import ANForm from   'containers/Analysis/Form';
+import ANList from   'containers/Analysis/List';
+import ANDetail from 'containers/Analysis/Detail';
+import ANDelete from 'containers/Analysis/Delete';
+
+import reducer from 'reducers';
+import {
+    devMiddleware,
+    renderDevTools,
+} from 'utils/devTools';
 
 
 const middleware = [ thunk ];

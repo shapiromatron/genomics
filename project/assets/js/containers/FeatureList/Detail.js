@@ -1,11 +1,9 @@
 import _ from 'underscore';
 import React from 'react';
-
 import { connect } from 'react-redux';
 
-import Loading from '../../components/Loading';
-
-import FL from '../../components/FeatureList/Object';
+import Loading from 'components/Loading';
+import FL from 'components/FeatureList/Object';
 
 
 class Detail extends React.Component {

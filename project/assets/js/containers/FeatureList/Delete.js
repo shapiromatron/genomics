@@ -1,17 +1,13 @@
 import _ from 'underscore';
 import React from 'react';
-
 import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
 import { bindActionCreators } from 'redux';
 
-import Loading from '../../components/Loading';
-
-import { deleteObject } from '../../actions/FeatureList';
-
-import urls from '../../constants/urls';
-
-import FL from '../../components/FeatureList/Object';
+import { deleteObject } from 'actions/FeatureList';
+import Loading from 'components/Loading';
+import FL from 'components/FeatureList/Object';
+import urls from 'constants/urls';
 
 
 class Delete extends React.Component {

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import BreadcrumbBar from '../BreadcrumbBar';
-import urls from '../../constants/urls';
+import urls from 'constants/urls';
+import h from 'utils/helpers';
 
-import h from '../../utils/helpers';
+import BreadcrumbBar from '../BreadcrumbBar';
 
 
 class _Object extends React.Component {

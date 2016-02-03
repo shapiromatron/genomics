@@ -1,5 +1,6 @@
 import _ from 'underscore';
-import * as types from '../constants/ActionTypes';
+
+import * as types from 'constants/ActionTypes';
 
 
 let defaultState = {

@@ -1,17 +1,13 @@
 import _ from 'underscore';
 import React from 'react';
-
 import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
 import { bindActionCreators } from 'redux';
 
-import Loading from '../../components/Loading';
-
-import { deleteObject } from '../../actions/Analysis';
-
-import urls from '../../constants/urls';
-
-import Component from '../../components/Analysis/Object';
+import { deleteObject } from 'actions/Analysis';
+import Loading from 'components/Loading';
+import Component from 'components/Analysis/Object';
+import urls from 'constants/urls';
 
 
 class Container extends React.Component {

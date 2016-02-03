@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 
 import {
     changeEditObject,
-} from '../../actions/Analysis';
+} from 'actions/Analysis';
 
-import Component from '../../components/Analysis/UserDatasetSelection';
+import Component from 'components/Analysis/UserDatasetSelection';
 
 
 class Container extends React.Component {

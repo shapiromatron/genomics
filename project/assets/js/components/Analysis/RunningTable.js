@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import urls from '../../constants/urls';
-import h from '../../utils/helpers';
+import urls from 'constants/urls';
+import h from 'utils/helpers';
 
 
 class RunningTable extends React.Component {

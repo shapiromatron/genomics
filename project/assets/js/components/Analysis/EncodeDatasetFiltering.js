@@ -1,8 +1,10 @@
 import _ from 'underscore';
 import $ from 'jquery';
 import React from 'react';
+
+import h from 'utils/helpers';
+
 import EncodeFilterSelect from './EncodeFilterSelect';
-import h from '../../utils/helpers';
 
 
 class EncodeDatasetFiltering extends React.Component {

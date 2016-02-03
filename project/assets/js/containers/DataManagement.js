@@ -2,10 +2,9 @@ import React from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 
-import urls from '../constants/urls';
-
-import BreadcrumbBar from '../components/BreadcrumbBar';
-import DataManagement from '../components/DataManagement';
+import BreadcrumbBar from 'components/BreadcrumbBar';
+import DataManagement from 'components/DataManagement';
+import urls from 'constants/urls';
 
 
 @connect((state) => (state))
