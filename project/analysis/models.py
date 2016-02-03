@@ -229,6 +229,9 @@ class Analysis(GenomicBinSettings):
     last_updated = models.DateTimeField(
         auto_now=True)
 
+    def __str__(self):
+        return self.name
+
     @property
     def user_datasets(self):
         return UserDataset.objects.filter(id__in=self.datasets.values_list('id', flat=True))
