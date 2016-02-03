@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import utils.models
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -16,17 +17,20 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='encodedataset',
             name='data_ambiguous',
-            field=models.FileField(blank=True, max_length=256, storage=utils.models.ReadOnlyFileSystemStorage(location='/Users/shapiroaj4/dev/temp/genomics'), upload_to=''),
+            field=models.FileField(blank=True, max_length=256,
+                                   storage=utils.models.ReadOnlyFileSystemStorage(location=settings.ENCODE_PATH), upload_to=''),
         ),
         migrations.AddField(
             model_name='encodedataset',
             name='data_minus',
-            field=models.FileField(blank=True, max_length=256, storage=utils.models.ReadOnlyFileSystemStorage(location='/Users/shapiroaj4/dev/temp/genomics'), upload_to=''),
+            field=models.FileField(blank=True, max_length=256,
+                                   storage=utils.models.ReadOnlyFileSystemStorage(location=settings.ENCODE_PATH), upload_to=''),
         ),
         migrations.AddField(
             model_name='encodedataset',
             name='data_plus',
-            field=models.FileField(blank=True, max_length=256, storage=utils.models.ReadOnlyFileSystemStorage(location='/Users/shapiroaj4/dev/temp/genomics'), upload_to=''),
+            field=models.FileField(blank=True, max_length=256,
+                                   storage=utils.models.ReadOnlyFileSystemStorage(location=settings.ENCODE_PATH), upload_to=''),
         ),
         migrations.AddField(
             model_name='userdataset',
