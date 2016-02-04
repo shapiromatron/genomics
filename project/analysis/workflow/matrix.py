@@ -5,10 +5,13 @@ import os
 from subprocess import call
 from six import string_types
 
+root = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+
+
 class BedMatrix(object):
 
     ANCHOR_OPTIONS = ('start', 'end', 'center')
-    bigWigAverageOverBed_path = "/ddn/gs1/home/lavenderca/bigWigAverageOverBed"
+    bigWigAverageOverBed_path = os.path.join(root, "bigWigAverageOverBed")
     temp_bed_fn = "temp_feature_bin.bed"
     temp_int_plus_fn = "temp_intersection.plus.tab"
     temp_int_minus_fn = "temp_intersection.minus.tab"
