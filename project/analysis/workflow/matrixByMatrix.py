@@ -167,25 +167,21 @@ class MatrixByMatrix():
 
 
 @click.command()
-#@click.argument('input_vector', type=str)
 @click.argument('matrix_list', type=str)
 @click.argument('window_start', type=int)
 @click.argument('bin_number', type=int)
 @click.argument('bin_size', type=int)
 @click.argument('output_header', type=str)
-@click.option('--sort_vector', nargs=1, type=str)
-#def cli(input_vector, matrix_list, window_start,
-#        bin_number, bin_size, output_header):
+@click.option('--sort_vector', nargs=1, type=str, help="Sort vector for correlative analysis")
+
 def cli(matrix_list, window_start, bin_number, 
         bin_size, output_header, sort_vector):
     """
     Considering matrix files specified by a list, performs cross-matrix
     correlative analysis.
-
+    
     \b
     Arguments:
-    - input_vector:     A tab-delimited file with two columns, feature names
-                        and numeric values to be used in correlative analysis.
     - matrix_list:      List of matrix files to be considered in analysis. Each
                         row in the list corresponds to a matrix to be considered
                         in the analysis. The list contains two columns. The
