@@ -175,7 +175,8 @@ class MatrixByMatrix():
         output_dict["med_cluster_correlation_values"] = self.med_correlation_values
         output_dict["max_abs_correlation_values"] = self.max_abs_correlation_values
         output_dict["sort_orders"] = self.sort_orders
-        output_dict["sort_vector"] = self.sort_vector
+        if self.sort_vector:
+            output_dict["sort_vector"] = self.sort_vector
         
         with open(self.output_json, 'w') as f:
             json.dump(output_dict, f, indent=2, separators=(",",": "))
