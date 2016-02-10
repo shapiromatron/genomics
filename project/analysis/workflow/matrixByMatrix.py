@@ -4,7 +4,7 @@ import click
 import numpy
 from scipy import stats
 from scipy.cluster.hierarchy import linkage, dendrogram
-from scipy.spatial.distance import squareform
+from scipy.spatial.distance import squareform, pdist
 import os
 import json
 
@@ -99,22 +99,46 @@ class MatrixByMatrix():
                             self.correlation_matrix[-1].append(self.correlation_matrix[j][i])
     
     def createDistanceMatrix(self):
-        distance_matrix = []
+        self.distance_matrix = []
         
-        for i in range(len(self.correlation_matrix)):
-            distance_matrix.append([])
-            for j in range(len(self.correlation_matrix[i])):
-                distance_matrix[-1].append(1 - self.correlation_matrix[i][j])
+        if self.sort_vector:
+            for i in range(len(self.correlation_matrix)):
+                self.distance_matrix.append([])
+                for j in range(len(self.correlation_matrix)):
+                    test_matrix = []
+                    test_matrix.append(self.correlation_matrix[i])
+                    test_matrix.append(self.correlation_matrix[j])
+                    self.distance_matrix[-1].append(pdist(numpy.array(test_matrix), "euclidean")[0])
+        else:
+            for i in range(len(self.correlation_matrix)):
+                self.distance_matrix.append([])
+                for j in range(len(self.correlation_matrix[i])):
+                    self.distance_matrix[-1].append(1 - self.correlation_matrix[i][j])
+
+    def findMedoids(self):
+        self.cluster_medoids = []
         
-        return distance_matrix
+        for cluster in self.cluster_members:
+            if len(cluster) == 1:
+                self.cluster_medoids.append(cluster[0])
+            else:
+                total_distances = []
+                for i in range(len(cluster)):
+                    total_distances.append(0)
+                    index_1 = self.matrix_names.index(cluster[i])
+                    for j in range(len(cluster)):
+                        if i == j:
+                            pass
+                        else:
+                            index_2 = self.matrix_names.index(cluster[j])
+                            total_distances[-1] += self.distance_matrix[index_1][index_2]
+                self.cluster_medoids.append(cluster[total_distances.index(min(total_distances))])
 
     def performClustering(self):
-        if self.sort_vector:
-            lnk = linkage(numpy.array(self.correlation_matrix), method="average")
-        else:
-            distance_matrix = self.createDistanceMatrix()
-            distance_array = numpy.array(distance_matrix)
-            lnk = linkage(squareform(distance_array), method="average")
+        self.createDistanceMatrix()
+        
+        distance_array = numpy.array(self.distance_matrix)
+        lnk = linkage(squareform(distance_array), method="average")
         
         full_dg = dendrogram(lnk)
         truncated_dg = dendrogram(lnk,p=50,truncate_mode="lastp")
@@ -133,6 +157,8 @@ class MatrixByMatrix():
             else:
                 self.cluster_members[-1].append(self.matrix_names[int(full_dg['ivl'][full_id])])
                 full_id += 1
+        
+        self.findMedoids()
 
     def maxAbs(self, input_list):
         abs_list = []
@@ -201,6 +227,7 @@ class MatrixByMatrix():
         output_dict["med_cluster_correlation_values"] = self.med_correlation_values
         output_dict["max_abs_correlation_values"] = self.max_abs_correlation_values
         output_dict["sort_orders"] = self.sort_orders
+        output_dict["cluster_medoids"] = self.cluster_medoids
         if self.sort_vector:
             output_dict["sort_vector"] = self.sort_vector
         
