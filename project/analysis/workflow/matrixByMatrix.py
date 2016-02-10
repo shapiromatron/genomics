@@ -55,7 +55,7 @@ class MatrixByMatrix():
                 for line in f:
                     matrix_entries[index] = {"feature_id": line.split()[0], "row_sum": sum(map(float, line.strip().split()[1:]))}
                     index += 1
-            self.sort_orders.append({"data_set": self.matrix_names, "sort_order":sorted(matrix_entries, key=lambda x: (matrix_entries[x]["row_sum"]), reverse=True)})
+            self.sort_orders.append({"data_set": self.matrix_names[i], "sort_order":sorted(matrix_entries, key=lambda x: (matrix_entries[x]["row_sum"]), reverse=True)})
 
     def createVectorList(self):
         self.vector_list = []
