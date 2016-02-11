@@ -139,8 +139,9 @@ class FeatureList(Dataset):
         choices=GENOME_ASSEMBLY_CHOICES)
     stranded = models.BooleanField(
         default=True)
-    text = models.TextField(
-        blank=True)
+    dataset = models.FileField(
+        blank=True,
+        max_length=256)
 
 
 class SortVector(Dataset):
