@@ -2,8 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView
-from django.views.generic.edit import BaseUpdateView
+from django.views.generic import TemplateView, UpdateView, DetailView
 
 from utils.views import OwnerOrStaff
 from . import models, tasks
@@ -26,7 +25,15 @@ class Dashboard(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class Execute(OwnerOrStaff, BaseUpdateView):
+class VisualTestingObject(DetailView):
+    """
+    Temporary view used for visual testing
+    """
+    model = models.Analysis
+    template_name = 'analysis/visual_testing.html'
+
+
+class Execute(OwnerOrStaff, UpdateView):
     http_method_names = ('post', )
     model = models.Analysis
 

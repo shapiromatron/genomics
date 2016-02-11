@@ -1,3 +1,4 @@
+import json
 import uuid
 
 from django.db import models
@@ -260,6 +261,14 @@ class Analysis(GenomicBinSettings):
     class Meta:
         verbose_name_plural = 'Analyses'
 
+    def get_flcm_ids(self):
+        return list(self.analysisdatasets_set.values_list('count_matrix', flat=True))
+
+    def get_summary_plot(self):
+        if not hasattr(self, 'datasetcorrelationmatrix'):
+            return False
+        return self.datasetcorrelationmatrix.get_summary_plot_data()
+
 
 class FeatureListCountMatrix(GenomicBinSettings):
     feature_list = models.ForeignKey(
@@ -278,6 +287,12 @@ class FeatureListCountMatrix(GenomicBinSettings):
     class Meta:
         verbose_name_plural = 'Feature list count matrices'
 
+    def get_dataset(self):
+        # todo: cache matrix read
+        with open(self.matrix.name, 'r') as f:
+            data = f.read()
+        return data
+
 
 class DatasetCorrelationMatrix(models.Model):
     analysis = models.OneToOneField(Analysis)
@@ -290,3 +305,14 @@ class DatasetCorrelationMatrix(models.Model):
 
     class Meta:
         verbose_name_plural = 'Dataset correlation matrices'
+
+    def get_summary_plot_data(self):
+        # todo: cache matrix read
+        with open(self.matrix.name, 'r') as f:
+            data = json.loads(f.read())
+        return {
+            'dendrogram': data['dendrogram'],
+            'max_abs_correlation_values': data['max_abs_correlation_values'],
+            'cluster_members': data['cluster_members'],
+            'correlation_matrix': data['correlation_matrix'],
+        }

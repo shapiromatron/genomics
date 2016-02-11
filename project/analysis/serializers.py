@@ -125,3 +125,10 @@ class AnalysisSerializer(serializers.ModelSerializer):
         if encode_datasets is not None:
             self.update_analysis_datasets(instance, encode_datasets, False)
         return instance
+
+
+class FeatureListCountMatrixSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.FeatureListCountMatrix
+        fields = ('id', )

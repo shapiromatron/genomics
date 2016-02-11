@@ -1,9 +1,13 @@
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
-from utils.api import SiteMixin, OwnedButShareableMixin, NoPagination
+from rest_framework.decorators import detail_route
+
+from utils.api import SiteMixin, OwnedButShareableMixin, NoPagination, PlainTextRenderer
+
 from . import models, serializers
 
 
@@ -108,6 +112,11 @@ class SortVectorViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
 class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
     pagination_class = NoPagination
 
+    @detail_route(methods=['get'])
+    def plot(self, request, pk=None):
+        an = get_object_or_404(models.Analysis, id=int(pk))
+        return Response(an.get_summary_plot())
+
     def get_serializer_class(self):
         return serializers.AnalysisSerializer
 
@@ -117,3 +126,17 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class FeatureListCountMatrixViewset(SiteMixin, viewsets.ReadOnlyModelViewSet):
+
+    @detail_route(methods=['get'], renderer_classes=(PlainTextRenderer,))
+    def plot(self, request, pk=None):
+        flcm = get_object_or_404(models.FeatureListCountMatrix, id=int(pk))
+        return Response(flcm.get_dataset())
+
+    def get_serializer_class(self):
+        return serializers.FeatureListCountMatrixSerializer
+
+    def get_queryset(self):
+        return models.FeatureListCountMatrix.objects.all()
