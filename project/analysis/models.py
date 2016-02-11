@@ -58,6 +58,10 @@ class GenomicDataset(Dataset):
         db_index=True,
         choices=GENOME_ASSEMBLY_CHOICES)
 
+    @property
+    def is_stranded(self):
+        return self.data_ambiguous.name == ''
+
 
 class UserDataset(GenomicDataset):
     data_ambiguous = models.FileField(
