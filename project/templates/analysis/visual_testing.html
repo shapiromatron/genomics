@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+body {
+  background-color: #E8E5D6;
+}
+</style>
+{% endblock extra_css %}
+
+
+
+{% block mid_content %}
+<h1>Hello.</h1>
+{% endblock mid_content %}
+
+
+
+{% block extra_js %}
+<script>
+$(document).ready(function(){
+
+    // here is the summary data
+    $.get("{% url 'analysis:api:analysis-plot' object.id %}", function(res){
+        window.summaryData = res;
+    });
+
+    // here is a list of feature-list count matrices
+    var getFeatureListUrl = function(id){
+        return "/dashboard/api/feature-list-count-matrix/" + id + "/plot/"
+    }
+    var featureListCountMatrixIds = {{object.get_flcm_ids}};
+    if (featureListCountMatrixIds.length>0){
+        $.get(getFeatureListUrl(featureListCountMatrixIds[0]), function(res){
+            window.featureList = res;
+        });
+    }
+
+    // todo - figure out how to get desired sort-vector...
+
+});
+</script>
+{% endblock extra_js %}
+
