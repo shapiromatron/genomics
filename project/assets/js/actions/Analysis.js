@@ -219,3 +219,20 @@ export function changeEditObject(key, value){
         });
     };
 }
+
+export function execute(url, cb){
+    cb = cb || h.noop;
+    return (dispatch, getState) => {
+        let state = getState(),
+            opts = h.fetchPost(state.config.csrf, {});
+        return fetch(url, opts)
+            .then(function(response){
+                if (response.status === 200){
+                    response.json()
+                        .then((json) => console.log(json))
+                        .then(cb());
+                }
+            })
+            .catch((ex) => console.error('Execute failed', ex));
+    };
+}

@@ -16,7 +16,12 @@ urlpatterns = [
     url(r'^api/',
         include(router.urls, namespace='api')),
 
+    url(r'^analysis/(?P<pk>\d+)/execute/$',
+        views.Execute.as_view(),
+        name='execute'),
+
     url(r'^',
         views.Dashboard.as_view(),
         name='dashboard'),
+
 ]

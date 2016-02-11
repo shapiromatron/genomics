@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.urlresolvers import reverse
 from django.contrib.postgres.fields import JSONField
 
 from utils.models import ReadOnlyFileSystemStorage
@@ -231,6 +232,9 @@ class Analysis(GenomicBinSettings):
 
     def __str__(self):
         return self.name
+
+    def get_execute_url(self):
+        return reverse('analysis:execute', args=[self.pk, ])
 
     @property
     def user_datasets(self):

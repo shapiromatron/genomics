@@ -53,6 +53,15 @@ class _Object extends React.Component {
         );
     }
 
+    renderExecuteBtn(){
+        return (
+            <button
+                onClick={this.props.handleExecute}
+                type='button'
+                className='btn btn-primary'>Execute</button>
+        );
+    }
+
     renderEncodeDatasets(){
         let datasets = this.props.object.analysis_encode_datasets;
         return (
@@ -110,10 +119,18 @@ class _Object extends React.Component {
                         {this.renderEncodeDatasets()}
                     </tbody>
                 </table>
+                {this.renderExecuteBtn()}
                 {this.renderDeleteConfirmation()}
             </div>
         );
     }
 }
+
+_Object.propTypes = {
+    object: React.PropTypes.object.isRequired,
+    isDelete: React.PropTypes.bool.isRequired,
+    handleDeleteForm: React.PropTypes.func,
+    handleExecute: React.PropTypes.func.isRequired,
+};
 
 export default _Object;

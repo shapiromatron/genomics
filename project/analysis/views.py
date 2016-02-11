@@ -1,10 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
+from django.views.generic.edit import BaseUpdateView
 
-from .tasks import debug_task
+from utils.views import OwnerOrStaff
+from . import models, tasks
 
 
 class Home(TemplateView):
@@ -24,7 +26,16 @@ class Dashboard(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
+class Execute(OwnerOrStaff, BaseUpdateView):
+    http_method_names = ('post', )
+    model = models.Analysis
+
+    def post(self, context, **response_kwargs):
+        obj = self.get_object()
+        return JsonResponse({'run': True})
+
+
 class CeleryTester(Home):
     def get(self, request, *args, **kwargs):
-        debug_task.delay()
+        tasks.debug_task.delay()
         return super().get(request, *args, **kwargs)
