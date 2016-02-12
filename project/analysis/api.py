@@ -5,6 +5,7 @@ from rest_framework import viewsets, filters
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
+from rest_framework.exceptions import NotAcceptable
 
 from utils.api import SiteMixin, OwnedButShareableMixin, NoPagination, PlainTextRenderer
 
@@ -116,6 +117,17 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
     def plot(self, request, pk=None):
         an = get_object_or_404(models.Analysis, id=int(pk))
         return Response(an.get_summary_plot())
+
+    @detail_route(methods=['get'])
+    def sort_vector(self, request, pk=None):
+        try:
+            sort_vector_id = int(self.request.GET.get('id', -1))
+        except:
+            sort_vector_id = -1
+        if sort_vector_id == -1:
+            raise NotAcceptable("Sort vector `id` parameter required")
+        an = get_object_or_404(models.Analysis, id=int(pk))
+        return Response(an.get_sort_vector(sort_vector_id))
 
     def get_serializer_class(self):
         return serializers.AnalysisSerializer

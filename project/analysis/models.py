@@ -1,5 +1,6 @@
 import json
 import uuid
+import random
 
 from django.db import models
 from django.conf import settings
@@ -269,6 +270,11 @@ class Analysis(GenomicBinSettings):
             return False
         return self.datasetcorrelationmatrix.get_summary_plot_data()
 
+    def get_sort_vector(self, id_):
+        if not hasattr(self, 'datasetcorrelationmatrix'):
+            return False
+        return self.datasetcorrelationmatrix.get_sort_vector(id_)
+
 
 class FeatureListCountMatrix(GenomicBinSettings):
     feature_list = models.ForeignKey(
@@ -315,4 +321,14 @@ class DatasetCorrelationMatrix(models.Model):
             'max_abs_correlation_values': data['max_abs_correlation_values'],
             'cluster_members': data['cluster_members'],
             'correlation_matrix': data['correlation_matrix'],
+        }
+
+    def get_sort_vector(self, id_):
+        # todo: get specific sort-vector instead of random
+        # todo: cache matrix read
+        with open(self.matrix.name, 'r') as f:
+            data = json.loads(f.read())
+        idx = random.randint(0, len(data['sort_orders']))
+        return {
+            'sort_order': data['sort_orders'][idx],
         }
