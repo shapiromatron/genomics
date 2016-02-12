@@ -328,7 +328,5 @@ class DatasetCorrelationMatrix(models.Model):
         # todo: cache matrix read
         with open(self.matrix.name, 'r') as f:
             data = json.loads(f.read())
-        idx = random.randint(0, len(data['sort_orders']))
-        return {
-            'sort_order': data['sort_orders'][idx],
-        }
+        idx = random.randint(0, len(data['sort_orders'])-1)
+        return data['sort_orders'][idx]
