@@ -1,3 +1,7 @@
+import os
+import uuid
+
+
 from django.core.files.storage import FileSystemStorage
 
 
@@ -12,3 +16,16 @@ class ReadOnlyFileSystemStorage(FileSystemStorage):
 
     def delete(self, name):
         raise NotImplementedError()
+
+
+def get_random_filename(root):
+    # get new, unused, random filename
+    while True:
+        fn = os.path.abspath(
+            os.path.join(
+                root, "{}.txt".format(uuid.uuid4())
+            )
+        )
+        if not os.path.exists(fn):
+            break
+    return fn

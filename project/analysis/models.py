@@ -1,3 +1,4 @@
+import os
 import json
 import uuid
 import random
@@ -8,7 +9,10 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.urlresolvers import reverse
 from django.contrib.postgres.fields import JSONField
 
-from utils.models import ReadOnlyFileSystemStorage
+from utils.models import ReadOnlyFileSystemStorage, get_random_filename
+
+from .workflow.matrix import BedMatrix
+from .workflow.matrixByMatrix import MatrixByMatrix
 
 
 encode_store = ReadOnlyFileSystemStorage.create_store(settings.ENCODE_PATH)
@@ -275,6 +279,12 @@ class Analysis(GenomicBinSettings):
             return False
         return self.datasetcorrelationmatrix.get_sort_vector(id_)
 
+    def execute(self):
+        for ads in self.analysisdatasets_set.all():
+            ads.count_matrix = FeatureListCountMatrix.execute(self, ads.dataset)
+            ads.save()
+        DatasetCorrelationMatrix.execute(self)
+
 
 class FeatureListCountMatrix(GenomicBinSettings):
     UPLOAD_TO = 'fcm/'
@@ -295,6 +305,52 @@ class FeatureListCountMatrix(GenomicBinSettings):
 
     class Meta:
         verbose_name_plural = 'Feature list count matrices'
+
+    @classmethod
+    def execute(cls, analysis, dataset):
+
+        # Find existing instance
+        existing = cls.objects.filter(
+            feature_list=analysis.feature_list,
+            dataset=analysis.dataset,
+            anchor=analysis.anchor,
+            bin_start=analysis.bin_start,
+            bin_number=analysis.bin_number,
+            bin_size=analysis.bin_size,
+        ).first()
+        if existing:
+            return existing
+
+        # existing not found; create instead
+        fn = get_random_filename(os.path.join(settings.MEDIA_ROOT, cls.UPLOAD_TO))
+
+        if dataset.is_stranded:
+            bigwigs = [dataset.data_plus, dataset.data_minus]
+        else:
+            bigwigs = [dataset.data_ambiguous]
+
+        BedMatrix(
+            bigwigs=bigwigs,
+            feature_bed=analysis.feature_list.dataset.path,
+            output_matrix=fn,
+            anchor=analysis.anchor,
+            bin_start=analysis.bin_start,
+            bin_number=analysis.bin_number,
+            bin_size=analysis.bin_size,
+            opposite_strand_fn=None,
+            stranded_bigwigs=dataset.is_stranded,
+            stranded_bed=analysis.feature_list.stranded
+        )
+
+        return cls.objects.create(
+            feature_list=analysis.feature_list,
+            dataset=analysis.dataset,
+            anchor=analysis.anchor,
+            bin_start=analysis.bin_start,
+            bin_number=analysis.bin_number,
+            bin_size=analysis.bin_size,
+            matrix=os.path.basename(fn)
+        )
 
     def get_dataset(self):
         # todo: cache matrix read
@@ -317,6 +373,42 @@ class DatasetCorrelationMatrix(models.Model):
 
     class Meta:
         verbose_name_plural = 'Dataset correlation matrices'
+
+    @classmethod
+    def create_matrix_list(analysis):
+        return [
+            [ads.count_matrix.matrix.path, ads.display_name]
+            for ads in analysis.analysisdatasets_set.all().prefetch_related('count_matrix')
+        ]
+
+    @classmethod
+    def execute(cls, analysis):
+        matrix_list = cls.create_matrix_list(analysis)
+        fn = get_random_filename(os.path.join(settings.MEDIA_ROOT, cls.UPLOAD_TO))
+
+        sv = None
+        if analysis.sort_vector:
+            sv = analysis.sort_vector.text   # todo - use file?
+
+        MatrixByMatrix(
+            matrix_list=matrix_list,
+            window_start=analysis.bin_start,
+            bin_number=analysis.bin_number,
+            bin_size=analysis.bin_size,
+            output_json=fn,
+            sort_vector=sv,
+        )
+
+        dcm = getattr(analysis, 'datasetcorrelationmatrix')
+        if dcm:
+            dcm.matrix = os.basename(fn)
+            dcm.save()
+        else:
+            dcm = cls.objects.create(
+                analysis=analysis,
+                matrix=os.basename(fn),
+            )
+        return dcm
 
     def get_summary_plot_data(self):
         # todo: cache matrix read
