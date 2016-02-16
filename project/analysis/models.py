@@ -277,6 +277,8 @@ class Analysis(GenomicBinSettings):
 
 
 class FeatureListCountMatrix(GenomicBinSettings):
+    UPLOAD_TO = 'fcm/'
+
     feature_list = models.ForeignKey(
         FeatureList,
         related_name='intermediates')
@@ -284,6 +286,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
         GenomicDataset,
         related_name='intermediates')
     matrix = models.FileField(
+        upload_to=UPLOAD_TO,
         max_length=256)
     created = models.DateTimeField(
         auto_now_add=True)
@@ -301,8 +304,11 @@ class FeatureListCountMatrix(GenomicBinSettings):
 
 
 class DatasetCorrelationMatrix(models.Model):
+    UPLOAD_TO = 'dcm/'
+
     analysis = models.OneToOneField(Analysis)
     matrix = models.FileField(
+        upload_to=UPLOAD_TO,
         max_length=256)
     created = models.DateTimeField(
         auto_now_add=True)
