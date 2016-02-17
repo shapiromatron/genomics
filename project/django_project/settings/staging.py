@@ -1,6 +1,6 @@
 from django_project.settings.base import *
 
-DEBUG = False
+DEBUG = bool(os.environ.get('DJANGO_FORCE_DEBUG', 'False') == 'True')
 TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split('|')
