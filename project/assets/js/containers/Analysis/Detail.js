@@ -1,4 +1,4 @@
-import $ from 'jQuery';
+import $ from 'jquery';
 import _ from 'underscore';
 import React from 'react';
 import { connect } from 'react-redux';
