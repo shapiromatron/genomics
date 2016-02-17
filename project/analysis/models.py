@@ -288,7 +288,8 @@ class Analysis(GenomicBinSettings):
         return self.datasetcorrelationmatrix.get_sort_vector(id_)
 
     def execute(self):
-        for ads in self.analysisdatasets_set.all():
+        for ads in self.analysisdatasets_set.all()\
+                .prefetch_related('dataset', 'dataset__encodedataset', 'dataset__userdataset'):
             ads.count_matrix = FeatureListCountMatrix.execute(self, ads.dataset.subclass)
             ads.save()
         DatasetCorrelationMatrix.execute(self)
