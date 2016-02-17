@@ -348,7 +348,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
             bin_size=analysis.bin_size,
             opposite_strand_fn=None,
             stranded_bigwigs=dataset.is_stranded,
-            stranded_bed=analysis.feature_list.stranded
+            stranded_bed=analysis.feature_list.stranded.path
         )
 
         return cls.objects.create(
