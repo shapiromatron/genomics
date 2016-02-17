@@ -358,7 +358,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
             bin_start=analysis.bin_start,
             bin_number=analysis.bin_number,
             bin_size=analysis.bin_size,
-            matrix=os.path.basename(fn)
+            matrix=os.path.join(cls.UPLOAD_TO, os.path.basename(fn))
         )
 
     def get_dataset(self):
@@ -408,14 +408,15 @@ class DatasetCorrelationMatrix(models.Model):
             sort_vector=sv,
         )
 
-        dcm = getattr(analysis, 'datasetcorrelationmatrix')
+        output_fn = os.path.join(cls.UPLOAD_TO, os.path.basename(fn))
+        dcm = getattr(analysis, 'datasetcorrelationmatrix', None)
         if dcm:
-            dcm.matrix = os.basename(fn)
+            dcm.matrix = output_fn
             dcm.save()
         else:
             dcm = cls.objects.create(
                 analysis=analysis,
-                matrix=os.basename(fn),
+                matrix=output_fn,
             )
         return dcm
 
