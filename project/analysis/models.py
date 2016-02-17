@@ -363,9 +363,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
 
     def get_dataset(self):
         # todo: cache matrix read
-        with self.matrix.open() as f:
-            data = f.read()
-        return data
+        return self.matrix.read()
 
 
 class DatasetCorrelationMatrix(models.Model):
@@ -422,8 +420,7 @@ class DatasetCorrelationMatrix(models.Model):
 
     def get_summary_plot_data(self):
         # todo: cache matrix read
-        with self.matrix.open() as f:
-            data = json.loads(f.read())
+        data = json.loads(self.matrix.read())
         return {
             'dendrogram': data['dendrogram'],
             'max_abs_correlation_values': data['max_abs_correlation_values'],
@@ -434,7 +431,6 @@ class DatasetCorrelationMatrix(models.Model):
     def get_sort_vector(self, id_):
         # todo: get specific sort-vector instead of random
         # todo: cache matrix read
-        with self.matrix.open() as f:
-            data = json.loads(f.read())
+        data = json.loads(self.matrix.read())
         idx = random.randint(0, len(data['sort_orders'])-1)
         return data['sort_orders'][idx]
