@@ -312,7 +312,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
         # Find existing instance
         existing = cls.objects.filter(
             feature_list=analysis.feature_list,
-            dataset=analysis.dataset,
+            dataset=dataset,
             anchor=analysis.anchor,
             bin_start=analysis.bin_start,
             bin_number=analysis.bin_number,
@@ -344,7 +344,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
 
         return cls.objects.create(
             feature_list=analysis.feature_list,
-            dataset=analysis.dataset,
+            dataset=dataset,
             anchor=analysis.anchor,
             bin_start=analysis.bin_start,
             bin_number=analysis.bin_number,
@@ -375,7 +375,7 @@ class DatasetCorrelationMatrix(models.Model):
         verbose_name_plural = 'Dataset correlation matrices'
 
     @classmethod
-    def create_matrix_list(analysis):
+    def create_matrix_list(cls, analysis):
         return [
             [ads.count_matrix.matrix.path, ads.display_name]
             for ads in analysis.analysisdatasets_set.all().prefetch_related('count_matrix')

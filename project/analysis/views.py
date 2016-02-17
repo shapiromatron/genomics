@@ -39,6 +39,7 @@ class Execute(OwnerOrStaff, UpdateView):
 
     def post(self, context, **response_kwargs):
         obj = self.get_object()
+        obj.execute()
         return JsonResponse({'run': True})
 
 
