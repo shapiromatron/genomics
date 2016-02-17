@@ -65,6 +65,14 @@ class GenomicDataset(Dataset):
         choices=GENOME_ASSEMBLY_CHOICES)
 
     @property
+    def subclass(self):
+        # this is inherited model; get subclass
+        if hasattr(self, 'encodedataset'):
+            return self.encodedataset
+        else:
+            return self.userdataset
+
+    @property
     def is_stranded(self):
         return self.data_ambiguous.name == ''
 
@@ -281,7 +289,7 @@ class Analysis(GenomicBinSettings):
 
     def execute(self):
         for ads in self.analysisdatasets_set.all():
-            ads.count_matrix = FeatureListCountMatrix.execute(self, ads.dataset)
+            ads.count_matrix = FeatureListCountMatrix.execute(self, ads.dataset.subclass)
             ads.save()
         DatasetCorrelationMatrix.execute(self)
 
