@@ -334,9 +334,9 @@ class FeatureListCountMatrix(GenomicBinSettings):
         fn = get_random_filename(os.path.join(settings.MEDIA_ROOT, cls.UPLOAD_TO))
 
         if dataset.is_stranded:
-            bigwigs = [dataset.data_plus, dataset.data_minus]
+            bigwigs = [dataset.data_plus.path, dataset.data_minus.path]
         else:
-            bigwigs = [dataset.data_ambiguous]
+            bigwigs = [dataset.data_ambiguous.path]
 
         BedMatrix(
             bigwigs=bigwigs,
@@ -348,7 +348,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
             bin_size=analysis.bin_size,
             opposite_strand_fn=None,
             stranded_bigwigs=dataset.is_stranded,
-            stranded_bed=analysis.feature_list.stranded.path
+            stranded_bed=analysis.feature_list.stranded
         )
 
         return cls.objects.create(
