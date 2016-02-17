@@ -342,7 +342,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
             bigwigs=bigwigs,
             feature_bed=analysis.feature_list.dataset.path,
             output_matrix=fn,
-            anchor=analysis.anchor,
+            anchor=analysis.get_anchor_display(),
             bin_start=analysis.bin_start,
             bin_number=analysis.bin_number,
             bin_size=analysis.bin_size,
