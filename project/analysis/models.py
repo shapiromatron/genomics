@@ -1,5 +1,5 @@
 import os
-import json
+from django.utils import timezone
 import uuid
 import random
 
@@ -244,6 +244,9 @@ class Analysis(GenomicBinSettings):
         editable=False)
     public = models.BooleanField(
         default=False)
+    output = JSONField(default=dict)
+    execute_started = models.DateTimeField(null=True)
+    execute_finished = models.DateTimeField(null=True)
     created = models.DateTimeField(
         auto_now_add=True)
     last_updated = models.DateTimeField(
@@ -277,22 +280,58 @@ class Analysis(GenomicBinSettings):
     def get_flcm_ids(self):
         return list(self.analysisdatasets_set.values_list('count_matrix', flat=True))
 
-    def get_summary_plot(self):
-        if not hasattr(self, 'datasetcorrelationmatrix'):
-            return False
-        return self.datasetcorrelationmatrix.get_summary_plot_data()
-
-    def get_sort_vector(self, id_):
-        if not hasattr(self, 'datasetcorrelationmatrix'):
-            return False
-        return self.datasetcorrelationmatrix.get_sort_vector(id_)
-
     def execute(self):
+        self.execute_started = timezone.now()
+        self.execute_finished = None
+        self.save()
+
         for ads in self.analysisdatasets_set.all()\
                 .prefetch_related('dataset', 'dataset__encodedataset', 'dataset__userdataset'):
             ads.count_matrix = FeatureListCountMatrix.execute(self, ads.dataset.subclass)
             ads.save()
-        DatasetCorrelationMatrix.execute(self)
+
+        self.output = self.execute_mat2mat()
+        self.execute_finished = timezone.now()
+        self.save()
+
+    def create_matrix_list(self):
+        return [
+            [ads.count_matrix.matrix.path, ads.display_name]
+            for ads in self.analysisdatasets_set.all().prefetch_related('count_matrix')
+        ]
+
+    def execute_mat2mat(self):
+        matrix_list = self.create_matrix_list()
+
+        sv = None
+        if self.sort_vector:
+            sv = self.sort_vector.text   # todo - use file?
+
+        mm = MatrixByMatrix(
+            matrix_list=matrix_list,
+            window_start=self.bin_start,
+            bin_number=self.bin_number,
+            bin_size=self.bin_size,
+            sort_vector=sv,
+        )
+        return mm.getOutputDict()
+
+    def get_summary_plot(self):
+        if not self.output:
+            return False
+        return {
+            'dendrogram': self.output['dendrogram'],
+            'max_abs_correlation_values': self.output['max_abs_correlation_values'],
+            'cluster_members': self.output['cluster_members'],
+            'correlation_matrix': self.output['correlation_matrix'],
+        }
+
+    def get_sort_vector(self, id_):
+        if not self.output:
+            return False
+        # todo: get specific sort-vector instead of random
+        idx = random.randint(0, len(self.output['sort_orders'])-1)
+        return self.output['sort_orders'][idx]
 
 
 class FeatureListCountMatrix(GenomicBinSettings):
@@ -382,58 +421,3 @@ class DatasetCorrelationMatrix(models.Model):
     class Meta:
         verbose_name_plural = 'Dataset correlation matrices'
 
-    @classmethod
-    def create_matrix_list(cls, analysis):
-        return [
-            [ads.count_matrix.matrix.path, ads.display_name]
-            for ads in analysis.analysisdatasets_set.all().prefetch_related('count_matrix')
-        ]
-
-    @classmethod
-    def execute(cls, analysis):
-        matrix_list = cls.create_matrix_list(analysis)
-        fn = get_random_filename(os.path.join(settings.MEDIA_ROOT, cls.UPLOAD_TO))
-
-        sv = None
-        if analysis.sort_vector:
-            sv = analysis.sort_vector.text   # todo - use file?
-
-        MatrixByMatrix(
-            matrix_list=matrix_list,
-            window_start=analysis.bin_start,
-            bin_number=analysis.bin_number,
-            bin_size=analysis.bin_size,
-            output_json=fn,
-            sort_vector=sv,
-        )
-
-        output_fn = os.path.join(cls.UPLOAD_TO, os.path.basename(fn))
-        dcm = getattr(analysis, 'datasetcorrelationmatrix', None)
-        if dcm:
-            dcm.matrix = output_fn
-            dcm.save()
-        else:
-            dcm = cls.objects.create(
-                analysis=analysis,
-                matrix=output_fn,
-            )
-        return dcm
-
-    def get_summary_plot_data(self):
-        # todo: cache matrix read
-        with open(self.matrix.path, 'r') as f:
-            data = json.loads(f.read())
-        return {
-            'dendrogram': data['dendrogram'],
-            'max_abs_correlation_values': data['max_abs_correlation_values'],
-            'cluster_members': data['cluster_members'],
-            'correlation_matrix': data['correlation_matrix'],
-        }
-
-    def get_sort_vector(self, id_):
-        # todo: get specific sort-vector instead of random
-        # todo: cache matrix read
-        with open(self.matrix.path, 'r') as f:
-            data = json.loads(f.read())
-        idx = random.randint(0, len(data['sort_orders'])-1)
-        return data['sort_orders'][idx]
