@@ -8,19 +8,18 @@ from scipy.spatial.distance import squareform, pdist
 import os
 import json
 
+
 class MatrixByMatrix():
 
     def __init__(self, matrix_list, window_start,
                  bin_number, bin_size, sort_vector):
 
-        #self.input_vector = input_vector
         self.matrix_list = matrix_list
         self.window_start = window_start
         self.bin_number = bin_number
         self.bin_size = bin_size
         self.sort_vector = sort_vector
 
-        #assert os.path.exists(self.input_vector)
         assert isinstance(window_start, int)
         assert isinstance(bin_number, int)
         assert isinstance(bin_size, int)
@@ -41,8 +40,18 @@ class MatrixByMatrix():
             with open(self.matrix_files[i]) as f:
                 next(f)
                 for j, line in enumerate(f):
-                    matrix_entries[j] = {"feature_id": line.split()[0], "row_sum": sum(map(float, line.strip().split()[1:]))}
-            self.sort_orders.append({"data_set": self.matrix_names[i], "sort_order":sorted(matrix_entries, key=lambda x: (matrix_entries[x]["row_sum"]), reverse=True)})
+                    matrix_entries[j] = {
+                        "feature_id": line.split()[0],
+                        "row_sum": sum(map(float, line.strip().split()[1:]))
+                    }
+            self.sort_orders.append({
+                "data_set": self.matrix_names[i],
+                "sort_order": sorted(
+                    matrix_entries,
+                    key=lambda x: (matrix_entries[x]["row_sum"]),
+                    reverse=True
+                )
+            })
 
     def createVectorList(self):
         vector_list = []
@@ -81,9 +90,11 @@ class MatrixByMatrix():
                         try:
                             self.correlation_matrix[j][i]
                         except IndexError:
-                            self.correlation_matrix[-1].append(stats.spearmanr(vector_list[i], vector_list[j])[0])
+                            self.correlation_matrix[-1].append(
+                                stats.spearmanr(vector_list[i], vector_list[j])[0])
                         else:
-                            self.correlation_matrix[-1].append(self.correlation_matrix[j][i])
+                            self.correlation_matrix[-1].append(
+                                self.correlation_matrix[j][i])
 
     def createDistanceMatrix(self):
         self.distance_matrix = []
@@ -128,7 +139,7 @@ class MatrixByMatrix():
         lnk = linkage(squareform(distance_array), method="average")
 
         full_dg = dendrogram(lnk)
-        truncated_dg = dendrogram(lnk,p=50,truncate_mode="lastp")
+        truncated_dg = dendrogram(lnk, p=50, truncate_mode="lastp")
 
         self.dendrogram = truncated_dg
         self.cluster_members = []
@@ -261,7 +272,6 @@ class MatrixByMatrix():
 @click.argument('bin_size', type=int)
 @click.argument('output_json', type=str)
 @click.option('--sort_vector', nargs=1, type=str, help="Sort vector for correlative analysis")
-
 def cli(matrix_list_fn, window_start, bin_number,
         bin_size, output_json, sort_vector):
     """
