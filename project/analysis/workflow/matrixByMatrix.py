@@ -10,16 +10,14 @@ import json
 
 class MatrixByMatrix():
 
-    def __init__(self,
-                 matrix_list, window_start, bin_number,
-                 bin_size, output_json, sort_vector):
+    def __init__(self, matrix_list, window_start,
+                 bin_number, bin_size, sort_vector):
 
         #self.input_vector = input_vector
         self.matrix_list = matrix_list
         self.window_start = window_start
         self.bin_number = bin_number
         self.bin_size = bin_size
-        self.output_json = output_json
         self.sort_vector = sort_vector
 
         #assert os.path.exists(self.input_vector)
@@ -203,27 +201,32 @@ class MatrixByMatrix():
                 self.med_correlation_values[-1].append(numpy.median(self.cluster_correlation_values[i][j]))
                 self.max_abs_correlation_values[-1].append(self.maxAbs(self.cluster_correlation_values[i][j]))
 
-    def writeJson(self):
-        output_dict = dict()
+    def getOutputDict(self):
+        # Return an output dict of the analysis results
+        return dict(
+            bin_parameters={
+                "window_start": self.window_start,
+                "bin_number": self.bin_number,
+                "bin_size": self.bin_size,
+            },
+            matrix_files=self.matrix_files,
+            matrix_names=self.matrix_names,
+            correlation_matrix=self.correlation_matrix,
+            dendrogram=self.dendrogram,
+            cluster_members=self.cluster_members,
+            cluster_correlation_values=self.cluster_correlation_values,
+            max_cluster_correlation_values=self.max_correlation_values,
+            med_cluster_correlation_values=self.med_correlation_values,
+            max_abs_correlation_values=self.max_abs_correlation_values,
+            sort_orders=self.sort_orders,
+            cluster_medoids=self.cluster_medoids,
+            sort_vector=getattr(self, 'sort_vector', None),
+        )
 
-        output_dict["bin_parameters"] = {"window_start":self.window_start, "bin_number":self.bin_number, "bin_size":self.bin_size}
-        output_dict["matrix_files"] = self.matrix_files
-        output_dict["matrix_names"] = self.matrix_names
-        output_dict["correlation_matrix"] = self.correlation_matrix
-        #output_dict["distance_matrix"] =  self.distance_matrix
-        output_dict["dendrogram"] =  self.dendrogram
-        output_dict["cluster_members"] = self.cluster_members
-        output_dict["cluster_correlation_values"] = self.cluster_correlation_values
-        output_dict["max_cluster_correlation_values"] = self.max_correlation_values
-        output_dict["med_cluster_correlation_values"] = self.med_correlation_values
-        output_dict["max_abs_correlation_values"] = self.max_abs_correlation_values
-        output_dict["sort_orders"] = self.sort_orders
-        output_dict["cluster_medoids"] = self.cluster_medoids
-        if self.sort_vector:
-            output_dict["sort_vector"] = self.sort_vector
-
-        with open(self.output_json, 'w') as f:
-            json.dump(output_dict, f, indent=2, separators=(",",": "))
+    def writeJson(self, fn):
+        output_dict = self.writeOutputDict()
+        with open(fn, 'w') as f:
+            json.dump(output_dict, f, separators=(",", ": "))
 
     def readInSortVector(self, input_file):
         """
@@ -254,7 +257,7 @@ class MatrixByMatrix():
         self.createCorrelationMatrix()
         self.performClustering()
         self.findClusterCorrelationValues()
-        self.writeJson()
+
 
 @click.command()
 @click.argument('matrix_list_fn', type=str)
@@ -291,8 +294,8 @@ def cli(matrix_list_fn, window_start, bin_number,
             for line in f.readlines()
         ]
 
-    MatrixByMatrix(matrix_list, window_start, bin_number, bin_size,
-        output_json, sort_vector)
+    mm = MatrixByMatrix(matrix_list, window_start, bin_number, bin_size, sort_vector)
+    mm.writeJson(output_json)
 
 
 if __name__ == '__main__':
