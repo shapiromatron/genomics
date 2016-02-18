@@ -245,8 +245,6 @@ class Analysis(GenomicBinSettings):
     public = models.BooleanField(
         default=False)
     output = JSONField(default=dict)
-    execute_started = models.DateTimeField(null=True)
-    execute_finished = models.DateTimeField(null=True)
     created = models.DateTimeField(
         auto_now_add=True)
     last_updated = models.DateTimeField(

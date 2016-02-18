@@ -15,16 +15,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='analysis',
-            name='execute_finished',
-            field=models.DateTimeField(null=True),
-        ),
-        migrations.AddField(
-            model_name='analysis',
-            name='execute_started',
-            field=models.DateTimeField(null=True),
-        ),
-        migrations.AddField(
-            model_name='analysis',
             name='output',
             field=django.contrib.postgres.fields.jsonb.JSONField(default=dict),
         ),
