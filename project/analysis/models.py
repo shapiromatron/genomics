@@ -286,8 +286,8 @@ class Analysis(GenomicBinSettings):
             return 'NOT STARTED'
 
     def execute(self):
-        self.execute_started = timezone.now()
-        self.execute_finished = None
+        self.start_time = timezone.now()
+        self.end_time = None
         self.save()
 
         for ads in self.analysisdatasets_set.all()\
@@ -296,7 +296,7 @@ class Analysis(GenomicBinSettings):
             ads.save()
 
         self.output = self.execute_mat2mat()
-        self.execute_finished = timezone.now()
+        self.end_time = timezone.now()
         self.save()
 
     def create_matrix_list(self):
