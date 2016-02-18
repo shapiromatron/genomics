@@ -2,6 +2,7 @@
 
 import click
 import os
+import tempfile
 from subprocess import call
 from six import string_types
 
@@ -12,10 +13,6 @@ class BedMatrix(object):
 
     ANCHOR_OPTIONS = ('start', 'end', 'center')
     bigWigAverageOverBed_path = os.path.join(root, "bigWigAverageOverBed")
-    temp_bed_fn = "temp_feature_bin.bed"
-    temp_int_plus_fn = "temp_intersection.plus.tab"
-    temp_int_minus_fn = "temp_intersection.minus.tab"
-    temp_int_unstranded_fn = "temp_intersection.tab"
 
     def __init__(self, bigwigs, feature_bed, output_matrix, anchor, bin_start,
                  bin_number, bin_size, opposite_strand_fn, stranded_bigwigs,
@@ -61,10 +58,34 @@ class BedMatrix(object):
         if os.path.dirname(self.output_matrix) != "":
             assert os.path.exists(os.path.dirname(self.output_matrix))
 
-        # Execute
-        self.make_bed()
-        self.bigwig_average_over_bed()
-        self.make_matrix()
+        self.execute()
+
+    def execute(self):
+        try:
+            self.create_temps()
+            self.make_bed()
+            self.bigwig_average_over_bed()
+            self.make_matrix()
+        finally:
+            self.cleanup()
+
+    def tryDelete(self, fn):
+        try:
+            os.remove(fn)
+        except FileNotFoundError:
+            pass
+
+    def create_temps(self):
+        self._plus_filename = tempfile.mkstemp()[1]
+        self._minus_filename = tempfile.mkstemp()[1]
+        self._unstranded_filename = tempfile.mkstemp()[1]
+        self._bedfile = tempfile.NamedTemporaryFile(mode='w')
+
+    def cleanup(self):
+        self.tryDelete(self._plus_filename)
+        self.tryDelete(self._minus_filename)
+        self.tryDelete(self._unstranded_filename)
+        self._bedfile.close()
 
     def checkInt(self, num):
         # Return int if possible, else return float
@@ -121,11 +142,10 @@ class BedMatrix(object):
         Create list with order of features in bed file.
         """
         input_file = self.feature_bed
-        output_file = self.temp_bed_fn
         feature_dict = {}
         feature_list = []
         with open(input_file, 'r') as f, \
-                open(output_file, "w") as OUTPUT:
+                self._bedfile.file as OUTPUT:
             total_valid_lines = self.countValidBedLines(input_file)
             count = 0
             for line in f:
@@ -202,21 +222,21 @@ class BedMatrix(object):
             call([
                 self.bigWigAverageOverBed_path,
                 self.plus_bigwig,
-                self.temp_bed_fn,
-                self.temp_int_plus_fn
+                self._bedfile.name,
+                self._plus_filename,
             ])
             call([
                 self.bigWigAverageOverBed_path,
                 self.minus_bigwig,
-                self.temp_bed_fn,
-                self.temp_int_minus_fn
+                self._bedfile.name,
+                self._minus_filename,
             ])
         else:
             call([
                 self.bigWigAverageOverBed_path,
                 self.unstranded_bigwig,
-                self.temp_bed_fn,
-                self.temp_int_unstranded_fn
+                self._bedfile.name,
+                self._unstranded_filename,
             ])
 
     def make_matrix(self):
@@ -228,7 +248,7 @@ class BedMatrix(object):
 
     def make_unstranded_matrix(self):
         # Create output matrix for unstranded bigwig
-        with open(self.temp_int_unstranded_fn, 'r') as f, \
+        with open(self._unstranded_filename, 'r') as f, \
                 open(self.output_matrix, 'w') as OUTPUT:
 
             # Make header, write to output
@@ -264,8 +284,8 @@ class BedMatrix(object):
         if self.opposite_strand_fn:
             OPPOSITE = open(self.opposite_strand_fn, "w")
 
-        with open(self.temp_int_plus_fn) as plus_file, \
-                open(self.temp_int_minus_fn) as minus_file, \
+        with open(self._plus_filename) as plus_file, \
+                open(self._minus_filename) as minus_file, \
                 open(self.output_matrix, "w") as OUTPUT:
 
             # Make header
