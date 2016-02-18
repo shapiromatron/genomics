@@ -106,12 +106,6 @@ class FeatureListCountMatrixAdmin(admin.ModelAdmin):
     )
 
 
-class DatasetCorrelationMatrixAdmin(admin.ModelAdmin):
-    list_display = (
-        'id', 'analysis', 'created', 'last_updated',
-    )
-
-
 admin.site.register(models.UserDataset, UserDatasetAdmin)
 admin.site.register(models.EncodeDataset, EncodeDatasetAdmin)
 admin.site.register(models.FeatureList, FeatureListAdmin)
@@ -119,4 +113,3 @@ admin.site.register(models.SortVector, SortVectorAdmin)
 admin.site.register(models.AnalysisDatasets, AnalysisDatasetsAdmin)
 admin.site.register(models.Analysis, AnalysisAdmin)
 admin.site.register(models.FeatureListCountMatrix, FeatureListCountMatrixAdmin)
-admin.site.register(models.DatasetCorrelationMatrix, DatasetCorrelationMatrixAdmin)

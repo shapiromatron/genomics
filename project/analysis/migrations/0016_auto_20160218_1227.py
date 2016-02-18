@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 import django.contrib.postgres.fields.jsonb
-from django.db import migrations, models
+from django.db import migrations
 
 
 class Migration(migrations.Migration):
@@ -17,5 +17,12 @@ class Migration(migrations.Migration):
             model_name='analysis',
             name='output',
             field=django.contrib.postgres.fields.jsonb.JSONField(default=dict),
+        ),
+        migrations.RemoveField(
+            model_name='datasetcorrelationmatrix',
+            name='analysis',
+        ),
+        migrations.DeleteModel(
+            name='DatasetCorrelationMatrix',
         ),
     ]

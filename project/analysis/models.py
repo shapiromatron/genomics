@@ -409,20 +409,3 @@ class FeatureListCountMatrix(GenomicBinSettings):
         # todo: cache matrix read
         with open(self.matrix.path, 'r') as f:
             return f.read()
-
-
-class DatasetCorrelationMatrix(models.Model):
-    UPLOAD_TO = 'dcm/'
-
-    analysis = models.OneToOneField(Analysis)
-    matrix = models.FileField(
-        upload_to=UPLOAD_TO,
-        max_length=256)
-    created = models.DateTimeField(
-        auto_now_add=True)
-    last_updated = models.DateTimeField(
-        auto_now=True)
-
-    class Meta:
-        verbose_name_plural = 'Dataset correlation matrices'
-
