@@ -38,12 +38,10 @@ class MatrixByMatrix():
 
         for i in range(len(self.matrix_files)):
             matrix_entries = dict()
-            index = 0
             with open(self.matrix_files[i]) as f:
                 next(f)
-                for line in f:
-                    matrix_entries[index] = {"feature_id": line.split()[0], "row_sum": sum(map(float, line.strip().split()[1:]))}
-                    index += 1
+                for j, line in enumerate(f):
+                    matrix_entries[j] = {"feature_id": line.split()[0], "row_sum": sum(map(float, line.strip().split()[1:]))}
             self.sort_orders.append({"data_set": self.matrix_names[i], "sort_order":sorted(matrix_entries, key=lambda x: (matrix_entries[x]["row_sum"]), reverse=True)})
 
     def createVectorList(self):
@@ -135,17 +133,14 @@ class MatrixByMatrix():
         self.dendrogram = truncated_dg
         self.cluster_members = []
 
-        full_id = 0
-        for entry in truncated_dg['ivl']:
+        for full_id, entry in enumerate(truncated_dg['ivl']):
             self.cluster_members.append([])
             if len(entry.split("(")) > 1:
                 member_num = int(entry.split("(")[1].split(")")[0])
                 for i in range(member_num):
                     self.cluster_members[-1].append(self.matrix_names[int(full_dg['ivl'][full_id])])
-                    full_id += 1
             else:
                 self.cluster_members[-1].append(self.matrix_names[int(full_dg['ivl'][full_id])])
-                full_id += 1
 
         self.findMedoids()
 
