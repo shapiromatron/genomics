@@ -59,8 +59,8 @@ class AnalysisSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Analysis
-        fields = '__all__'
-        read_only_fields = ('validated', 'start_time', 'end_time', 'owner')
+        exclude = ('output', )
+        read_only_fields = ('output', 'validated', 'start_time', 'end_time', 'owner')
 
     def create_analysis_datasets(self, analysis, datasets):
         objects = [
