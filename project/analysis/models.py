@@ -278,6 +278,13 @@ class Analysis(GenomicBinSettings):
     def get_flcm_ids(self):
         return list(self.analysisdatasets_set.values_list('count_matrix', flat=True))
 
+    @property
+    def status(self):
+        if self.start_time:
+            return 'COMPLETE' if self.end_time else 'RUNNING'
+        else:
+            return 'NOT STARTED'
+
     def execute(self):
         self.execute_started = timezone.now()
         self.execute_finished = None

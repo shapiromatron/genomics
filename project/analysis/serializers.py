@@ -55,6 +55,7 @@ class AnalysisSerializer(serializers.ModelSerializer):
     analysis_encode_datasets = AnalysisDatasetsSerializer(many=True)
     genome_assembly_display = serializers.ReadOnlyField(source='get_genome_assembly_display')
     anchor_display = serializers.ReadOnlyField(source='get_anchor_display')
+    status = serializers.ReadOnlyField()
 
     class Meta:
         model = models.Analysis
