@@ -19,13 +19,15 @@ DATABASES = {
     }
 }
 
-TIME_ZONE = 'America/New_York'
-LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
 
+LANGUAGE_CODE = 'en-us'
 USE_I18N = True
-USE_L10N = True
+
+
 USE_TZ = True
+USE_L10N = True
+TIME_ZONE = 'America/New_York'
 
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'public', 'media')
 MEDIA_URL = '/media/'
