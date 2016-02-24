@@ -321,6 +321,8 @@ class DatasetCorrelationMatrix(models.Model):
             'max_abs_correlation_values': data['max_abs_correlation_values'],
             'cluster_members': data['cluster_members'],
             'correlation_matrix': data['correlation_matrix'],
+            'matrix_names': data['matrix_names'],
+            'cluster_medoids': data['cluster_medoids']
         }
 
     def get_sort_vector(self, id_):
