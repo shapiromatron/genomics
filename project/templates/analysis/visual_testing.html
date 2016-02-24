@@ -133,36 +133,38 @@ var showFeatureListCount = function(data){
 }
 
 var AnalysisOverview = function(data, parent_div) {
-    this.dendrogram = data['dendrogram'];
-    this.cluster_members = data['cluster_members'];
-    this.cluster_display = data['max_abs_correlation_values'];
-    this.correlation_matrix = data['correlation_matrix'];
-    this.matrix_names = data['matrix_names'];
-    this.cluster_medoids = data['cluster_medoids'];
+    var self = this;
 
-    this.parent_div = parent_div;
+    self.dendrogram = data['dendrogram'];
+    self.cluster_members = data['cluster_members'];
+    self.cluster_display = data['max_abs_correlation_values'];
+    self.correlation_matrix = data['correlation_matrix'];
+    self.matrix_names = data['matrix_names'];
+    self.cluster_medoids = data['cluster_medoids'];
+
+    self.parent_div = parent_div;
 }
 
 AnalysisOverview.prototype.drawHeatmap = function() {
     var self = this;
 
     //Remove heatmap div if there; append heatmap div
-    $('#' + this.parent_div + '> #heatmap').remove();
-    $('#' + this.parent_div).append('<div id=\'heatmap\'></div>');
+    $('#' + self.parent_div + '> #heatmap').remove();
+    $('#' + self.parent_div).append('<div id=\'heatmap\'></div>');
 
     //Add attributes, style to div
-    $('#' + this.parent_div + '> #heatmap').height('80%');
-    $('#' + this.parent_div + '> #heatmap').width('60%');
-    $('#' + this.parent_div + '> #heatmap').css({
+    $('#' + self.parent_div + '> #heatmap').height('80%');
+    $('#' + self.parent_div + '> #heatmap').width('60%');
+    $('#' + self.parent_div + '> #heatmap').css({
         'position': 'absolute', 'left': '40%', 'top': '20%'
     });
 
     //Draw SVGs
-    var height = $('#' + this.parent_div + '> #heatmap').height();
-    var width = $('#' + this.parent_div + '> #heatmap').width();
+    var height = $('#' + self.parent_div + '> #heatmap').height();
+    var width = $('#' + self.parent_div + '> #heatmap').width();
 
-    var col_number = this.cluster_display[0].length;
-    var row_number = this.cluster_display.length;
+    var col_number = self.cluster_display[0].length;
+    var row_number = self.cluster_display.length;
 
     var cell_height = height/row_number;
     var cell_width = width/col_number;
@@ -171,17 +173,17 @@ AnalysisOverview.prototype.drawHeatmap = function() {
         .domain([-1, 0, 1])
         .range(['blue', 'white', 'red']);
 
-    var svg = d3.select('#' + this.parent_div + '> #heatmap')
+    var svg = d3.select('#' + self.parent_div + '> #heatmap')
         .append('svg')
         .attr('height', height)
         .attr('width', width);
 
-    var cluster_members = this.cluster_members;
-    var cluster_medoids = this.cluster_medoids;
+    var cluster_members = self.cluster_members;
+    var cluster_medoids = self.cluster_medoids;
 
     svg.append('g')
         .selectAll('g')
-        .data(this.cluster_display)
+        .data(self.cluster_display)
         .enter()
         .append('g')
         .selectAll('rect')
@@ -223,34 +225,35 @@ AnalysisOverview.prototype.drawHeatmap = function() {
 }
 
 AnalysisOverview.prototype.writeVertNames = function () {
+    var self = this;
 
     //Remove heatmap div if there; append heatmap div
-    $('#' + this.parent_div + '> #vert_names').remove();
-    $('#' + this.parent_div).append('<div id=\'vert_names\'></div>');
+    $('#' + self.parent_div + '> #vert_names').remove();
+    $('#' + self.parent_div).append('<div id=\'vert_names\'></div>');
 
     //Add attributes, style to div
-    $('#' + this.parent_div + '> #vert_names').height('18%');
-    $('#' + this.parent_div + '> #vert_names').width('60%');
-    $('#' + this.parent_div + '> #vert_names').css({
+    $('#' + self.parent_div + '> #vert_names').height('18%');
+    $('#' + self.parent_div + '> #vert_names').width('60%');
+    $('#' + self.parent_div + '> #vert_names').css({
         'position': 'absolute', 'left': '40%', 'top': '1%', 'overflow': 'hidden'
     });
 
     //Draw SVGs
-    var height = $('#' + this.parent_div + '> #vert_names').height();
-    var width = $('#' + this.parent_div + '> #vert_names').width();
+    var height = $('#' + self.parent_div + '> #vert_names').height();
+    var width = $('#' + self.parent_div + '> #vert_names').width();
 
-    var row_number = this.cluster_members.length;
+    var row_number = self.cluster_members.length;
 
-    var svg = d3.select('#' + this.parent_div + '> #vert_names')
+    var svg = d3.select('#' + self.parent_div + '> #vert_names')
         .append('svg')
         .attr('height', height)
         .attr('width', width)
 
-    var cluster_medoids = this.cluster_medoids;
+    var cluster_medoids = self.cluster_medoids;
 
     svg.append('g')
         .selectAll('text')
-        .data(this.cluster_members)
+        .data(self.cluster_members)
         .enter()
         .append('text')
         .text(function(d,i) { if (d.length > 1) {return '(' + d.length + ') ' + cluster_medoids[i];} else {return d[0];}})
@@ -264,34 +267,35 @@ AnalysisOverview.prototype.writeVertNames = function () {
 }
 
 AnalysisOverview.prototype.writeRowNames = function() {
+    var self = this;
 
     //Remove heatmap div if there; append heatmap div
-    $('#' + this.parent_div + '> #row_names').remove();
-    $('#' + this.parent_div).append('<div id=\'row_names\'></div>');
+    $('#' + self.parent_div + '> #row_names').remove();
+    $('#' + self.parent_div).append('<div id=\'row_names\'></div>');
 
     //Add attributes, style to div
-    $('#' + this.parent_div + '> #row_names').height('80%');
-    $('#' + this.parent_div + '> #row_names').width('18%');
-    $('#' + this.parent_div + '> #row_names').css({
+    $('#' + self.parent_div + '> #row_names').height('80%');
+    $('#' + self.parent_div + '> #row_names').width('18%');
+    $('#' + self.parent_div + '> #row_names').css({
         'position': 'absolute', 'left': '21%', 'top': '20%', 'overflow': 'hidden'
     });
 
     //Draw SVGs
-    var height = $('#' + this.parent_div + '> #row_names').height();
-    var width = $('#' + this.parent_div + '> #row_names').width();
+    var height = $('#' + self.parent_div + '> #row_names').height();
+    var width = $('#' + self.parent_div + '> #row_names').width();
 
-    var row_number = this.cluster_members.length;
+    var row_number = self.cluster_members.length;
 
-    var svg = d3.select('#' + this.parent_div + '> #row_names')
+    var svg = d3.select('#' + self.parent_div + '> #row_names')
         .append("svg")
         .attr("height", height)
         .attr("width", width);
 
-    var cluster_medoids = this.cluster_medoids;
+    var cluster_medoids = self.cluster_medoids;
 
     svg.append("g")
         .selectAll("text")
-        .data(this.cluster_members)
+        .data(self.cluster_members)
         .enter()
         .append("text")
         .text(function(d,i) { if (d.length > 1) {return '(' + d.length + ') ' + cluster_medoids[i];} else {return d[0];}})
@@ -304,43 +308,44 @@ AnalysisOverview.prototype.writeRowNames = function() {
 }
 
 AnalysisOverview.prototype.writeDendrogram = function() {
+    var self = this;
 
     //Remove heatmap div if there; append heatmap div
-    $('#' + this.parent_div + '> #dendrogram').remove();
-    $('#' + this.parent_div).append('<div id=\'dendrogram\'></div>');
+    $('#' + self.parent_div + '> #dendrogram').remove();
+    $('#' + self.parent_div).append('<div id=\'dendrogram\'></div>');
 
     //Add attributes, style to div
-    $('#' + this.parent_div + '> #dendrogram').height('80%');
-    $('#' + this.parent_div + '> #dendrogram').width('20%');
-    $('#' + this.parent_div + '> #dendrogram').css({
+    $('#' + self.parent_div + '> #dendrogram').height('80%');
+    $('#' + self.parent_div + '> #dendrogram').width('20%');
+    $('#' + self.parent_div + '> #dendrogram').css({
         'position': 'absolute', 'left': '0%', 'top': '20%', 'overflow': 'hidden'
     });
 
     var line_coords = [];
 
-    var x_max = parseFloat(Math.max(...[].concat.apply([],this.dendrogram['dcoord'])));
-    var y_max = parseFloat(Math.max(...[].concat.apply([],this.dendrogram['icoord'])));
+    var x_max = parseFloat(Math.max(...[].concat.apply([],self.dendrogram['dcoord'])));
+    var y_max = parseFloat(Math.max(...[].concat.apply([],self.dendrogram['icoord'])));
 
-    var x_min = parseFloat(Math.min(...[].concat.apply([],this.dendrogram['dcoord'])));
-    var y_min = parseFloat(Math.min(...[].concat.apply([],this.dendrogram['icoord'])));
+    var x_min = parseFloat(Math.min(...[].concat.apply([],self.dendrogram['dcoord'])));
+    var y_min = parseFloat(Math.min(...[].concat.apply([],self.dendrogram['icoord'])));
 
-    var height = $('#' + this.parent_div + '> #dendrogram').height();
-    var width = $('#' + this.parent_div + '> #dendrogram').width();
+    var height = $('#' + self.parent_div + '> #dendrogram').height();
+    var width = $('#' + self.parent_div + '> #dendrogram').width();
 
-    var leaf_num = this.dendrogram['leaves'].length;
+    var leaf_num = self.dendrogram['leaves'].length;
 
-    for (var i in this.dendrogram['dcoord']) {
+    for (var i in self.dendrogram['dcoord']) {
         for (var j in [0, 1, 2]) {
             line_coords.push({
-                y1: ((0.5/leaf_num)*height)+((parseFloat(this.dendrogram['icoord'][i][j])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
-                y2: ((0.5/leaf_num)*height)+((parseFloat(this.dendrogram['icoord'][i][parseInt(j)+1])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
-                x1: width-((parseFloat(this.dendrogram['dcoord'][i][j])-x_min)/(x_max-x_min))*width,
-                x2: width-((parseFloat(this.dendrogram['dcoord'][i][parseInt(j)+1])-x_min)/(x_max-x_min))*width
+                y1: ((0.5/leaf_num)*height)+((parseFloat(self.dendrogram['icoord'][i][j])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
+                y2: ((0.5/leaf_num)*height)+((parseFloat(self.dendrogram['icoord'][i][parseInt(j)+1])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
+                x1: width-((parseFloat(self.dendrogram['dcoord'][i][j])-x_min)/(x_max-x_min))*width,
+                x2: width-((parseFloat(self.dendrogram['dcoord'][i][parseInt(j)+1])-x_min)/(x_max-x_min))*width
             });
         }
     }
 
-    var svg = d3.select('#' + this.parent_div + '> #dendrogram')
+    var svg = d3.select('#' + self.parent_div + '> #dendrogram')
         .append('svg')
         .attr('width', width)
         .attr('height', height)
@@ -360,21 +365,23 @@ AnalysisOverview.prototype.writeDendrogram = function() {
 }
 
 AnalysisOverview.prototype.drawLegend = function() {
+    var self = this;
+
     //Remove heatmap div if there; append heatmap div
-    $('#' + this.parent_div + '> #legend').remove();
-    $('#' + this.parent_div).append('<div id=\'legend\'></div>');
+    $('#' + self.parent_div + '> #legend').remove();
+    $('#' + self.parent_div).append('<div id=\'legend\'></div>');
 
     //Add attributes, style to div
-    $('#' + this.parent_div + '> #legend').height('5%');
-    $('#' + this.parent_div + '> #legend').width('20%');
-    $('#' + this.parent_div + '> #legend').css({
+    $('#' + self.parent_div + '> #legend').height('5%');
+    $('#' + self.parent_div + '> #legend').width('20%');
+    $('#' + self.parent_div + '> #legend').css({
         'position': 'absolute', 'left': '10%', 'top': '8%', 'overflow': 'visible'
     });
 
-    var height = $('#' + this.parent_div + '> #legend').height(),
-    width = $('#' + this.parent_div + '> #legend').width();
+    var height = $('#' + self.parent_div + '> #legend').height(),
+    width = $('#' + self.parent_div + '> #legend').width();
 
-    var svg = d3.select('#' + this.parent_div + '> #legend')
+    var svg = d3.select('#' + self.parent_div + '> #legend')
         .append('svg')
         .attr('width', width)
         .attr('height', height)
@@ -446,110 +453,116 @@ AnalysisOverview.prototype.drawLegend = function() {
 }
 
 AnalysisOverview.prototype.render = function() {
-    this.drawHeatmap();
-    this.writeRowNames();
-    this.writeVertNames();
-    this.writeDendrogram();
-    this.drawLegend();
+    var self = this;
+
+    self.drawHeatmap();
+    self.writeRowNames();
+    self.writeVertNames();
+    self.writeDendrogram();
+    self.drawLegend();
 }
 
 var IndividualOverview = function(data, parent_div) {
-    this.dendrogram = data['dendrogram'];
-    this.cluster_members = data['cluster_members'];
-    this.cluster_display = data['max_abs_correlation_values'];
-    this.correlation_matrix = data['correlation_matrix'];
-    this.matrix_names = data['matrix_names'];
-    this.cluster_medoids = data['cluster_medoids'];
+    var self = this;
 
-    this.selectable = data['matrix_names'];
-    this.selected_val = null;
+    self.dendrogram = data['dendrogram'];
+    self.cluster_members = data['cluster_members'];
+    self.cluster_display = data['max_abs_correlation_values'];
+    self.correlation_matrix = data['correlation_matrix'];
+    self.matrix_names = data['matrix_names'];
+    self.cluster_medoids = data['cluster_medoids'];
 
-    this.parent_div = parent_div;
+    self.selectable = data['matrix_names'];
+    self.selected_val = null;
+
+    self.parent_div = parent_div;
 }
 
 IndividualOverview.prototype.renderSelectList = function() {
     var self = this;
 
     //Remove heatmap div if there; append heatmap div
-    $('#' + this.parent_div + '> #select_list').remove();
-    $('#' + this.parent_div).append('<select id=\'select_list\'></select>');
+    $('#' + self.parent_div + '> #select_list').remove();
+    $('#' + self.parent_div).append('<select id=\'select_list\'></select>');
 
     //Add attributes, style to div
-    $('#' + this.parent_div + '> #select_list').height('40%');
-    $('#' + this.parent_div + '> #select_list').width('30%');
-    $('#' + this.parent_div + '> #select_list').attr('size', '12');
-    $('#' + this.parent_div + '> #select_list').css({
+    $('#' + self.parent_div + '> #select_list').height('40%');
+    $('#' + self.parent_div + '> #select_list').width('30%');
+    $('#' + self.parent_div + '> #select_list').attr('size', '12');
+    $('#' + self.parent_div + '> #select_list').css({
         'font-size': '8px', 'position': 'absolute', 'top': '20%'
     });
 
-    var sort_list = d3.select('#' + this.parent_div + '> #select_list')
+    var sort_list = d3.select('#' + self.parent_div + '> #select_list')
         .selectAll('option')
-        .data(this.selectable)
+        .data(self.selectable)
         .enter()
         .append('option')
         .text(function(d) {return d;})
         .attr('value', function(d) {return d;});
 
-    $('#' + this.parent_div + '> #select_list').prop('selectedIndex', '0');
+    $('#' + self.parent_div + '> #select_list').prop('selectedIndex', '0');
 
-    self.selected_val = this.selectable[0];
-    $('#' + this.parent_div + '> #select_list').change(function() {
-        self.selected_val = this.value;
+    self.selected_val = self.matrix_names.indexOf(self.selectable[0]);
+    $('#' + self.parent_div + '> #select_list').change(function() {
+        self.selected_val = self.matrix_names.indexOf(this.value);
     });
 }
 
 IndividualOverview.prototype.addDisplayButtons = function() {
-    self = this;
+    var self = this;
 
     //Remove heatmap div if there; append heatmap div
-    $('#' + this.parent_div + '> #display_correlations').remove();
-    $('#' + this.parent_div).append(
+    $('#' + self.parent_div + '> #display_correlations').remove();
+    $('#' + self.parent_div).append(
         '<button id=\'display_correlations\' type=\'button\' class=\'btn btn-primary\'>Display correlation values</button>'
     );
-    $('#' + this.parent_div + '> #display_correlations').css({
+    $('#' + self.parent_div + '> #display_correlations').css({
         'position': 'absolute', 'left': '0%', 'top': '65%', 'width': '30%'
     });
-    $('#' + this.parent_div + '> #display_correlations').click(
-        this.displayCorrelations.bind(this)
+    $('#' + self.parent_div + '> #display_correlations').click(
+        self.displayCorrelations.bind(this)
     );
 
     //Remove heatmap div if there; append heatmap div
-    $('#' + this.parent_div).remove('#display_heatmap');
-    $('#' + this.parent_div).append(
+    $('#' + self.parent_div).remove('#display_heatmap');
+    $('#' + self.parent_div).append(
         '<button id=\'display_heatmap\' type=\'button\' class=\'btn btn-primary\'>Display individual heatmap</button>'
     );
-    $('#' + this.parent_div + '> #display_heatmap').css({
+    $('#' + self.parent_div + '> #display_heatmap').css({
         'position': 'absolute', 'left': '0%', 'top': '80%', 'width': '30%'
     });
-    $('#' + this.parent_div + '> #display_heatmap').click(
-        this.displayIndividualHeatmap.bind(this)
+    $('#' + self.parent_div + '> #display_heatmap').click(
+        self.displayIndividualHeatmap.bind(this)
     );
 }
 
 IndividualOverview.prototype.displayCorrelations = function() {
+    var self = this;
 
     //Remove correlation_plot div if there; append correlation_plot div
-    $('#' + this.parent_div + '> #correlation_plot').remove();
-    $('#' + this.parent_div).append('<div id=\'correlation_plot\'></div>');
+    $('#' + self.parent_div + '> #correlation_plot').remove();
+    $('#' + self.parent_div).append('<div id=\'correlation_plot\'></div>');
 
     //Add attributes, style to div
-    $('#' + this.parent_div + '> #correlation_plot').height('100%');
-    $('#' + this.parent_div + '> #correlation_plot').width('68%');
-    $('#' + this.parent_div + '> #correlation_plot').css({
+    $('#' + self.parent_div + '> #correlation_plot').height('100%');
+    $('#' + self.parent_div + '> #correlation_plot').width('68%');
+    $('#' + self.parent_div + '> #correlation_plot').css({
         'position': 'absolute', 'left': '32%', 'top': '0%', 'overflow': 'scroll'
     });
 
-    $('#' + this.parent_div + '> #correlation_plot').append('<div id=\'graph\'></div>');
+    $('#' + self.parent_div + '> #correlation_plot').append('<div id=\'graph\'></div>');
 
-    var num = this.matrix_names.length - 1;
+    var num = self.matrix_names.length - 1;
     var entry_length = 20;
 
-    var index = $('#' + this.parent_div + '> #select_list').prop('selectedIndex');
+    //var index = $('#' + self.parent_div + '> #select_list').prop('selectedIndex');
+    var index = self.selected_val;
 
     var margin = {top: 0, right: 20, bottom: 20, left: 20},
         offset = {top: 20, right: 20, bottom: 100, left: 40},
         width = num*entry_length - margin.left - margin.right,
-        height = $('#' + this.parent_div + '> #correlation_plot').height() - margin.top - margin.bottom;
+        height = $('#' + self.parent_div + '> #correlation_plot').height() - margin.top - margin.bottom;
 
     $('#correlation_plot > #graph').height(height);
     $('#correlation_plot > #graph').width(width);
@@ -557,19 +570,19 @@ IndividualOverview.prototype.displayCorrelations = function() {
         'position': 'absolute', 'left': '0%', 'top': margin.top
     });
 
-    $('#' + this.parent_div).append('<div id=\'tooltip\'>test</div>');
+    $('#' + self.parent_div).append('<div id=\'tooltip\'>test</div>');
 
-    $('#' + this.parent_div + '> #tooltip').css({
+    $('#' + self.parent_div + '> #tooltip').css({
         'position': 'absolute', 'visibility': 'hidden', 'z-index': '10'
     });
 
-    var graph_tooltip = d3.select('#' + this.parent_div + '> #tooltip');
+    var graph_tooltip = d3.select('#' + self.parent_div + '> #tooltip');
 
     var sortable = [];
 
-    for (i = 0; i < this.correlation_matrix[index].length; i++) {
+    for (i = 0; i < self.correlation_matrix[index].length; i++) {
         if (i !== index) {
-            sortable.push([this.matrix_names[i], this.correlation_matrix[index][i]])
+            sortable.push([self.matrix_names[i], self.correlation_matrix[index][i]])
         }
     }
 
@@ -593,8 +606,8 @@ IndividualOverview.prototype.displayCorrelations = function() {
         .orient('left')
         .ticks(5);
 
-    var matrix_names = this.matrix_names;
-    var div_offset = $('#' + this.parent_div + '> #correlation_plot').offset();
+    var matrix_names = self.matrix_names;
+    var div_offset = $('#' + self.parent_div + '> #correlation_plot').offset();
 
     graph.append('g')
         .selectAll('rect')
@@ -667,17 +680,17 @@ IndividualOverview.prototype.displayCorrelations = function() {
 IndividualOverview.prototype.addInputText = function () {
     var self = this;
 
-    $('#' + this.parent_div + '> #search_field').remove();
-    $('#' + this.parent_div).append('<input type=\'text\' id=\'search_field\'></input>');
+    $('#' + self.parent_div + '> #search_field').remove();
+    $('#' + self.parent_div).append('<input type=\'text\' id=\'search_field\'></input>');
 
-    $('#' + this.parent_div + '> #search_field').attr('placeholder', 'Filter data list');
-    $('#' + this.parent_div + '> #search_field').outerWidth('30%');
-    $('#' + this.parent_div + '> #search_field').outerHeight('15%');
-    $('#' + this.parent_div + '> #search_field').css({
+    $('#' + self.parent_div + '> #search_field').attr('placeholder', 'Filter data list');
+    $('#' + self.parent_div + '> #search_field').outerWidth('30%');
+    $('#' + self.parent_div + '> #search_field').outerHeight('15%');
+    $('#' + self.parent_div + '> #search_field').css({
         'position': 'absolute', 'left': '0%', 'top': '0%', 'overflow': 'scroll'
     });
 
-    $('#' + this.parent_div + '> #search_field').on("input", function() {
+    $('#' + self.parent_div + '> #search_field').on("input", function() {
         value = this.value.toLowerCase();
         if (value === '') {
             self.selectable = self.matrix_names;
@@ -706,10 +719,12 @@ IndividualOverview.prototype.displayIndividualHeatmap = function () {
 }
 
 IndividualOverview.prototype.render = function() {
-    this.renderSelectList();
-    this.addDisplayButtons();
-    this.displayCorrelations();
-    this.addInputText();
+    var self = this;
+
+    self.renderSelectList();
+    self.addDisplayButtons();
+    self.displayCorrelations();
+    self.addInputText();
 }
 
 var IndividualHeatmap = function(selected_value, matrix_names, modal_title, modal_body) {
@@ -726,7 +741,7 @@ var IndividualHeatmap = function(selected_value, matrix_names, modal_title, moda
 IndividualHeatmap.prototype.render = function() {
     var self = this;
 
-    $('#' + self.modal_title).html(self.selected_value);
+    $('#' + self.modal_title).html(self.matrix_names[self.selected_value]);
 
     self.drawHeatmapHeader();
     self.drawHeatmap();
