@@ -3,23 +3,73 @@
 {% block extra_css %}
 <style>
 body {
-  background-color: #E8E5D6;
+    background-color: #E8E5D6;
 }
 
-#visual {
+#visual_panel_1 {
     height: 500px;
     width: 95%;
-    border: 2px solid gray;
+    position: relative;
+}
+
+#visual_panel_2 {
+    height: 250px;
+    width: 95%;
+    margin-top: 20px;
+    position: relative;
 }
 
 #flcModal .modal-dialog {
-  width: 95%;
-  height: 95%;
-  padding: 0;
+    width: 95%;
+    height: 95%;
+    padding: 0;
 }
 
 #flcModal .modal-content {
-  height: 100%;
+    height: 100%;
+    width: 100%;
+}
+
+#flcModal .modal-header {
+    height: 10%;
+    width: 100%;
+}
+
+#flcModal .modal-body{
+    height: 90%;
+    width: 100%;
+}
+
+.tooltip-inner {
+    max-width: 350px;
+}
+
+path {
+    stroke: steelblue;
+    stroke-width: 1;
+    fill: none;
+}
+
+.axis {
+    shape-rendering: crispEdges;
+}
+
+.x.axis line {
+    stroke: #000;
+}
+
+.x.axis .minor {
+    //stroke-opacity: .5;
+    stroke: #000;
+}
+
+.x.axis path {
+    stroke: #000;
+}
+
+.y.axis line, .y.axis path {
+    fill: none;
+    stroke: #000;
 }
 
 </style>
@@ -28,30 +78,29 @@ body {
 
 
 {% block mid_content %}
+<div id='visual_panel_1'></div>
+<div id='visual_panel_2'></div>
 
-
-<div id='visual'></div>
-
-
+<!--
 <button id='sortOrder' type='button' class='btn btn-primary'>Apply random sort order</button>
 <br>
+
 <select id='featureListSelector'>
 </select>
 <br>
 <button id='featureList' type='button' class='btn btn-primary'>View feature list count</button>
+-->
 
 <div class="modal fade" id="flcModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-        <h4 class="modal-title">Feature list name</h4>
-      </div>
-      <div class="modal-body">
-        <p>Visualization.</p>
-      </div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title" id='ind_heatmap_modal_title'>Feature list name</h4>
+            </div>
+            <div class="modal-body" id='ind_heatmap_modal_body'></div>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock mid_content %}
 
@@ -72,7 +121,7 @@ var applyNewSortOrder = function(data){
 
 var renderFeatureList = function(data){
     // add code here...
-    console.log('render modal visual', data)
+    console.log('render modal visual_panel_1', data)
 }
 
 var showFeatureListCount = function(data){
@@ -83,6 +132,1013 @@ var showFeatureListCount = function(data){
         }).modal('show');
 }
 
+var AnalysisOverview = function(data, parent_div) {
+    this.dendrogram = data['dendrogram'];
+    this.cluster_members = data['cluster_members'];
+    this.cluster_display = data['max_abs_correlation_values'];
+    this.correlation_matrix = data['correlation_matrix'];
+    this.matrix_names = data['matrix_names'];
+    this.cluster_medoids = data['cluster_medoids'];
+
+    this.parent_div = parent_div;
+}
+
+AnalysisOverview.prototype.drawHeatmap = function() {
+    var self = this;
+
+    //Remove heatmap div if there; append heatmap div
+    $('#' + this.parent_div + '> #heatmap').remove();
+    $('#' + this.parent_div).append('<div id=\'heatmap\'></div>');
+
+    //Add attributes, style to div
+    $('#' + this.parent_div + '> #heatmap').height('80%');
+    $('#' + this.parent_div + '> #heatmap').width('60%');
+    $('#' + this.parent_div + '> #heatmap').css({
+        'position': 'absolute', 'left': '40%', 'top': '20%'
+    });
+
+    //Draw SVGs
+    var height = $('#' + this.parent_div + '> #heatmap').height();
+    var width = $('#' + this.parent_div + '> #heatmap').width();
+
+    var col_number = this.cluster_display[0].length;
+    var row_number = this.cluster_display.length;
+
+    var cell_height = height/row_number;
+    var cell_width = width/col_number;
+
+    var colorScale = d3.scale.linear()
+        .domain([-1, 0, 1])
+        .range(['blue', 'white', 'red']);
+
+    var svg = d3.select('#' + this.parent_div + '> #heatmap')
+        .append('svg')
+        .attr('height', height)
+        .attr('width', width);
+
+    var cluster_members = this.cluster_members;
+    var cluster_medoids = this.cluster_medoids;
+
+    svg.append('g')
+        .selectAll('g')
+        .data(this.cluster_display)
+        .enter()
+        .append('g')
+        .selectAll('rect')
+        .data( function(d,i,j) { return d; } )
+        .enter()
+        .append('rect')
+        .text( function(d,i,j) { return d; } )
+        .attr('x', function(d,i,j) { return (i * cell_width); })
+        .attr('y', function(d,i,j) { return (j * cell_height); })
+        .attr('width', function(d) { return cell_width; })
+        .attr('height', function(d) { return cell_height; })
+        .style('fill', function(d) { return colorScale(d); })
+        .on('mouseover', function (d, i, j) {
+            d3.select(this).style('stroke', 'black').style('stroke-width', '1');
+            if (cluster_members[i].length === 1) {
+                var clust_1 = cluster_members[i][0];
+            } else {
+                var clust_1 = '(' + cluster_members[i].length + ') ' + cluster_medoids[i];
+            };
+            if (cluster_members[j].length === 1) {
+                var clust_2 = cluster_members[j][0];
+            } else {
+                var clust_2 = '(' + cluster_members[j].length + ') ' + cluster_medoids[j];
+            };
+            var content = (clust_1 + '<br/>' + clust_2 + '<br/>' + d.toFixed(2));
+            $(this).tooltip({
+                container: 'body',
+                title: content,
+                html: true,
+                animation: false
+            });
+            $(this).tooltip('show');
+        })
+        .on('mouseout', function () {
+            d3.select(this).style('stroke', 'none');
+        });
+
+    $('[data-toggle="tooltip"]').tooltip();
+}
+
+AnalysisOverview.prototype.writeVertNames = function () {
+
+    //Remove heatmap div if there; append heatmap div
+    $('#' + this.parent_div + '> #vert_names').remove();
+    $('#' + this.parent_div).append('<div id=\'vert_names\'></div>');
+
+    //Add attributes, style to div
+    $('#' + this.parent_div + '> #vert_names').height('18%');
+    $('#' + this.parent_div + '> #vert_names').width('60%');
+    $('#' + this.parent_div + '> #vert_names').css({
+        'position': 'absolute', 'left': '40%', 'top': '1%', 'overflow': 'hidden'
+    });
+
+    //Draw SVGs
+    var height = $('#' + this.parent_div + '> #vert_names').height();
+    var width = $('#' + this.parent_div + '> #vert_names').width();
+
+    var row_number = this.cluster_members.length;
+
+    var svg = d3.select('#' + this.parent_div + '> #vert_names')
+        .append('svg')
+        .attr('height', height)
+        .attr('width', width)
+
+    var cluster_medoids = this.cluster_medoids;
+
+    svg.append('g')
+        .selectAll('text')
+        .data(this.cluster_members)
+        .enter()
+        .append('text')
+        .text(function(d,i) { if (d.length > 1) {return '(' + d.length + ') ' + cluster_medoids[i];} else {return d[0];}})
+        .attr('x', function(d,i) {return (((0.5/row_number)*width) + i*(width/row_number)); })
+        .attr('y', 0)
+        .attr('font-family', 'sans-serif')
+        .attr('font-size', '8px')
+        .attr('fill', 'black')
+        .attr('transform', function(d,i) {return 'rotate(90 ' + (((0.5/row_number)*width) + i*(width/row_number)) + ',' + 0 +')';})
+        .style('dominant-baseline', 'middle');
+}
+
+AnalysisOverview.prototype.writeRowNames = function() {
+
+    //Remove heatmap div if there; append heatmap div
+    $('#' + this.parent_div + '> #row_names').remove();
+    $('#' + this.parent_div).append('<div id=\'row_names\'></div>');
+
+    //Add attributes, style to div
+    $('#' + this.parent_div + '> #row_names').height('80%');
+    $('#' + this.parent_div + '> #row_names').width('18%');
+    $('#' + this.parent_div + '> #row_names').css({
+        'position': 'absolute', 'left': '21%', 'top': '20%', 'overflow': 'hidden'
+    });
+
+    //Draw SVGs
+    var height = $('#' + this.parent_div + '> #row_names').height();
+    var width = $('#' + this.parent_div + '> #row_names').width();
+
+    var row_number = this.cluster_members.length;
+
+    var svg = d3.select('#' + this.parent_div + '> #row_names')
+        .append("svg")
+        .attr("height", height)
+        .attr("width", width);
+
+    var cluster_medoids = this.cluster_medoids;
+
+    svg.append("g")
+        .selectAll("text")
+        .data(this.cluster_members)
+        .enter()
+        .append("text")
+        .text(function(d,i) { if (d.length > 1) {return '(' + d.length + ') ' + cluster_medoids[i];} else {return d[0];}})
+        .attr("x", 0)
+        .attr("y", function(d,i) {return (((0.5/row_number)*height) + i*(height/row_number)); })
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "8px")
+        .attr("fill", "black")
+        .style("dominant-baseline", "middle");
+}
+
+AnalysisOverview.prototype.writeDendrogram = function() {
+
+    //Remove heatmap div if there; append heatmap div
+    $('#' + this.parent_div + '> #dendrogram').remove();
+    $('#' + this.parent_div).append('<div id=\'dendrogram\'></div>');
+
+    //Add attributes, style to div
+    $('#' + this.parent_div + '> #dendrogram').height('80%');
+    $('#' + this.parent_div + '> #dendrogram').width('20%');
+    $('#' + this.parent_div + '> #dendrogram').css({
+        'position': 'absolute', 'left': '0%', 'top': '20%', 'overflow': 'hidden'
+    });
+
+    var line_coords = [];
+
+    var x_max = parseFloat(Math.max(...[].concat.apply([],this.dendrogram['dcoord'])));
+    var y_max = parseFloat(Math.max(...[].concat.apply([],this.dendrogram['icoord'])));
+
+    var x_min = parseFloat(Math.min(...[].concat.apply([],this.dendrogram['dcoord'])));
+    var y_min = parseFloat(Math.min(...[].concat.apply([],this.dendrogram['icoord'])));
+
+    var height = $('#' + this.parent_div + '> #dendrogram').height();
+    var width = $('#' + this.parent_div + '> #dendrogram').width();
+
+    var leaf_num = this.dendrogram['leaves'].length;
+
+    for (var i in this.dendrogram['dcoord']) {
+        for (var j in [0, 1, 2]) {
+            line_coords.push({
+                y1: ((0.5/leaf_num)*height)+((parseFloat(this.dendrogram['icoord'][i][j])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
+                y2: ((0.5/leaf_num)*height)+((parseFloat(this.dendrogram['icoord'][i][parseInt(j)+1])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
+                x1: width-((parseFloat(this.dendrogram['dcoord'][i][j])-x_min)/(x_max-x_min))*width,
+                x2: width-((parseFloat(this.dendrogram['dcoord'][i][parseInt(j)+1])-x_min)/(x_max-x_min))*width
+            });
+        }
+    }
+
+    var svg = d3.select('#' + this.parent_div + '> #dendrogram')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .style('overflow', 'visible');
+
+    svg.append('g')
+        .selectAll('line')
+        .data(line_coords)
+        .enter()
+        .append('line')
+        .attr('x1', function(d) { return d.x1; })
+        .attr('x2', function(d) { return d.x2; })
+        .attr('y1', function(d) { return d.y1; })
+        .attr('y2', function(d) { return d.y2; })
+        .style('stroke', 'black')
+        .style('stroke-width', 1);
+}
+
+AnalysisOverview.prototype.drawLegend = function() {
+    //Remove heatmap div if there; append heatmap div
+    $('#' + this.parent_div + '> #legend').remove();
+    $('#' + this.parent_div).append('<div id=\'legend\'></div>');
+
+    //Add attributes, style to div
+    $('#' + this.parent_div + '> #legend').height('5%');
+    $('#' + this.parent_div + '> #legend').width('20%');
+    $('#' + this.parent_div + '> #legend').css({
+        'position': 'absolute', 'left': '10%', 'top': '8%', 'overflow': 'visible'
+    });
+
+    var height = $('#' + this.parent_div + '> #legend').height(),
+    width = $('#' + this.parent_div + '> #legend').width();
+
+    var svg = d3.select('#' + this.parent_div + '> #legend')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .style('overflow', 'visible');
+
+    var gradient = svg
+        .append('linearGradient')
+        .attr('y1', '0')
+        .attr('y2', '0')
+        .attr('x1', '0')
+        .attr('x2', width)
+        .attr('id', 'gradient')
+        .attr('gradientUnits', 'userSpaceOnUse')
+
+    gradient
+        .append('stop')
+        .attr('offset', '0')
+        .attr('stop-color', 'blue')
+
+    gradient
+        .append('stop')
+        .attr('offset', '0.5')
+        .attr('stop-color', 'white')
+
+    gradient
+        .append('stop')
+        .attr('offset', '1')
+        .attr('stop-color', 'red')
+
+    svg.append('rect')
+        .attr('width', width)
+        .attr('height', 0.5*height)
+        .attr('x', '0')
+        .attr('y', 0.5*height)
+        .attr('fill', 'url(#gradient)')
+        .attr('stroke', 'black')
+        .attr('stroke-width', '1');
+
+    var legend_lines = [
+        {text: '-1', position: 0},
+        {text: '0', position: 0.5*width},
+        {text: '1', position: width}
+    ];
+
+    svg.append('g')
+        .selectAll('line')
+        .data(legend_lines)
+        .enter()
+        .append('line')
+        .attr('x1', function(d) {return d.position;})
+        .attr('x2', function(d) {return d.position;})
+        .attr('y1', 0.3*height)
+        .attr('y2', 0.5*height)
+        .style('stroke', 'black')
+        .style('stroke-width', 1);
+
+    svg.append('g')
+        .selectAll('text')
+        .data(legend_lines)
+        .enter()
+        .append('text')
+        .text(function(d) { return d.text;})
+        .attr('x', function(d) {return d.position;})
+        .attr('y', 0.25*height)
+        .attr('font-family', 'sans-serif')
+        .attr('font-size', '12px')
+        .attr('fill', 'black')
+        .style('text-anchor', 'middle');
+}
+
+AnalysisOverview.prototype.render = function() {
+    this.drawHeatmap();
+    this.writeRowNames();
+    this.writeVertNames();
+    this.writeDendrogram();
+    this.drawLegend();
+}
+
+var IndividualOverview = function(data, parent_div) {
+    this.dendrogram = data['dendrogram'];
+    this.cluster_members = data['cluster_members'];
+    this.cluster_display = data['max_abs_correlation_values'];
+    this.correlation_matrix = data['correlation_matrix'];
+    this.matrix_names = data['matrix_names'];
+    this.cluster_medoids = data['cluster_medoids'];
+
+    this.selectable = data['matrix_names'];
+    this.selected_val = null;
+
+    this.parent_div = parent_div;
+}
+
+IndividualOverview.prototype.renderSelectList = function() {
+    var self = this;
+
+    //Remove heatmap div if there; append heatmap div
+    $('#' + this.parent_div + '> #select_list').remove();
+    $('#' + this.parent_div).append('<select id=\'select_list\'></select>');
+
+    //Add attributes, style to div
+    $('#' + this.parent_div + '> #select_list').height('40%');
+    $('#' + this.parent_div + '> #select_list').width('30%');
+    $('#' + this.parent_div + '> #select_list').attr('size', '12');
+    $('#' + this.parent_div + '> #select_list').css({
+        'font-size': '8px', 'position': 'absolute', 'top': '20%'
+    });
+
+    var sort_list = d3.select('#' + this.parent_div + '> #select_list')
+        .selectAll('option')
+        .data(this.selectable)
+        .enter()
+        .append('option')
+        .text(function(d) {return d;})
+        .attr('value', function(d) {return d;});
+
+    $('#' + this.parent_div + '> #select_list').prop('selectedIndex', '0');
+
+    self.selected_val = this.selectable[0];
+    $('#' + this.parent_div + '> #select_list').change(function() {
+        self.selected_val = this.value;
+    });
+}
+
+IndividualOverview.prototype.addDisplayButtons = function() {
+    self = this;
+
+    //Remove heatmap div if there; append heatmap div
+    $('#' + this.parent_div + '> #display_correlations').remove();
+    $('#' + this.parent_div).append(
+        '<button id=\'display_correlations\' type=\'button\' class=\'btn btn-primary\'>Display correlation values</button>'
+    );
+    $('#' + this.parent_div + '> #display_correlations').css({
+        'position': 'absolute', 'left': '0%', 'top': '65%', 'width': '30%'
+    });
+    $('#' + this.parent_div + '> #display_correlations').click(
+        this.displayCorrelations.bind(this)
+    );
+
+    //Remove heatmap div if there; append heatmap div
+    $('#' + this.parent_div).remove('#display_heatmap');
+    $('#' + this.parent_div).append(
+        '<button id=\'display_heatmap\' type=\'button\' class=\'btn btn-primary\'>Display individual heatmap</button>'
+    );
+    $('#' + this.parent_div + '> #display_heatmap').css({
+        'position': 'absolute', 'left': '0%', 'top': '80%', 'width': '30%'
+    });
+    $('#' + this.parent_div + '> #display_heatmap').click(
+        this.displayIndividualHeatmap.bind(this)
+    );
+}
+
+IndividualOverview.prototype.displayCorrelations = function() {
+
+    //Remove correlation_plot div if there; append correlation_plot div
+    $('#' + this.parent_div + '> #correlation_plot').remove();
+    $('#' + this.parent_div).append('<div id=\'correlation_plot\'></div>');
+
+    //Add attributes, style to div
+    $('#' + this.parent_div + '> #correlation_plot').height('100%');
+    $('#' + this.parent_div + '> #correlation_plot').width('68%');
+    $('#' + this.parent_div + '> #correlation_plot').css({
+        'position': 'absolute', 'left': '32%', 'top': '0%', 'overflow': 'scroll'
+    });
+
+    $('#' + this.parent_div + '> #correlation_plot').append('<div id=\'graph\'></div>');
+
+    var num = this.matrix_names.length - 1;
+    var entry_length = 20;
+
+    var index = $('#' + this.parent_div + '> #select_list').prop('selectedIndex');
+
+    var margin = {top: 0, right: 20, bottom: 20, left: 20},
+        offset = {top: 20, right: 20, bottom: 100, left: 40},
+        width = num*entry_length - margin.left - margin.right,
+        height = $('#' + this.parent_div + '> #correlation_plot').height() - margin.top - margin.bottom;
+
+    $('#correlation_plot > #graph').height(height);
+    $('#correlation_plot > #graph').width(width);
+    $('#correlation_plot > #graph').css({
+        'position': 'absolute', 'left': '0%', 'top': margin.top
+    });
+
+    $('#' + this.parent_div).append('<div id=\'tooltip\'>test</div>');
+
+    $('#' + this.parent_div + '> #tooltip').css({
+        'position': 'absolute', 'visibility': 'hidden', 'z-index': '10'
+    });
+
+    var graph_tooltip = d3.select('#' + this.parent_div + '> #tooltip');
+
+    var sortable = [];
+
+    for (i = 0; i < this.correlation_matrix[index].length; i++) {
+        if (i !== index) {
+            sortable.push([this.matrix_names[i], this.correlation_matrix[index][i]])
+        }
+    }
+
+    sortable.sort(function(a, b) {return Math.abs(b[1]) - Math.abs(a[1])});
+
+    var y = d3.scale.linear().domain([-1,1]).range([height - offset.top - offset.bottom,0]);
+    var x = d3.scale.ordinal().domain(sortable.map(function(d) {return d[0];})).rangeBands([6,width - offset.left - offset.right]);
+
+    var graph = d3.select('#correlation_plot > #graph').append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g');
+        //.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient('bottom');
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient('left')
+        .ticks(5);
+
+    var matrix_names = this.matrix_names;
+    var div_offset = $('#' + this.parent_div + '> #correlation_plot').offset();
+
+    graph.append('g')
+        .selectAll('rect')
+        .data(sortable)
+        .enter()
+        .append('rect')
+        .style('fill', function(d) { if (d[1] >= 0) { return 'red'; } else { return 'blue'; }})
+        .attr('x', function(d) { return offset.left + x(d[0]); })
+        .attr('width', x.rangeBand() - 2)
+        .attr('y', function(d) { return offset.top + y(Math.max(0,d[1])); })
+        .attr('height', function(d) { return Math.abs(y(0) - y(d[1])); })
+        .on('mouseover', function (d) {
+            d3.select(this).style('stroke', 'black').style('stroke-width', '1');
+            var content = (d[0] + '<br/>' + d[1].toFixed(2));
+            $(this).tooltip({
+                container: 'body',
+                title: content,
+                html: true,
+                animation: false
+            });
+            $(this).tooltip('show');
+        })
+        .on('mouseout', function () {
+            d3.select(this).style('stroke', 'none');
+        });
+
+    $('[data-toggle="tooltip"]').tooltip();
+
+    graph.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', 'translate(' + offset.left + ',' + (height - offset.bottom) + ')')
+        .call(xAxis)
+        .style('fill', 'none')
+        .selectAll('text')
+        .style('fill', 'black')
+        .attr('font-size', '8px')
+        .style('text-anchor', 'end')
+        .attr('transform', 'rotate(-90)' )
+        .attr('dx', '-8px')
+        .attr('dy', '-8px');
+
+    graph.append('g')
+        .attr('class', 'y axis')
+        .attr('transform', 'translate(' + offset.left + ',' + offset.top +')')
+        .style('fill', 'none')
+        .style('stroke', 'black')
+        .style('stroke-width', '1px')
+        .call(yAxis)
+        .selectAll('text')
+        .attr('font-size','8px')
+        .style('fill', 'black')
+        .style('stroke', 'none');
+
+    var lines = [-1,0,1]
+
+    graph.append('g')
+        .selectAll('line')
+        .data(lines)
+        .enter()
+        .append('line')
+        .attr('x1', offset.left)
+        .attr('x2', width - offset.right)
+        .attr('y1', function(d) { return offset.top + y(d); })
+        .attr('y2', function(d) { return offset.top + y(d); })
+        .style('stroke', 'black')
+        .style('stroke-width', 1)
+        .style('stroke-dasharray', function (d) {if (d === 0) {return 'none';} else {return '5,5';}});
+}
+
+IndividualOverview.prototype.addInputText = function () {
+    var self = this;
+
+    $('#' + this.parent_div + '> #search_field').remove();
+    $('#' + this.parent_div).append('<input type=\'text\' id=\'search_field\'></input>');
+
+    $('#' + this.parent_div + '> #search_field').attr('placeholder', 'Filter data list');
+    $('#' + this.parent_div + '> #search_field').outerWidth('30%');
+    $('#' + this.parent_div + '> #search_field').outerHeight('15%');
+    $('#' + this.parent_div + '> #search_field').css({
+        'position': 'absolute', 'left': '0%', 'top': '0%', 'overflow': 'scroll'
+    });
+
+    $('#' + this.parent_div + '> #search_field').on("input", function() {
+        value = this.value.toLowerCase();
+        if (value === '') {
+            self.selectable = self.matrix_names;
+        } else {
+            self.selectable = $.grep(self.matrix_names, function(n) {
+                return (n.toLowerCase().includes(value));
+            });
+        }
+        self.renderSelectList();
+    });
+}
+
+IndividualOverview.prototype.displayIndividualHeatmap = function () {
+    var self = this;
+
+    $('#flcModal')
+        .one('shown.bs.modal', function(){
+            var individual_heatmap = new IndividualHeatmap(
+                self.selected_val,
+                self.matrix_names,
+                'ind_heatmap_modal_title',
+                'ind_heatmap_modal_body'
+            );
+            individual_heatmap.render();
+        }).modal('show');
+}
+
+IndividualOverview.prototype.render = function() {
+    this.renderSelectList();
+    this.addDisplayButtons();
+    this.displayCorrelations();
+    this.addInputText();
+}
+
+var IndividualHeatmap = function(selected_value, matrix_names, modal_title, modal_body) {
+    var self = this;
+
+    self.selected_value = selected_value;
+    self.matrix_names = matrix_names;
+    self.modal_title = modal_title;
+    self.modal_body = modal_body;
+
+    self.selected_sort = null;
+}
+
+IndividualHeatmap.prototype.render = function() {
+    var self = this;
+
+    $('#' + self.modal_title).html(self.selected_value);
+
+    self.drawHeatmapHeader();
+    self.drawHeatmap();
+    self.drawMetaPlot();
+    self.drawQuartiles();
+    self.createSelect();
+    self.addButtons();
+}
+
+IndividualHeatmap.prototype.addButtons = function() {
+    var self = this;
+
+    $('#' + self.modal_body + '> #display_correlations').remove();
+    $('#' + self.modal_body).append(
+        '<button id=\'display_correlations\' type=\'button\' class=\'btn btn-primary\'>Reorder heatmap</button>'
+    );
+    $('#' + self.modal_body + '> #display_correlations').css({
+        'position': 'absolute', 'left': '5%', 'top': '84%', 'width': '20%'
+    });
+}
+
+IndividualHeatmap.prototype.createSelect = function() {
+    var self = this;
+
+    //Remove heatmap div if there; append heatmap div
+    $('#' + self.modal_body + '> #select_list').remove();
+    $('#' + self.modal_body).append('<select id=\'select_list\'></select>');
+
+    //Add attributes, style to div
+    $('#' + self.modal_body + '> #select_list').height('15%');
+    $('#' + self.modal_body + '> #select_list').width('33.5%');
+    $('#' + self.modal_body + '> #select_list').attr('size', '12');
+    $('#' + self.modal_body + '> #select_list').css({
+        'font-size': '8px', 'position': 'absolute', 'top': '68%', 'left': '5%'
+    });
+
+    $('#' + self.modal_body + '> #select_list').append('<option>Feature list order</option>')
+
+    var sort_list = d3.select('#' + self.modal_body + '> #select_list')
+        .selectAll('option')
+        .data(self.matrix_names)
+        .enter()
+        .append('option')
+        .text(function(d) {return d;})
+        .attr('value', function(d) {return d;});
+
+    $('#' + self.modal_body + '> #select_list').prop('selectedIndex', '0');
+}
+
+IndividualHeatmap.prototype.url = function(id) {
+    return "/dashboard/api/feature-list-count-matrix/" + id + "/plot/";
+}
+
+IndividualHeatmap.prototype.drawQuartiles = function() {
+    var self = this;
+
+    $('#' + self.modal_body + '> #quartile_plot').remove();
+    $('#' + self.modal_body).append('<div id=\'quartile_plot\'></div>');
+
+    $('#' + self.modal_body + '> #quartile_plot').css({
+        'position': 'absolute', 'left': '0%', 'top': '35%', 'height': '25%', 'width': '40%'
+    });
+
+    $('#' + self.modal_body + '> #quartile_label').remove();
+    $('#' + self.modal_body).append('<div id=\'quartile_label\'></div>');
+
+    $('#' + self.modal_body + '> #quartile_label').css({
+        'position': 'absolute', 'left': '5%', 'top': '33%', 'height': '2%', 'width': '30%'
+    });
+    $('#' + self.modal_body + '> #quartile_label').append('<p>Quartiles, bin averages:</p>');
+
+    $('#' + self.modal_body + '> #quartile_legend').remove();
+    $('#' + self.modal_body).append('<div id=\'quartile_legend\'></div>');
+
+    $('#' + self.modal_body + '> #quartile_legend').css({
+        'position': 'absolute', 'left': '10%', 'top': '60%', 'height': '5%', 'width': '30%'
+    });
+
+    var height = $('#' + self.modal_body + '> #quartile_plot').height();
+    var width = $('#' + self.modal_body + '> #quartile_plot').width();
+
+    var legend_height = $('#' + self.modal_body + '> #quartile_legend').height();
+    var legend_width = $('#' + self.modal_body + '> #quartile_legend').width();
+
+    var margins = {
+        "top": 0.1 * height,
+        "bottom": 0.15 * height,
+        "left": 0.25 * width,
+        "right": 0.05 * width
+    };
+
+    var colors = ['red', 'orange', 'blue', 'black'];
+
+    var legend = d3.select('#' + self.modal_body + '> #quartile_legend')
+        .append("svg")
+        .attr("height", legend_height)
+        .attr("width", legend_width)
+        .style("overflow", "visible");
+
+    legend.append("g")
+        .selectAll("rect")
+        .data(colors)
+        .enter()
+        .append("rect")
+        .attr('x', function(d,i) { return (i * (legend_width/5)); })
+        .attr('y', 1*legend_height/4)
+        .attr('width', '10')
+        .attr('height', '10')
+        .style('fill', function(d) {return d;});
+
+    legend.append("g")
+        .selectAll("text")
+        .data(colors)
+        .enter()
+        .append("text")
+        .text(function(d, i) { return i;})
+        .attr("x", function(d, i) {return (i * (legend_width/5)) + 20;})
+        .attr("y", 2.25*legend_height/4)
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "12px")
+        .attr("fill", "black")
+        .style("text-anchor", "left");
+
+    $.get(self.url(273), function(data) {
+        var display_data = d3.tsv.parseRows(data);
+        var row_number = display_data.length-1;
+
+        var window_values = [];
+
+        for (var i = 1; i < display_data[0].length; i++) {
+            var val_1 = parseInt(display_data[0][i].split(':')[0]);
+            var val_2 = parseInt(display_data[0][i].split(':')[1]);
+            window_values.push((val_1 + val_2)/2);
+        }
+
+        var quartiles = [
+            new Array(display_data[1].length-1).fill(0),
+            new Array(display_data[1].length-1).fill(0),
+            new Array(display_data[1].length-1).fill(0),
+            new Array(display_data[1].length-1).fill(0)
+        ];
+
+        var quartile_count = [0,0,0,0];
+
+        for (var i = 1; i < display_data.length; i++) {
+            var index = Math.floor((i-1) / (row_number/4));
+            quartile_count[index]++;
+            for (var j = 1; j < display_data[i].length; j++) {
+                quartiles[index][j-1] = quartiles[index][j-1] + parseFloat(display_data[i][j]);
+            }
+        }
+
+        for (var i = 0; i < quartiles.length; i++) {
+            for (var j = 0; j < quartiles[i].length; j++ ) {
+                quartiles[i][j] = quartiles[i][j]/quartile_count[i];
+            }
+        }
+
+        var max_value = Math.max(...[].concat.apply([],quartiles));
+
+        var y = d3.scale.linear()
+            .domain([0, max_value])
+            .range([(height - margins.top - margins.bottom), 0]);
+        var x = d3.scale.linear()
+            .domain([parseInt(display_data[0][1].split(":")[0]), parseInt(display_data[0][display_data[0].length-1].split(":")[1])])
+            .range([0, (width - margins.left - margins.right)]);
+
+        var line = d3.svg.line()
+            .x(function(d) { return x(d[0]);})
+            .y(function(d) { return y(d[1]);});
+
+        var graph = d3.select("#quartile_plot").append("svg:svg")
+            .attr("height", height)
+            .attr("width", width)
+            .append("svg:g")
+            .attr("transform", "translate(" + margins.left + "," + margins.top + ")");
+
+        var xAxis = d3.svg.axis().scale(x).ticks(4).tickSubdivide(true);
+        graph.append("svg:g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + (height - margins.top - margins.bottom) + ")")
+            .call(xAxis);
+
+        var yAxisLeft = d3.svg.axis().scale(y).ticks(2).orient("left");
+        graph.append("svg:g")
+            .attr("class", "y axis")
+            .call(yAxisLeft);
+
+        for (var i = 0; i < quartiles.length; i++) {
+            var scatter = [];
+            var line_color = colors[i];
+            for (var j = 0; j < quartiles[i].length; j++) {
+                scatter.push([window_values[j], quartiles[i][j]]);
+            }
+            graph.append("svg:path").attr("d", line(scatter))
+                .style('stroke', line_color);
+        }
+    });
+}
+
+IndividualHeatmap.prototype.drawMetaPlot = function() {
+    var self = this;
+
+    $('#' + self.modal_body + '> #metaplot_label').remove();
+    $('#' + self.modal_body).append('<div id=\'metaplot_label\'></div>');
+
+    $('#' + self.modal_body + '> #metaplot_label').css({
+        'position': 'absolute', 'left': '5%', 'top': '3%', 'height': '2%', 'width': '40%'
+    });
+
+    $('#' + self.modal_body + '> #metaplot_label').append('<p>Bin averages:</p>');
+
+    $('#' + self.modal_body + '> #metaplot').remove();
+    $('#' + self.modal_body).append('<div id=\'metaplot\'></div>');
+
+    $('#' + self.modal_body + '> #metaplot').css({
+        'position': 'absolute', 'left': '0%', 'top': '5%', 'height': '25%', 'width': '40%'
+    });
+
+    var height = $('#' + self.modal_body + '> #metaplot').height();
+    var width = $('#' + self.modal_body + '> #metaplot').width();
+
+    var margins = {
+        "top": 0.1 * height,
+        "bottom": 0.15 * height,
+        "left": 0.25 * width,
+        "right": 0.05 * width
+    };
+
+    $.get(self.url(273), function(data) {
+        var display_data = d3.tsv.parseRows(data);
+        var row_number = display_data.length-1;
+
+        var window_values = [];
+
+        for (var i = 1; i < display_data[0].length; i++) {
+            var val_1 = parseInt(display_data[0][i].split(':')[0]);
+            var val_2 = parseInt(display_data[0][i].split(':')[1]);
+            window_values.push((val_1 + val_2)/2);
+        }
+
+        var metaplot = new Array(display_data[1].length-1).fill(0);
+
+        for (var i = 1; i < display_data.length; i++) {
+            for (var j = 1; j < display_data[i].length; j++) {
+                metaplot[j-1] = metaplot[j-1] + parseFloat(display_data[i][j]);
+            }
+        }
+
+        metaplot = metaplot.map(function(obj) {
+            return (obj/row_number);
+        });
+
+        var scatter = [];
+        for (var i = 0; i < metaplot.length; i++) {
+            scatter.push([window_values[i], metaplot[i]]);
+        }
+
+        var y = d3.scale.linear()
+            .domain([0, d3.max(metaplot)])
+            .range([(height - margins.top - margins.bottom), 0]);
+        var x = d3.scale.linear()
+            .domain([display_data[0][1].split(":")[0], display_data[0][display_data[0].length-1].split(":")[1]])
+            .range([0, (width - margins.left - margins.right)]);
+
+        var line = d3.svg.line()
+            .x(function(d) { return x(d[0]);})
+            .y(function(d) { return y(d[1]);});
+
+        var graph = d3.select("#metaplot").append("svg:svg")
+            .attr("height", height)
+            .attr("width", width)
+            .append("svg:g")
+            .attr("transform", "translate(" + margins.left + "," + margins.top + ")");
+
+        var xAxis = d3.svg.axis().scale(x).ticks(4).tickSubdivide(true);
+        graph.append("svg:g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + (height - margins.top - margins.bottom) + ")")
+            .call(xAxis);
+
+        var yAxisLeft = d3.svg.axis().scale(y).ticks(2).orient("left");
+        graph.append("svg:g")
+            .attr("class", "y axis")
+            .call(yAxisLeft);
+
+        graph.append("svg:path").attr("d", line(scatter));
+    });
+}
+
+IndividualHeatmap.prototype.drawHeatmapHeader = function() {
+    var self = this;
+
+    $('#' + self.modal_body + '> #heatmap_header').remove();
+    $('#' + self.modal_body).append('<div id=\'heatmap_header\'></div>');
+
+    $('#' + self.modal_body + '> #heatmap_header').height(0.10*$('#' + self.modal_body).height());
+    $('#' + self.modal_body + '> #heatmap_header').width(0.55*$('#' + self.modal_body).width());
+    $('#' + self.modal_body + '> #heatmap_header').css({
+        'position': 'absolute', 'left': '40%', 'top': '0%'
+    });
+
+    var height = $('#' + self.modal_body + '> #heatmap_header').height();
+    var width = $('#' + self.modal_body + '> #heatmap_header').width();
+
+    $.get(self.url(273), function(data) {
+        var display_data = d3.tsv.parseRows(data);
+
+        var range_start = parseInt(display_data[0][1].split(":")[0]);
+        var range_end = parseInt(display_data[0][display_data[0].length-1].split(":")[1]);
+
+        var zero_position = width/(range_end-range_start)*(0-range_start);
+
+        var svg = d3.select('#' + self.modal_body + "> #heatmap_header")
+            .append("svg")
+            .attr("height", height)
+            .attr("width", width)
+            .style("overflow", "visible");
+
+        var header_lines = [
+            {text: range_start, position: 0},
+            {text: range_end, position: width},
+            {text: "0", position: zero_position}
+        ];
+
+        svg.append("g")
+            .selectAll("line")
+            .data(header_lines)
+            .enter()
+            .append("line")
+            .attr("x1", function(d) {return d.position;})
+            .attr("x2", function(d) {return d.position;})
+            .attr("y1", 0.6*height)
+            .attr("y2", 0.9*height)
+            .style("stroke", "black")
+            .style("stroke-width", 1);
+
+        svg.append("line")
+            .attr("x1", 0)
+            .attr("x2", width)
+            .attr("y1", 0.9*height)
+            .attr("y2", 0.9*height)
+            .style("stroke", "black")
+            .style("stroke-width", 1);
+
+        svg.append("g")
+            .selectAll("text")
+            .data(header_lines)
+            .enter()
+            .append("text")
+            .text(function(d) { return d.text;})
+            .attr("x", function(d) {return d.position;})
+            .attr("y", 0.45*height)
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "12px")
+            .attr("fill", "black")
+            .style("text-anchor", "middle");
+    });
+}
+
+IndividualHeatmap.prototype.drawHeatmap = function() {
+    var self = this;
+
+    $('#' + self.modal_body + '> #heatmap_canvas').remove();
+    $('#' + self.modal_body).append('<canvas id=\'heatmap_canvas\'></canvas>');
+
+    $('#' + self.modal_body + '> #heatmap_canvas').prop('height',0.85*$('#' + self.modal_body).height());
+    $('#' + self.modal_body + '> #heatmap_canvas').prop('width',0.55*$('#' + self.modal_body).width());
+    $('#' + self.modal_body + '> #heatmap_canvas').css({
+        'position': 'absolute', 'left': '40%', 'top': '10%'
+    });
+
+    $.get(self.url(273), function(data) {
+
+        // Get all but first row; remove first column
+        var display_data = d3.tsv.parseRows(data).slice(1);
+        for (i = 0; i < display_data.length; i++) {
+            display_data[i] = display_data[i].slice(1);
+        }
+
+        var row_number = display_data.length;
+        var col_number = display_data[0].length;
+
+        var height = $('#' + self.modal_body + '> #heatmap_canvas').height();
+        var width = $('#' + self.modal_body + '> #heatmap_canvas').width();
+
+        var context = document.getElementById('heatmap_canvas').getContext('2d');
+
+        var data_max = -Infinity;
+        for (var i = 0; i < display_data.length; i++) {
+            for (var j = 0; j < display_data[i].length; j++) {
+                if (display_data[i][j] > data_max) data_max = display_data[i][j];
+            }
+        }
+
+        var colorScale = d3.scale.linear()
+            .domain([0, data_max])
+            .range(['white','red']);
+
+        var scale_x = width/col_number;
+        var scale_y = height/row_number;
+
+        context.scale(scale_x,scale_y);
+
+        for (var i = 0; i < display_data.length; i++) {
+            for (var j = 0; j < display_data[i].length; j++) {
+                context.fillStyle=colorScale(display_data[i][j]);
+                context.fillRect(j,i,1,1);
+            }
+        }
+    });
+}
 
 $(document).ready(function(){
 
@@ -93,14 +1149,22 @@ $(document).ready(function(){
         sortVector: function(){
             return "{% url 'analysis:api:analysis-sort-vector' object.id %}";
         },
+        /*
         featureListDetail: function(id){
             return "/dashboard/api/feature-list-count-matrix/" + id + "/plot/";
         }
+        */
     }
 
     // #1 here is the summary data
-    $.get(urls.summaryPlot(), renderSummaryPlot);
+    $.get(urls.summaryPlot(), function(data){
+        var overview = new AnalysisOverview(data, 'visual_panel_1');
+        var individual_overview = new IndividualOverview(data, 'visual_panel_2');
+        overview.render();
+        individual_overview.render();
+    });
 
+    /*
     // #2 is getting a new sort-vector
     $('#sortOrder').on('click', function(){
         $.get(urls.sortVector(), {id: 2}, applyNewSortOrder);
@@ -120,7 +1184,9 @@ $(document).ready(function(){
         $('#featureListSelector').html(opts);
     }
     populateFeatureList({{object.get_flcm_ids}});
+    */
+
+
 });
 </script>
 {% endblock extra_js %}
-
