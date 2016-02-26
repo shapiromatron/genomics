@@ -332,6 +332,8 @@ class Analysis(GenomicBinSettings):
             'max_abs_correlation_values': self.output['max_abs_correlation_values'],
             'cluster_members': self.output['cluster_members'],
             'correlation_matrix': self.output['correlation_matrix'],
+            'matrix_names': self.output['matrix_names'],
+            'cluster_medoids': self.output['cluster_medoids']
         }
 
     def get_sort_vector(self, id_):
