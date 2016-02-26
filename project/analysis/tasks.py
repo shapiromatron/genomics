@@ -31,6 +31,7 @@ def execute_analysis(analysis_id):
     job = group([
         execute_count_matrix.s(
             analysis.id,
+            ads.id,
             isinstance(ads.dataset.subclass, EncodeDataset),
             ads.dataset.subclass.id)
         for ads in ads_qs
@@ -44,11 +45,13 @@ def execute_analysis(analysis_id):
 
 
 @task()
-def execute_count_matrix(analysis_id, isEncode, dataset_id):
+def execute_count_matrix(analysis_id, ads_id, isEncode, dataset_id):
     analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
+    ads = apps.get_model('analysis', 'AnalysisDatasets').objects.get(id=ads_id)
     if isEncode:
         dataset = apps.get_model('analysis', 'EncodeDataset').objects.get(id=dataset_id)
     else:
         dataset = apps.get_model('analysis', 'UserDataset').objects.get(id=dataset_id)
     FeatureListCountMatrix = apps.get_model('analysis', 'FeatureListCountMatrix')
-    FeatureListCountMatrix.execute(analysis, dataset)
+    ads.count_matrix = FeatureListCountMatrix.execute(analysis, dataset)
+    ads.save()
