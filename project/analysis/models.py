@@ -1,5 +1,4 @@
 import os
-from django.utils import timezone
 import uuid
 import random
 
