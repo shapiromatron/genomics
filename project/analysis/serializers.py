@@ -51,6 +51,7 @@ class AnalysisDatasetsSerializer(serializers.ModelSerializer):
 
 class AnalysisSerializer(serializers.ModelSerializer):
     url_execute = serializers.ReadOnlyField(source='get_execute_url')
+    url_visuals = serializers.ReadOnlyField(source='get_visuals_url')
     analysis_user_datasets = AnalysisDatasetsSerializer(many=True)
     analysis_encode_datasets = AnalysisDatasetsSerializer(many=True)
     genome_assembly_display = serializers.ReadOnlyField(source='get_genome_assembly_display')

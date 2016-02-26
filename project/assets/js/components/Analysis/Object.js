@@ -62,6 +62,13 @@ class _Object extends React.Component {
         );
     }
 
+    renderVisualBtn(){
+        return (
+            <a href={this.props.object.url_visuals}
+                className='btn btn-primary'>View visualization</a>
+        );
+    }
+
     renderEncodeDatasets(){
         let datasets = this.props.object.analysis_encode_datasets;
         return (
@@ -120,6 +127,7 @@ class _Object extends React.Component {
                     </tbody>
                 </table>
                 {this.renderExecuteBtn()}
+                {this.renderVisualBtn()}
                 {this.renderDeleteConfirmation()}
             </div>
         );

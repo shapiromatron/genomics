@@ -256,6 +256,9 @@ class Analysis(GenomicBinSettings):
     def get_execute_url(self):
         return reverse('analysis:execute', args=[self.pk, ])
 
+    def get_visuals_url(self):
+        return reverse('analysis:visual_testing', args=[self.pk, ])
+
     @property
     def user_datasets(self):
         return UserDataset.objects.filter(id__in=self.datasets.values_list('id', flat=True))
