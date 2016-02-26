@@ -17,9 +17,10 @@ def debug_task():
 
 
 @task()
-def execute_analysis(analysis):
-
+def execute_analysis(analysis_id):
     # save current start-time
+    analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
+    EncodeDataset = apps.get_model('analysis', 'EncodeDataset')
     analysis.start_time = timezone.now()
     analysis.end_time = None
     analysis.save()
@@ -28,7 +29,10 @@ def execute_analysis(analysis):
     ads_qs = analysis.analysisdatasets_set.all()\
         .prefetch_related('dataset', 'dataset__encodedataset', 'dataset__userdataset')
     job = group([
-        execute_count_matrix.s(analysis, ads.dataset.subclass)
+        execute_count_matrix.s(
+            analysis.id,
+            isinstance(ads.dataset.subclass, EncodeDataset),
+            ads.dataset.subclass.id)
         for ads in ads_qs
     ])
     job.apply_async()
@@ -40,6 +44,11 @@ def execute_analysis(analysis):
 
 
 @task()
-def execute_count_matrix(analysis, dataset):
+def execute_count_matrix(analysis_id, isEncode, dataset_id):
+    analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
+    if isEncode:
+        dataset = apps.get_model('analysis', 'EncodeDataset').objects.get(id=dataset_id)
+    else:
+        dataset = apps.get_model('analysis', 'UserDataset').objects.get(id=dataset_id)
     FeatureListCountMatrix = apps.get_model('analysis', 'FeatureListCountMatrix')
     FeatureListCountMatrix.execute(analysis, dataset)

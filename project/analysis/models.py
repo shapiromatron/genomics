@@ -291,7 +291,7 @@ class Analysis(GenomicBinSettings):
             return 'NOT STARTED'
 
     def execute(self):
-        tasks.execute_analysis.delay(self)
+        tasks.execute_analysis.delay(self.id)
 
     def create_matrix_list(self):
         return [
