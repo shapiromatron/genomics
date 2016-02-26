@@ -115,7 +115,7 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
 
     @detail_route(methods=['get'])
     def plot(self, request, pk=None):
-        an = get_object_or_404(models.Analysis, id=int(pk))
+        an = get_object_or_404(models.Analysis, pk=int(pk))
         return Response(an.get_summary_plot())
 
     @detail_route(methods=['get'])
@@ -126,7 +126,7 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
             sort_vector_id = -1
         if sort_vector_id == -1:
             raise NotAcceptable("Sort vector `id` parameter required")
-        an = get_object_or_404(models.Analysis, id=int(pk))
+        an = get_object_or_404(models.Analysis, pk=int(pk))
         return Response(an.get_sort_vector(sort_vector_id))
 
     def get_serializer_class(self):
@@ -144,7 +144,7 @@ class FeatureListCountMatrixViewset(SiteMixin, viewsets.ReadOnlyModelViewSet):
 
     @detail_route(methods=['get'], renderer_classes=(PlainTextRenderer,))
     def plot(self, request, pk=None):
-        flcm = get_object_or_404(models.FeatureListCountMatrix, id=int(pk))
+        flcm = get_object_or_404(models.FeatureListCountMatrix, pk=int(pk))
         return Response(flcm.get_dataset())
 
     def get_serializer_class(self):
