@@ -11,6 +11,8 @@ from django.contrib.postgres.fields import JSONField
 
 from utils.models import ReadOnlyFileSystemStorage, get_random_filename
 
+from .import tasks
+
 from .workflow.matrix import BedMatrix
 from .workflow.matrixByMatrix import MatrixByMatrix
 
@@ -289,18 +291,7 @@ class Analysis(GenomicBinSettings):
             return 'NOT STARTED'
 
     def execute(self):
-        self.start_time = timezone.now()
-        self.end_time = None
-        self.save()
-
-        for ads in self.analysisdatasets_set.all()\
-                .prefetch_related('dataset', 'dataset__encodedataset', 'dataset__userdataset'):
-            ads.count_matrix = FeatureListCountMatrix.execute(self, ads.dataset.subclass)
-            ads.save()
-
-        self.output = self.execute_mat2mat()
-        self.end_time = timezone.now()
-        self.save()
+        tasks.execute_analysis.delay(self)
 
     def create_matrix_list(self):
         return [
@@ -366,6 +357,8 @@ class FeatureListCountMatrix(GenomicBinSettings):
 
     @classmethod
     def execute(cls, analysis, dataset):
+        # returns a new or existing FeatureListCountMatrix that matches the
+        # specified criteria
 
         # Find existing instance
         existing = cls.objects.filter(
