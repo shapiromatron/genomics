@@ -1,3 +1,4 @@
+import json
 import os
 import uuid
 import random
@@ -324,10 +325,18 @@ class Analysis(GenomicBinSettings):
 
         return os.path.join(self.UPLOAD_TO, os.path.basename(fn))
 
+    @property
+    def output_json(self):
+        # TODO: cache using redis
+        if not hasattr(self, '_output_json'):
+            with open(self.output.path, 'r') as f:
+                self._output_json = json.loads(f.read())
+        return self._output_json
+
     def get_summary_plot(self):
         if not self.output:
             return False
-        output = self.output.read()  # TODO: cache
+        output = self.output_json
         return {
             'dendrogram': output['dendrogram'],
             'max_abs_correlation_values': output['max_abs_correlation_values'],
@@ -342,7 +351,7 @@ class Analysis(GenomicBinSettings):
         if not self.output:
             return False
         # todo: get specific sort-vector instead of random
-        output = self.output.read()  # TODO: cache
+        output = self.output_json
         idx = random.randint(0, len(output['sort_orders'])-1)
         return output['sort_orders'][idx]
 
