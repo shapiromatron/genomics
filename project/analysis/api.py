@@ -134,7 +134,7 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         query = owner_or_public(self.request.user)
-        return models.Analysis.objects.filter(query).defer('output')
+        return models.Analysis.objects.filter(query)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

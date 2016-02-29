@@ -217,6 +217,8 @@ class GenomicBinSettings(models.Model):
 
 
 class Analysis(GenomicBinSettings):
+    UPLOAD_TO = 'analysis/'
+
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL)
     name = models.CharField(
@@ -245,7 +247,11 @@ class Analysis(GenomicBinSettings):
         editable=False)
     public = models.BooleanField(
         default=False)
-    output = JSONField(default=dict)
+    output = models.FileField(
+        upload_to=UPLOAD_TO,
+        max_length=256,
+        blank=True,
+        null=True)
     created = models.DateTimeField(
         auto_now_add=True)
     last_updated = models.DateTimeField(
@@ -312,26 +318,33 @@ class Analysis(GenomicBinSettings):
             bin_size=self.bin_size,
             sort_vector=sv,
         )
-        return mm.getOutputDict()
+
+        fn = get_random_filename(os.path.join(settings.MEDIA_ROOT, self.UPLOAD_TO))
+        mm.writeJson(fn)
+
+        return os.path.join(self.UPLOAD_TO, os.path.basename(fn))
 
     def get_summary_plot(self):
         if not self.output:
             return False
+        output = self.output.read()  # TODO: cache
         return {
-            'dendrogram': self.output['dendrogram'],
-            'max_abs_correlation_values': self.output['max_abs_correlation_values'],
-            'cluster_members': self.output['cluster_members'],
-            'correlation_matrix': self.output['correlation_matrix'],
-            'matrix_names': self.output['matrix_names'],
-            'cluster_medoids': self.output['cluster_medoids']
+            'dendrogram': output['dendrogram'],
+            'max_abs_correlation_values': output['max_abs_correlation_values'],
+            'cluster_members': output['cluster_members'],
+            'correlation_matrix': output['correlation_matrix'],
+            'matrix_ids': output['matrix_ids'],
+            'matrix_names': output['matrix_names'],
+            'cluster_medoids': output['cluster_medoids']
         }
 
     def get_sort_vector(self, id_):
         if not self.output:
             return False
         # todo: get specific sort-vector instead of random
-        idx = random.randint(0, len(self.output['sort_orders'])-1)
-        return self.output['sort_orders'][idx]
+        output = self.output.read()  # TODO: cache
+        idx = random.randint(0, len(output['sort_orders'])-1)
+        return output['sort_orders'][idx]
 
 
 class FeatureListCountMatrix(GenomicBinSettings):
