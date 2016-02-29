@@ -37,15 +37,17 @@ class MatrixByMatrix():
     def createSortOrders(self):
         self.sort_orders = []
 
-        for i in range(len(self.matrix_files)):
+        for i, fn in enumerate(self.matrix_files):
             matrix_entries = dict()
-            with open(self.matrix_files[i]) as f:
+
+            with open(fn) as f:
                 next(f)
                 for j, line in enumerate(f):
                     matrix_entries[j] = {
                         "feature_id": line.split()[0],
                         "row_sum": sum(map(float, line.strip().split()[1:]))
                     }
+
             self.sort_orders.append({
                 "data_set_id": self.matrix_ids[i],
                 "data_set": self.matrix_names[i],
@@ -84,56 +86,53 @@ class MatrixByMatrix():
                 )
         else:
             vector_list = self.createVectorList()
-            for i in range(len(vector_list)):
-                self.correlation_matrix.append([])
-                for j in range(len(vector_list)):
+            for i, vl1 in enumerate(vector_list):
+                corrs = []
+                for j, vl2 in enumerate(vector_list):
                     if i == j:
-                        self.correlation_matrix[-1].append(1)
+                        corr = 1.
                     else:
                         try:
-                            self.correlation_matrix[j][i]
+                            corr = self.correlation_matrix[j][i]
                         except IndexError:
-                            self.correlation_matrix[-1].append(
-                                stats.spearmanr(vector_list[i], vector_list[j])[0])
-                        else:
-                            self.correlation_matrix[-1].append(
-                                self.correlation_matrix[j][i])
+                            corr = stats.spearmanr(vl1, vl2)[0]
+                    corrs.append(corr)
+                self.correlation_matrix.append(corrs)
 
     def createDistanceMatrix(self):
         self.distance_matrix = []
 
         if self.sort_vector:
-            for i in range(len(self.correlation_matrix)):
-                self.distance_matrix.append([])
-                for j in range(len(self.correlation_matrix)):
-                    test_matrix = []
-                    test_matrix.append(self.correlation_matrix[i])
-                    test_matrix.append(self.correlation_matrix[j])
-                    self.distance_matrix[-1].append(pdist(numpy.array(test_matrix), "euclidean")[0])
+            for cm1 in self.correlation_matrix:
+                dists = []
+                for cm2 in self.correlation_matrix:
+                    dist = pdist(numpy.array([cm1, cm2]), "euclidean")[0]
+                    dists.append(dist)
+                self.distance_matrix.append(dists)
         else:
-            for i in range(len(self.correlation_matrix)):
-                self.distance_matrix.append([])
-                for j in range(len(self.correlation_matrix[i])):
-                    self.distance_matrix[-1].append(1 - self.correlation_matrix[i][j])
+            for cm1 in self.correlation_matrix:
+                dists = []
+                for cm2 in cm1:
+                    dists.append(1. - cm2)
+                self.distance_matrix.append(dists)
 
     def findMedoids(self):
         self.cluster_medoids = []
-
         for cluster in self.cluster_members:
             if len(cluster) == 1:
-                self.cluster_medoids.append(cluster[0])
+                medoid = cluster[0]
             else:
                 total_distances = []
-                for i in range(len(cluster)):
-                    total_distances.append(0)
-                    index_1 = self.matrix_ids.index(cluster[i])
-                    for j in range(len(cluster)):
-                        if i == j:
-                            pass
-                        else:
-                            index_2 = self.matrix_ids.index(cluster[j])
-                            total_distances[-1] += self.distance_matrix[index_1][index_2]
-                self.cluster_medoids.append(cluster[total_distances.index(min(total_distances))])
+                for i, clust1 in enumerate(cluster):
+                    dist = 0.
+                    index_1 = self.matrix_ids.index(clust1)
+                    for j, clust2 in enumerate(cluster):
+                        if i != j:
+                            index_2 = self.matrix_ids.index(clust2)
+                            dist += self.distance_matrix[index_1][index_2]
+                    total_distances.append(dist)
+                medoid = cluster[total_distances.index(min(total_distances))]
+            self.cluster_medoids.append(medoid)
 
     def performClustering(self):
         self.createDistanceMatrix()
@@ -147,15 +146,12 @@ class MatrixByMatrix():
         self.dendrogram = truncated_dg
         self.cluster_members = []
 
-        for full_id, entry in enumerate(truncated_dg['ivl']):
-            self.cluster_members.append([])
-            if len(entry.split("(")) > 1:
-                member_num = int(entry.split("(")[1].split(")")[0])
-                for i in range(member_num):
-                    self.cluster_members[-1].append(self.matrix_ids[int(full_dg['ivl'][full_id])])
-            else:
-                self.cluster_members[-1].append(self.matrix_ids[int(full_dg['ivl'][full_id])])
-
+        for i, entry in enumerate(truncated_dg['ivl']):
+            id_ = self.matrix_ids[int(full_dg['ivl'][i])]
+            members = [id_]
+            if '(' in entry:
+                members = members * int(entry.split("(")[1].split(")")[0])
+            self.cluster_members.append(members)
         self.findMedoids()
 
     def maxAbs(self, input_list):
@@ -177,38 +173,49 @@ class MatrixByMatrix():
         return input_list[max_index]
 
     def findClusterCorrelationValues(self):
+
         self.cluster_correlation_values = []
-
-        for i in range(len(self.cluster_members)):
-            self.cluster_correlation_values.append([])
-            if self.sort_vector:
-                for j in range(len(self.cluster_members[i])):
-                    index = self.matrix_ids.index(self.cluster_members[i][j])
-                    for k in range(len(self.correlation_matrix[index])):
-                        if j == 0:
-                            self.cluster_correlation_values[-1].append([])
-                        self.cluster_correlation_values[-1][k].append(self.correlation_matrix[index][k])
-            else:
-                for j in range(len(self.cluster_members)):
-                    self.cluster_correlation_values[-1].append([])
-                    for k in range(len(self.cluster_members[i])):
-                        for l in range(len(self.cluster_members[j])):
-                            index_1 = self.matrix_ids.index(self.cluster_members[i][k])
-                            index_2 = self.matrix_ids.index(self.cluster_members[j][l])
-                            self.cluster_correlation_values[-1][-1].append(self.correlation_matrix[index_1][index_2])
-
         self.max_correlation_values = []
         self.med_correlation_values = []
         self.max_abs_correlation_values = []
 
-        for i in range(len(self.cluster_correlation_values)):
-            self.max_correlation_values.append([])
-            self.med_correlation_values.append([])
-            self.max_abs_correlation_values.append([])
-            for j in range(len(self.cluster_correlation_values)):
-                self.max_correlation_values[-1].append(max(self.cluster_correlation_values[i][j]))
-                self.med_correlation_values[-1].append(numpy.median(self.cluster_correlation_values[i][j]))
-                self.max_abs_correlation_values[-1].append(self.maxAbs(self.cluster_correlation_values[i][j]))
+        # define cluster_correlation_values
+        for cm1 in self.cluster_members:
+            ccvs = []
+            if self.sort_vector:
+                for cm2 in cm1:
+                    ccvs2 = []
+                    index = self.matrix_ids.index(cm2)
+                    for k, cm3 in enumerate(self.correlation_matrix[index]):
+                        ccvs2.append(cm3)
+                    ccvs.append(ccvs2)
+            else:
+                for cm2 in self.cluster_members:
+                    ccvs2 = []
+                    for cm3 in cm1:
+                        for cm4 in cm2:
+                            index_1 = self.matrix_ids.index(cm3)
+                            index_2 = self.matrix_ids.index(cm4)
+                            ccvs2.append(self.correlation_matrix[index_1][index_2])
+                    ccvs.append(ccvs2)
+            self.cluster_correlation_values.append(ccvs)
+
+        # get summary statistics
+        for i, ccv1 in enumerate(self.cluster_correlation_values):
+
+            max_cv = []
+            med_cv = []
+            max_abs_cv = []
+
+            for j, ccv2 in enumerate(self.cluster_correlation_values):
+                ccvs = self.cluster_correlation_values[i][j]
+                max_cv.append(max(ccvs))
+                med_cv.append(numpy.median(ccvs))
+                max_abs_cv.append(self.maxAbs(ccvs))
+
+            self.max_correlation_values.append(max_cv)
+            self.med_correlation_values.append(med_cv)
+            self.max_abs_correlation_values.append(max_abs_cv)
 
     def getOutputDict(self):
         # Return an output dict of the analysis results
