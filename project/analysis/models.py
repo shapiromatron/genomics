@@ -294,7 +294,7 @@ class Analysis(GenomicBinSettings):
 
     def create_matrix_list(self):
         return [
-            [ads.count_matrix.matrix.path, ads.display_name]
+            [ads.id, ads.count_matrix.matrix.path, ads.display_name]
             for ads in self.analysisdatasets_set.all().prefetch_related('count_matrix')
         ]
 

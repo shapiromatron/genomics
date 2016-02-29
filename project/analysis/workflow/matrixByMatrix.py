@@ -30,7 +30,9 @@ class MatrixByMatrix():
         self.execute()
 
     def readMatrixFiles(self):
-        self.matrix_files, self.matrix_names = zip(*self.matrix_list)
+        self.matrix_ids, \
+            self.matrix_names, \
+            self.matrix_files,  = zip(*self.matrix_list)
 
     def createSortOrders(self):
         self.sort_orders = []
@@ -45,6 +47,7 @@ class MatrixByMatrix():
                         "row_sum": sum(map(float, line.strip().split()[1:]))
                     }
             self.sort_orders.append({
+                "data_set_id": self.matrix_ids[i],
                 "data_set": self.matrix_names[i],
                 "sort_order": sorted(
                     matrix_entries,
@@ -123,12 +126,12 @@ class MatrixByMatrix():
                 total_distances = []
                 for i in range(len(cluster)):
                     total_distances.append(0)
-                    index_1 = self.matrix_names.index(cluster[i])
+                    index_1 = self.matrix_ids.index(cluster[i])
                     for j in range(len(cluster)):
                         if i == j:
                             pass
                         else:
-                            index_2 = self.matrix_names.index(cluster[j])
+                            index_2 = self.matrix_ids.index(cluster[j])
                             total_distances[-1] += self.distance_matrix[index_1][index_2]
                 self.cluster_medoids.append(cluster[total_distances.index(min(total_distances))])
 
@@ -149,9 +152,9 @@ class MatrixByMatrix():
             if len(entry.split("(")) > 1:
                 member_num = int(entry.split("(")[1].split(")")[0])
                 for i in range(member_num):
-                    self.cluster_members[-1].append(self.matrix_names[int(full_dg['ivl'][full_id])])
+                    self.cluster_members[-1].append(self.matrix_ids[int(full_dg['ivl'][full_id])])
             else:
-                self.cluster_members[-1].append(self.matrix_names[int(full_dg['ivl'][full_id])])
+                self.cluster_members[-1].append(self.matrix_ids[int(full_dg['ivl'][full_id])])
 
         self.findMedoids()
 
@@ -180,7 +183,7 @@ class MatrixByMatrix():
             self.cluster_correlation_values.append([])
             if self.sort_vector:
                 for j in range(len(self.cluster_members[i])):
-                    index = self.matrix_names.index(self.cluster_members[i][j])
+                    index = self.matrix_ids.index(self.cluster_members[i][j])
                     for k in range(len(self.correlation_matrix[index])):
                         if j == 0:
                             self.cluster_correlation_values[-1].append([])
@@ -190,8 +193,8 @@ class MatrixByMatrix():
                     self.cluster_correlation_values[-1].append([])
                     for k in range(len(self.cluster_members[i])):
                         for l in range(len(self.cluster_members[j])):
-                            index_1 = self.matrix_names.index(self.cluster_members[i][k])
-                            index_2 = self.matrix_names.index(self.cluster_members[j][l])
+                            index_1 = self.matrix_ids.index(self.cluster_members[i][k])
+                            index_2 = self.matrix_ids.index(self.cluster_members[j][l])
                             self.cluster_correlation_values[-1][-1].append(self.correlation_matrix[index_1][index_2])
 
         self.max_correlation_values = []
@@ -215,8 +218,9 @@ class MatrixByMatrix():
                 "bin_number": self.bin_number,
                 "bin_size": self.bin_size,
             },
-            matrix_files=self.matrix_files,
+            matrix_ids=self.matrix_ids,
             matrix_names=self.matrix_names,
+            matrix_files=self.matrix_files,
             correlation_matrix=self.correlation_matrix,
             dendrogram=self.dendrogram,
             cluster_members=self.cluster_members,
@@ -280,11 +284,12 @@ def cli(matrix_list_fn, window_start, bin_number,
 
     \b
     Arguments:
-    - matrix_list_fn:      List of matrix files to be considered in analysis. Each
+    - matrix_list_fn:   List of matrix files to be considered in analysis. Each
                         row in the list corresponds to a matrix to be considered
-                        in the analysis. The list contains two columns. The
-                        first specifies the name to be given to a matrix. The
-                        second specifies the path of the associated matrix file.
+                        in the analysis. The list contains three columns:
+                            1) unique integer ID for matrix
+                            2) unique name for each matrix
+                            3) absolute path to matrix file
     - window_start:     The first position of the analysis window relative to
                         the features in the associated feature list.
     - bin_number:       Number of bins used
