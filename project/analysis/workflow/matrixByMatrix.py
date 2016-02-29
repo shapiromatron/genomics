@@ -241,7 +241,7 @@ class MatrixByMatrix():
         )
 
     def writeJson(self, fn):
-        output_dict = self.writeOutputDict()
+        output_dict = self.getOutputDict()
         with open(fn, 'w') as f:
             json.dump(output_dict, f, separators=(",", ": "))
 
