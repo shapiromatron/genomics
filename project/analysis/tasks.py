@@ -1,7 +1,7 @@
 from time import sleep
 from celery.utils.log import get_task_logger
 from celery.decorators import task
-from celery import group
+from celery import group, chain
 from django.apps import apps
 from django.utils import timezone
 
@@ -18,34 +18,43 @@ def debug_task():
 
 @task()
 def execute_analysis(analysis_id):
-    # save current start-time
-    analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
-    EncodeDataset = apps.get_model('analysis', 'EncodeDataset')
-    analysis.start_time = timezone.now()
-    analysis.end_time = None
-    analysis.save()
 
-    # run all feature-list count matrix
+    # reset analysis object to pre-analysis mode
+    task1 = reset_analysis_startup.si(analysis_id)
+
+    # run all feature-list count matrix in parallel
+    EncodeDataset = apps.get_model('analysis', 'EncodeDataset')
+    analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
     ads_qs = analysis.analysisdatasets_set.all()\
         .prefetch_related('dataset', 'dataset__encodedataset', 'dataset__userdataset')
-    job = group([
-        execute_count_matrix.s(
+    task2 = group([
+        execute_count_matrix.si(
             analysis.id,
             ads.id,
             isinstance(ads.dataset.subclass, EncodeDataset),
             ads.dataset.subclass.id)
         for ads in ads_qs
     ])
-    job.apply_async()
 
-    # build feature-list matrix
-    analysis.output = analysis.execute_mat2mat()
-    analysis.end_time = timezone.now()
+    # after completion, build combinatorial result and save
+    task3 = execute_matrix_combination.si(analysis_id)
+
+    # chain tasks to be performed serially
+    return chain(task1, task2, task3)()
+
+
+@task()
+def reset_analysis_startup(analysis_id):
+    # save current start-time
+    analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
+    analysis.start_time = timezone.now()
+    analysis.end_time = None
     analysis.save()
 
 
 @task()
 def execute_count_matrix(analysis_id, ads_id, isEncode, dataset_id):
+    # execute each count matrix
     analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
     ads = apps.get_model('analysis', 'AnalysisDatasets').objects.get(id=ads_id)
     if isEncode:
@@ -55,3 +64,12 @@ def execute_count_matrix(analysis_id, ads_id, isEncode, dataset_id):
     FeatureListCountMatrix = apps.get_model('analysis', 'FeatureListCountMatrix')
     ads.count_matrix = FeatureListCountMatrix.execute(analysis, dataset)
     ads.save()
+
+
+@task()
+def execute_matrix_combination(analysis_id):
+    # save results from matrix combination
+    analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
+    analysis.output = analysis.execute_mat2mat()
+    analysis.end_time = timezone.now()
+    analysis.save()
