@@ -43,7 +43,7 @@ def execute_analysis(analysis_id):
     return chain(task1, task2, task3)()
 
 
-@task()
+@task(ignore_result=True)
 def reset_analysis_startup(analysis_id):
     # save current start-time
     analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
@@ -52,7 +52,7 @@ def reset_analysis_startup(analysis_id):
     analysis.save()
 
 
-@task()
+@task(ignore_result=True)
 def execute_count_matrix(analysis_id, ads_id, isEncode, dataset_id):
     # execute each count matrix
     analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
@@ -66,7 +66,7 @@ def execute_count_matrix(analysis_id, ads_id, isEncode, dataset_id):
     ads.save()
 
 
-@task()
+@task(ignore_result=True)
 def execute_matrix_combination(analysis_id):
     # save results from matrix combination
     analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
