@@ -470,7 +470,6 @@ var IndividualOverview = function(data, parent_div) {
     self.names_crosswalk = _.object(self.matrix_ids, self.matrix_names);
 
     self.selectable = data['matrix_names'];
-    self.selected_val = null;
 
     self.parent_div = parent_div;
 };
@@ -499,11 +498,6 @@ IndividualOverview.prototype = {
             .attr('value', function(d) {return d[0];});
 
         $('#' + self.parent_div + '> #select_list').prop('selectedIndex', '0');
-
-        self.selected_val = self.matrix_names.indexOf(self.selectable[0]);
-        $('#' + self.parent_div + '> #select_list').change(function() {
-            self.selected_val = this.value;
-        });
     },
     addDisplayButtons: function() {
         var self = this;
@@ -698,10 +692,11 @@ IndividualOverview.prototype = {
     displayIndividualHeatmap: function () {
         var self = this;
 
+        var selected = $('#' + self.parent_div + '> #select_list option:selected').val();
         $('#flcModal')
             .one('shown.bs.modal', function(){
                 var individual_heatmap = new IndividualHeatmap(
-                    self.selected_val,
+                    selected,
                     self.matrix_names,
                     'ind_heatmap_modal_title',
                     'ind_heatmap_modal_body'
