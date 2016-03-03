@@ -747,10 +747,11 @@ IndividualHeatmap.prototype.render = function() {
     $('#' + self.modal_title).html(self.matrix_names[self.selected_value]);
 
     $.get(this.url(this.selected_value), function(data){
-        self.drawHeatmapHeader(data);
-        self.drawHeatmap(data);
-        self.drawMetaPlot(data);
-        self.drawQuartiles(data);
+        var display_data = d3.tsv.parseRows(data);
+        self.drawHeatmapHeader(display_data);
+        self.drawHeatmap(display_data);
+        self.drawMetaPlot(display_data);
+        self.drawQuartiles(display_data);
         self.createSelect();
         self.addButtons();
     });
@@ -800,7 +801,7 @@ IndividualHeatmap.prototype.url = function(id) {
     return "/dashboard/api/feature-list-count-matrix/" + id + "/plot/";
 }
 
-IndividualHeatmap.prototype.drawQuartiles = function(data) {
+IndividualHeatmap.prototype.drawQuartiles = function(display_data) {
     var self = this;
 
     $('#' + self.modal_body + '> #quartile_plot').remove();
@@ -870,7 +871,6 @@ IndividualHeatmap.prototype.drawQuartiles = function(data) {
         .attr("fill", "black")
         .style("text-anchor", "left");
 
-    var display_data = d3.tsv.parseRows(data);
     var row_number = display_data.length-1;
 
     var window_values = [];
@@ -945,7 +945,7 @@ IndividualHeatmap.prototype.drawQuartiles = function(data) {
     }
 }
 
-IndividualHeatmap.prototype.drawMetaPlot = function(data) {
+IndividualHeatmap.prototype.drawMetaPlot = function(display_data) {
     var self = this;
 
     $('#' + self.modal_body + '> #metaplot_label').remove();
@@ -974,7 +974,6 @@ IndividualHeatmap.prototype.drawMetaPlot = function(data) {
         "right": 0.05 * width
     };
 
-    var display_data = d3.tsv.parseRows(data);
     var row_number = display_data.length-1;
 
     var window_values = [];
@@ -1033,7 +1032,7 @@ IndividualHeatmap.prototype.drawMetaPlot = function(data) {
     graph.append("svg:path").attr("d", line(scatter));
 }
 
-IndividualHeatmap.prototype.drawHeatmapHeader = function(data) {
+IndividualHeatmap.prototype.drawHeatmapHeader = function(display_data) {
     var self = this;
 
     $('#' + self.modal_body + '> #heatmap_header').remove();
@@ -1047,8 +1046,6 @@ IndividualHeatmap.prototype.drawHeatmapHeader = function(data) {
 
     var height = $('#' + self.modal_body + '> #heatmap_header').height();
     var width = $('#' + self.modal_body + '> #heatmap_header').width();
-
-    var display_data = d3.tsv.parseRows(data);
 
     var range_start = parseInt(display_data[0][1].split(":")[0]);
     var range_end = parseInt(display_data[0][display_data[0].length-1].split(":")[1]);
@@ -1101,7 +1098,7 @@ IndividualHeatmap.prototype.drawHeatmapHeader = function(data) {
         .style("text-anchor", "middle");
 }
 
-IndividualHeatmap.prototype.drawHeatmap = function(data) {
+IndividualHeatmap.prototype.drawHeatmap = function(display_data) {
     $('#' + this.modal_body + '> #heatmap_canvas').remove();
     $('#' + this.modal_body).append('<canvas id=\'heatmap_canvas\'></canvas>');
 
@@ -1112,7 +1109,7 @@ IndividualHeatmap.prototype.drawHeatmap = function(data) {
     });
 
     // Get all but first row; remove first column
-    var display_data = d3.tsv.parseRows(data).slice(1);
+    var display_data = display_data.slice(1);
     for (i = 0; i < display_data.length; i++) {
         display_data[i] = display_data[i].slice(1);
     }
