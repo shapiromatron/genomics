@@ -21,6 +21,10 @@ urlpatterns = [
         views.VisualTestingObject.as_view(),
         name='visual_testing'),
 
+    url(r'^analysis/(?P<pk>\d+)/zip/$',
+        views.AnalysisZip.as_view(),
+        name='analysis_zip'),
+
     url(r'^analysis/(?P<pk>\d+)/execute/$',
         views.Execute.as_view(),
         name='execute'),

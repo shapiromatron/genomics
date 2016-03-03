@@ -2,6 +2,8 @@ import json
 import os
 import uuid
 import random
+import io
+import zipfile
 
 from django.db import models
 from django.conf import settings
@@ -354,6 +356,31 @@ class Analysis(GenomicBinSettings):
         output = self.output_json
         idx = random.randint(0, len(output['sort_orders'])-1)
         return output['sort_orders'][idx]
+
+    def create_zip(self):
+        """
+        Create a zip file of output, specifically designed to recreate analysis,
+        or to load analysis onto local development computers.
+        """
+        f = io.BytesIO()
+        with zipfile.ZipFile(f, mode='w', compression=zipfile.ZIP_DEFLATED) as z:
+
+            # write feature list
+            z.write(self.feature_list.dataset.path, arcname='feature_list.txt')
+
+            # write sort vector
+            if self.sort_vector:
+                z.writestr('sort_vector.txt', self.sort_vector.text.encode('utf-8'))
+
+            # write output JSON
+            if self.output:
+                z.write(self.output.path, arcname='output.json')
+
+            # write all intermediate count matrices
+            for ds in self.analysisdatasets_set.all():
+                z.write(ds.count_matrix.matrix.path, 'count_matrix/{}.txt'.format(ds.display_name))
+
+        return f
 
 
 class FeatureListCountMatrix(GenomicBinSettings):

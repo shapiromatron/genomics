@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, UpdateView, DetailView
 
@@ -41,6 +42,18 @@ class Execute(OwnerOrStaff, UpdateView):
         obj = self.get_object()
         obj.execute()
         return JsonResponse({'run': True})
+
+
+class AnalysisZip(OwnerOrStaff, DetailView):
+    model = models.Analysis
+
+    def get(self, context, **response_kwargs):
+        obj = self.get_object()
+        zip_ = obj.create_zip()
+        zip_.seek(0)
+        response = HttpResponse(zip_, content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="{}.zip"'.format(obj)
+        return response
 
 
 class CeleryTester(Home):
