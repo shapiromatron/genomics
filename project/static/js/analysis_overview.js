@@ -1,14 +1,11 @@
 var AnalysisOverview = function(data, parent_div) {
-    var self = this;
-
-    self.dendrogram = data['dendrogram'];
-    self.cluster_members = data['cluster_members'];
-    self.cluster_display = data['max_abs_correlation_values'];
-    self.correlation_matrix = data['correlation_matrix'];
-    self.matrix_names = data['matrix_names'];
-    self.cluster_medoids = data['cluster_medoids'];
-
-    self.parent_div = parent_div;
+    this.dendrogram = data['dendrogram'];
+    this.cluster_members = data['cluster_members'];
+    this.cluster_display = data['max_abs_correlation_values'];
+    this.correlation_matrix = data['correlation_matrix'];
+    this.matrix_names = data['matrix_names'];
+    this.cluster_medoids = data['cluster_medoids'];
+    this.parent_div = parent_div;
 };
 AnalysisOverview.prototype = {
     drawHeatmap: function() {

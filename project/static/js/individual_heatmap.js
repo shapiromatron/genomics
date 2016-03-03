@@ -1,10 +1,9 @@
 var IndividualHeatmap = function(selected_value, matrix_names, modal_title, modal_body) {
-    var self = this;
-    self.selected_value = selected_value;
-    self.matrix_names = matrix_names;
-    self.modal_title = modal_title;
-    self.modal_body = modal_body;
-    self.selected_sort = null;
+    this.selected_value = selected_value;
+    this.matrix_names = matrix_names;
+    this.modal_title = modal_title;
+    this.modal_body = modal_body;
+    this.selected_sort = null;
 };
 IndividualHeatmap.prototype = {
     addButtons: function() {
