@@ -108,80 +108,26 @@ path {
 <script type="text/javascript" src="{{STATIC_URL}}/js/individual_heatmap.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}/js/individual_overview.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}/js/analysis_overview.js"></script>
-
 <script>
+    $(document).ready(function(){
 
-var renderSummaryPlot = function(data){
-    // add code here...
-    console.log('render summary plot here', data);
-};
+        var urls = {
+            summaryPlot: function(){
+                return "{% url 'analysis:api:analysis-plot' object.id %}";
+            },
+            sortVector: function(){
+                return "{% url 'analysis:api:analysis-sort-vector' object.id %}";
+            },
+        };
 
-var applyNewSortOrder = function(data){
-    // add code here...
-    console.log('apply sort order and re-render', data);
-};
-
-var renderFeatureList = function(data){
-    // add code here...
-    console.log('render modal visual_panel_1', data)
-};
-
-var showFeatureListCount = function(data){
-    var data = d3.csv.parse(data);  // not sure if this is parsed correctly...
-    $('#flcModal')
-        .one('shown.bs.modal', function(){
-            renderFeatureList(data)
-        }).modal('show');
-};
-
-
-
-$(document).ready(function(){
-
-    var urls = {
-        summaryPlot: function(){
-            return "{% url 'analysis:api:analysis-plot' object.id %}";
-        },
-        sortVector: function(){
-            return "{% url 'analysis:api:analysis-sort-vector' object.id %}";
-        },
-        /*
-        featureListDetail: function(id){
-            return "/dashboard/api/feature-list-count-matrix/" + id + "/plot/";
-        }
-        */
-    }
-
-    // #1 here is the summary data
-    $.get(urls.summaryPlot(), function(data){
-        var overview = new AnalysisOverview(data, 'visual_panel_1');
-        var individual_overview = new IndividualOverview(data, 'visual_panel_2');
-        overview.render();
-        individual_overview.render();
-    });
-
-    /*
-    // #2 is getting a new sort-vector
-    $('#sortOrder').on('click', function(){
-        $.get(urls.sortVector(), {id: 2}, applyNewSortOrder);
-    });
-
-    // #3 feature-list count matrices
-    $('#featureList').on('click', function(){
-        var id = $('#featureListSelector').val();
-        $.get(urls.featureListDetail(id), showFeatureListCount);
-    });
-
-    // add options to select
-    var populateFeatureList = function(arr){
-        var opts = arr.map(function(d){
-            return '<option id="' + d + '">' + d + "</option>";
+        // #1 here is the summary data
+        $.get(urls.summaryPlot(), function(data){
+            var overview = new AnalysisOverview(data, 'visual_panel_1');
+            var individual_overview = new IndividualOverview(data, 'visual_panel_2');
+            overview.render();
+            individual_overview.render();
         });
-        $('#featureListSelector').html(opts);
-    }
-    populateFeatureList({{object.get_flcm_ids}});
-    */
-});
 
+    });
 </script>
 {% endblock extra_js %}
