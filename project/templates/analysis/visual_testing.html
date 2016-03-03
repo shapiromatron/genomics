@@ -107,6 +107,7 @@ path {
 
 
 {% block extra_js %}
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 <script>
 
 var renderSummaryPlot = function(data){
@@ -469,8 +470,11 @@ var IndividualOverview = function(data, parent_div) {
     self.cluster_members = data['cluster_members'];
     self.cluster_display = data['max_abs_correlation_values'];
     self.correlation_matrix = data['correlation_matrix'];
+    self.matrix_ids = data['matrix_ids'];
     self.matrix_names = data['matrix_names'];
     self.cluster_medoids = data['cluster_medoids'];
+
+    self.names_crosswalk = _.object(self.matrix_ids, self.matrix_names);
 
     self.selectable = data['matrix_names'];
     self.selected_val = null;
@@ -495,17 +499,17 @@ IndividualOverview.prototype.renderSelectList = function() {
 
     var sort_list = d3.select('#' + self.parent_div + '> #select_list')
         .selectAll('option')
-        .data(self.selectable)
+        .data(_.pairs(self.names_crosswalk))
         .enter()
         .append('option')
-        .text(function(d) {return d;})
-        .attr('value', function(d) {return d;});
+        .text(function(d) {return d[1];})
+        .attr('value', function(d) {return d[0];});
 
     $('#' + self.parent_div + '> #select_list').prop('selectedIndex', '0');
 
     self.selected_val = self.matrix_names.indexOf(self.selectable[0]);
     $('#' + self.parent_div + '> #select_list').change(function() {
-        self.selected_val = self.matrix_names.indexOf(this.value);
+        self.selected_val = this.value;
     });
 }
 
@@ -729,7 +733,6 @@ IndividualOverview.prototype.render = function() {
 
 var IndividualHeatmap = function(selected_value, matrix_names, modal_title, modal_body) {
     var self = this;
-
     self.selected_value = selected_value;
     self.matrix_names = matrix_names;
     self.modal_title = modal_title;
@@ -865,7 +868,7 @@ IndividualHeatmap.prototype.drawQuartiles = function() {
         .attr("fill", "black")
         .style("text-anchor", "left");
 
-    $.get(self.url(273), function(data) {
+    $.get(self.url(self.selected_value), function(data) {
         var display_data = d3.tsv.parseRows(data);
         var row_number = display_data.length-1;
 
@@ -971,7 +974,7 @@ IndividualHeatmap.prototype.drawMetaPlot = function() {
         "right": 0.05 * width
     };
 
-    $.get(self.url(273), function(data) {
+    $.get(self.url(self.selected_value), function(data) {
         var display_data = d3.tsv.parseRows(data);
         var row_number = display_data.length-1;
 
@@ -1047,7 +1050,7 @@ IndividualHeatmap.prototype.drawHeatmapHeader = function() {
     var height = $('#' + self.modal_body + '> #heatmap_header').height();
     var width = $('#' + self.modal_body + '> #heatmap_header').width();
 
-    $.get(self.url(273), function(data) {
+    $.get(self.url(self.selected_value), function(data) {
         var display_data = d3.tsv.parseRows(data);
 
         var range_start = parseInt(display_data[0][1].split(":")[0]);
@@ -1114,7 +1117,7 @@ IndividualHeatmap.prototype.drawHeatmap = function() {
         'position': 'absolute', 'left': '40%', 'top': '10%'
     });
 
-    $.get(self.url(273), function(data) {
+    $.get(self.url(self.selected_value), function(data) {
 
         // Get all but first row; remove first column
         var display_data = d3.tsv.parseRows(data).slice(1);
