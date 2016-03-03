@@ -42,30 +42,26 @@ IndividualOverview.prototype = {
         $('#' + self.parent_div + '> #select_list').prop('selectedIndex', '0');
     },
     addDisplayButtons: function() {
-        var self = this;
+
+        // display new correlations whenver field changes
+        $('#' + this.parent_div + '> #select_list')
+            .change(this.displayCorrelations.bind(this));
 
         //Remove heatmap div if there; append heatmap div
-        $('#' + self.parent_div + '> #display_correlations').remove();
-        $('#' + self.parent_div).append(
-            '<button id=\'display_correlations\' type=\'button\' class=\'btn btn-primary\'>Display correlation values</button>'
-        );
-        $('#' + self.parent_div + '> #display_correlations').css({
-            'position': 'absolute', 'left': '0%', 'top': '65%', 'width': '30%'
-        });
-        $('#' + self.parent_div + '> #display_correlations').click(
-            self.displayCorrelations.bind(this)
-        );
+        $('#' + this.parent_div)
+            .remove('#display_heatmap')
+            .append(
+                '<button id=\'display_heatmap\' type=\'button\' class=\'btn btn-primary\'>Display individual heatmap</button>'
+            );
 
-        //Remove heatmap div if there; append heatmap div
-        $('#' + self.parent_div).remove('#display_heatmap');
-        $('#' + self.parent_div).append(
-            '<button id=\'display_heatmap\' type=\'button\' class=\'btn btn-primary\'>Display individual heatmap</button>'
-        );
-        $('#' + self.parent_div + '> #display_heatmap').css({
-            'position': 'absolute', 'left': '0%', 'top': '80%', 'width': '30%'
-        });
-        $('#' + self.parent_div + '> #display_heatmap').click(
-            self.displayIndividualHeatmap.bind(this)
+        // on click display heatmap
+        $('#' + this.parent_div + '> #display_heatmap').css({
+            position: 'absolute',
+            left: '0%',
+            top: '80%',
+            width: '30%',
+        }).click(
+            this.displayIndividualHeatmap.bind(this)
         );
     },
     displayCorrelations: function() {
@@ -247,11 +243,9 @@ IndividualOverview.prototype = {
             }).modal('show');
     },
     render: function() {
-        var self = this;
-
-        self.renderSelectList();
-        self.addDisplayButtons();
-        self.displayCorrelations();
-        self.addInputText();
+        this.renderSelectList();
+        this.addDisplayButtons();
+        this.displayCorrelations();
+        this.addInputText();
     },
 };
