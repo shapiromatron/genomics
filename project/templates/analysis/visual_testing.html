@@ -554,8 +554,7 @@ IndividualOverview.prototype = {
         var num = self.matrix_names.length - 1;
         var entry_length = 20;
 
-        //var index = $('#' + self.parent_div + '> #select_list').prop('selectedIndex');
-        var index = self.selected_val;
+        var index = $('#' + self.parent_div + '> #select_list').find('option:selected').index();
 
         var margin = {top: 0, right: 20, bottom: 20, left: 20},
             offset = {top: 20, right: 20, bottom: 100, left: 40},
