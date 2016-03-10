@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import HttpResponse
+from django.core.exceptions import PermissionDenied
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, UpdateView, DetailView
 
@@ -26,7 +27,16 @@ class Dashboard(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class VisualTestingObject(DetailView):
+class AnalysisReadOnlyMixin(object):
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if not obj.user_can_view(self.request.user):
+            raise PermissionDenied()
+        return obj
+
+
+class VisualTestingObject(AnalysisReadOnlyMixin, DetailView):
     """
     Temporary view used for visual testing
     """
@@ -44,7 +54,7 @@ class Execute(OwnerOrStaff, UpdateView):
         return JsonResponse({'run': True})
 
 
-class AnalysisZip(OwnerOrStaff, DetailView):
+class AnalysisZip(AnalysisReadOnlyMixin, DetailView):
     model = models.Analysis
 
     def get(self, context, **response_kwargs):
