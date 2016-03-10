@@ -199,6 +199,7 @@ CELERY_TIMEZONE = 'US/Eastern'
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 ENCODE_PATH = os.path.join(PROJECT_ROOT, 'data', 'encode')
+USERDATA_PATH = os.path.join(PROJECT_ROOT, 'data', 'users')
 
 WEBPACK_LOADER = {
     'DEFAULT': {

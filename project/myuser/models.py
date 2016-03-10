@@ -1,4 +1,7 @@
+import os
+
 from django.db import models
+from django.conf import settings
 from django.contrib.auth import models as authModels
 from django.utils import timezone
 
@@ -39,6 +42,10 @@ class User(authModels.AbstractBaseUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+    @property
+    def path(self):
+        return os.path.join(settings.USERDATA_PATH, str(self.id))
 
     def get_full_name(self):
         return self.email
