@@ -87,3 +87,8 @@ python manage.py shell_plus --notebook
 ```
 
 Then, navigate to [localhost:8888](http://127.0.0.1:8888/) to view the notebooks.
+
+### Loading an analysis into development environment.
+
+1. Download a zip file from an analysis you have access to using the URL `/dashboard/analysis/{id}/zip/`, where `{id}` is the numeric ID of the analysis.
+2. Use the [django management command](https://docs.djangoproject.com/en/1.9/howto/custom-management-commands/) `python manage.py load_zip {fn}`, where `{fn}` is the name of the zip file.
