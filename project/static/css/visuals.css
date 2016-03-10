@@ -62,3 +62,13 @@ path {
     fill: none;
     stroke: #000;
 }
+
+.heatmapLabelText{
+    font-size: 8px;
+    dominant-baseline: middle;
+}
+
+.dendroLine {
+    stroke: black;
+    stroke-width: 1px;
+}

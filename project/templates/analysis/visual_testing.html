@@ -43,7 +43,7 @@
         };
 
         $.get(urls.summaryPlot(), function(data){
-            var overview = new AnalysisOverview(data, 'visual_panel_1'),
+            var overview = new AnalysisOverview($('#visual_panel_1'), data),
                 individual_overview = new IndividualOverview(data, 'visual_panel_2');
             overview.render();
             individual_overview.render();
