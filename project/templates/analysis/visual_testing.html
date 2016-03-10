@@ -1,75 +1,8 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-<style>
-
-#visual_panel_1 {
-    height: 500px;
-    width: 95%;
-    position: relative;
-}
-
-#visual_panel_2 {
-    height: 250px;
-    width: 95%;
-    margin-top: 20px;
-    position: relative;
-}
-
-#flcModal .modal-dialog {
-    width: 95%;
-    height: 95%;
-    padding: 0;
-}
-
-#flcModal .modal-content {
-    height: 100%;
-    width: 100%;
-}
-
-#flcModal .modal-header {
-    height: 10%;
-    width: 100%;
-}
-
-#flcModal .modal-body{
-    height: 90%;
-    width: 100%;
-}
-
-.tooltip-inner {
-    max-width: 350px;
-}
-
-path {
-    stroke: steelblue;
-    stroke-width: 1;
-    fill: none;
-}
-
-.axis {
-    shape-rendering: crispEdges;
-}
-
-.x.axis line {
-    stroke: #000;
-}
-
-.x.axis .minor {
-    //stroke-opacity: .5;
-    stroke: #000;
-}
-
-.x.axis path {
-    stroke: #000;
-}
-
-.y.axis line, .y.axis path {
-    fill: none;
-    stroke: #000;
-}
-
-</style>
+    <link rel="stylesheet" type="text/css" media="all"
+          href="{{STATIC_URL}}css/visuals.css">
 {% endblock extra_css %}
 
 
@@ -109,10 +42,9 @@ path {
             },
         };
 
-        // #1 here is the summary data
         $.get(urls.summaryPlot(), function(data){
-            var overview = new AnalysisOverview(data, 'visual_panel_1');
-            var individual_overview = new IndividualOverview(data, 'visual_panel_2');
+            var overview = new AnalysisOverview(data, 'visual_panel_1'),
+                individual_overview = new IndividualOverview(data, 'visual_panel_2');
             overview.render();
             individual_overview.render();
         });
