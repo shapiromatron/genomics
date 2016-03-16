@@ -25,6 +25,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        if not os.path.exists(settings.MEDIA_ROOT):
+            os.makedirs(settings.MEDIA_ROOT)
+
         zip_ = options.get('zipfile')
         if not os.path.exists(zip_):
             return self.stdout.write('Zipfile not found: {}'.format(zip_))
