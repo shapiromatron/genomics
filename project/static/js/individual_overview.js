@@ -8,10 +8,12 @@ var IndividualOverview = function(el, data) {
     this.matrix_names = data['matrix_names'];
     this.cluster_medoids = data['cluster_medoids'];
 
+    /*
     this.name_to_id = new Object();
     for(var i=0;i<this.matrix_names.length;i++){
         this.name_to_id[this.matrix_names[i]]=this.matrix_ids[i];
     }
+    */
     //this.names_crosswalk = _.object(this.matrix_ids, this.matrix_names);
     //this.selectable = data['matrix_names'];
 };
@@ -191,7 +193,7 @@ IndividualOverview.prototype = {
         //var index = $('#' + self.parent_div + '> #select_list').find('option:selected').index();
         //var select = this.el.find('#select_list');
         //console.log(select.options[select.selectedIndex].value);
-        console.log(this.el.find('#select_list').find('option:selected').text());
+        //console.log(this.el.find('#select_list').find('option:selected').text());
         var index = this.matrix_names.indexOf(this.el.find('#select_list').find('option:selected').text());
         //var index = 0;
 
@@ -395,14 +397,17 @@ IndividualOverview.prototype = {
         */
     },
     displayIndividualHeatmap: function () {
-        var self = this;
-
-        var selected = $('#' + self.parent_div + '> #select_list option:selected').val();
+        //var self = this;
+        var selected = this.matrix_names.indexOf(this.el.find('#select_list').find('option:selected').text());
+        var index = this.matrix_ids[selected];
+        console.log(selected);
+        //var selected = $('#' + self.parent_div + '> #select_list option:selected').val();
+        //var matrix_names = this.matrix_names;
         $('#flcModal')
             .one('shown.bs.modal', function(){
                 var individual_heatmap = new IndividualHeatmap(
-                    selected,
-                    self.matrix_names,
+                    index,
+                    matrix_names,
                     'ind_heatmap_modal_title',
                     'ind_heatmap_modal_body'
                 );
