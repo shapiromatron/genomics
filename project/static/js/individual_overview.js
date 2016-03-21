@@ -7,14 +7,35 @@ var IndividualOverview = function(el, data) {
     this.matrix_ids = data['matrix_ids'];
     this.matrix_names = data['matrix_names'];
     this.cluster_medoids = data['cluster_medoids'];
-    this.names_crosswalk = _.object(this.matrix_ids, this.matrix_names);
-    this.selectable = data['matrix_names'];
+
+    this.name_to_id = new Object();
+    for(var i=0;i<this.matrix_names.length;i++){
+        this.name_to_id[this.matrix_names[i]]=this.matrix_ids[i];
+    }
+    //this.names_crosswalk = _.object(this.matrix_ids, this.matrix_names);
+    //this.selectable = data['matrix_names'];
 };
 IndividualOverview.prototype = {
     renderSelectList: function() {
+        var selectable = this.matrix_names;
+
+        function addOptions(el, option_array) {
+            var select = el.find('#select_list');
+
+            select.empty();
+
+            d3.select(select.get(0))
+                .selectAll('option')
+                .data(option_array)
+                .enter()
+                .append('option')
+                .text(function(d) {return d;})
+                .attr('value', function(d) {return d;});
+        }
+
         //var self = this;
-        console.log('renderSelectList called!!');
-        console.log(this.selectable);
+        //console.log('renderSelectList called!!');
+        //console.log(this.selectable);
 
         //Remove heatmap div if there; append heatmap div
         this.el.find('#select_list').remove();
@@ -44,6 +65,7 @@ IndividualOverview.prototype = {
         });
         */
 
+        /*
         var names_crosswalk = this.names_crosswalk;
 
         var sort_list = d3.select(select_list.get(0))
@@ -53,8 +75,44 @@ IndividualOverview.prototype = {
             .append('option')
             .text(function(d) {return d[1];})
             .attr('value', function(d) {return d[0];});
+        */
+        addOptions(this.el, selectable);
 
         select_list[0].selectedIndex = 0;
+
+        var matrix_names = this.matrix_names;
+        var selectable = this.selectable;
+        var el = this.el;
+
+        this.el.find('#search_field').remove();
+
+        var search_field = $('<input></input>')
+            .attr({
+                'type': 'text',
+                'id': 'search_field',
+                'placeholder': 'Filter data list',
+                'outerWidth': '30%',
+                'outerHeight': '15%'
+            }).css({
+                'position': 'absolute',
+                'left': '0%',
+                'top': '0%',
+                'overflow': 'scroll'
+            })
+
+            .on('input', function() {
+                value = this.value.toLowerCase();
+                if (value === '') {
+                    selectable = matrix_names;
+                } else {
+                    selectable = $.grep(matrix_names, function(n) {
+                        return (n.toLowerCase().includes(value));
+                    });
+                }
+                addOptions(el, selectable);
+            })
+
+            .appendTo(this.el);
     },
     addDisplayButtons: function() {
 
@@ -131,7 +189,10 @@ IndividualOverview.prototype = {
         var entry_length = 20;
 
         //var index = $('#' + self.parent_div + '> #select_list').find('option:selected').index();
-        var index = this.el.find('#select_list').find('option:selected').index();
+        //var select = this.el.find('#select_list');
+        //console.log(select.options[select.selectedIndex].value);
+        console.log(this.el.find('#select_list').find('option:selected').text());
+        var index = this.matrix_names.indexOf(this.el.find('#select_list').find('option:selected').text());
         //var index = 0;
 
         var margin = {top: 0, right: 20, bottom: 20, left: 20},
@@ -352,6 +413,6 @@ IndividualOverview.prototype = {
         this.renderSelectList();
         this.addDisplayButtons();
         this.displayCorrelations();
-        this.addInputText();
+        //this.addInputText();
     },
 };
