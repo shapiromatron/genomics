@@ -1,26 +1,38 @@
-var IndividualOverview = function(data, parent_div) {
-    var self = this;
-
-    self.dendrogram = data['dendrogram'];
-    self.cluster_members = data['cluster_members'];
-    self.cluster_display = data['max_abs_correlation_values'];
-    self.correlation_matrix = data['correlation_matrix'];
-    self.matrix_ids = data['matrix_ids'];
-    self.matrix_names = data['matrix_names'];
-    self.cluster_medoids = data['cluster_medoids'];
-
-    self.names_crosswalk = _.object(self.matrix_ids, self.matrix_names);
-
-    self.selectable = data['matrix_names'];
-
-    self.parent_div = parent_div;
+var IndividualOverview = function(el, data) {
+    this.el = el;
+    this.dendrogram = data['dendrogram'];
+    this.cluster_members = data['cluster_members'];
+    this.cluster_display = data['max_abs_correlation_values'];
+    this.correlation_matrix = data['correlation_matrix'];
+    this.matrix_ids = data['matrix_ids'];
+    this.matrix_names = data['matrix_names'];
+    this.cluster_medoids = data['cluster_medoids'];
+    this.names_crosswalk = _.object(this.matrix_ids, this.matrix_names);
+    this.selectable = data['matrix_names'];
 };
 IndividualOverview.prototype = {
     renderSelectList: function() {
-        var self = this;
+        //var self = this;
+        console.log('renderSelectList called!!');
+        console.log(this.selectable);
 
         //Remove heatmap div if there; append heatmap div
-        $('#' + self.parent_div + '> #select_list').remove();
+        this.el.find('#select_list').remove();
+
+        var select_list = $('<select id="select_list"></select>')
+            .attr({
+                'size': '12'
+            })
+            .css({
+                'height': '40%',
+                'weight': '30%',
+                'font-size': '8px',
+                'position': 'absolute',
+                'top': '20%'
+            })
+            .change(this.displayCorrelations.bind(this))
+            .appendTo(this.el);
+        /*
         $('#' + self.parent_div).append('<select id=\'select_list\'></select>');
 
         //Add attributes, style to div
@@ -30,31 +42,54 @@ IndividualOverview.prototype = {
         $('#' + self.parent_div + '> #select_list').css({
             'font-size': '8px', 'position': 'absolute', 'top': '20%'
         });
+        */
 
-        var sort_list = d3.select('#' + self.parent_div + '> #select_list')
+        var names_crosswalk = this.names_crosswalk;
+
+        var sort_list = d3.select(select_list.get(0))
             .selectAll('option')
-            .data(_.pairs(self.names_crosswalk))
+            .data(_.pairs(names_crosswalk))
             .enter()
             .append('option')
             .text(function(d) {return d[1];})
             .attr('value', function(d) {return d[0];});
 
-        $('#' + self.parent_div + '> #select_list').prop('selectedIndex', '0');
+        select_list[0].selectedIndex = 0;
     },
     addDisplayButtons: function() {
 
         // display new correlations whenver field changes
-        $('#' + this.parent_div + '> #select_list')
+        //$('#' + this.parent_div + '> #select_list')
+        /*
+        this.el.find('#select_list')
             .change(this.displayCorrelations.bind(this));
+        */
 
         //Remove heatmap div if there; append heatmap div
+        this.el.find('#display_heatmap').remove();
+
+        var display_heatmap = $('<button>Display individual heatmap</button>')
+            .attr({
+                'type': 'button',
+                'class': 'btn btn-primary'
+            }).css({
+                'position': 'absolute',
+                'left': '0%',
+                'top': '80%',
+                'width': '30%'
+            }).click(
+                this.displayIndividualHeatmap.bind(this)
+            ).appendTo(this.el);
+        /*
         $('#' + this.parent_div)
             .remove('#display_heatmap')
             .append(
                 '<button id=\'display_heatmap\' type=\'button\' class=\'btn btn-primary\'>Display individual heatmap</button>'
             );
+        */
 
         // on click display heatmap
+        /*
         $('#' + this.parent_div + '> #display_heatmap').css({
             position: 'absolute',
             left: '0%',
@@ -63,39 +98,73 @@ IndividualOverview.prototype = {
         }).click(
             this.displayIndividualHeatmap.bind(this)
         );
+        */
     },
     displayCorrelations: function() {
-        var self = this;
+        //var self = this;
 
         //Remove correlation_plot div if there; append correlation_plot div
-        $('#' + self.parent_div + '> #correlation_plot').remove();
-        $('#' + self.parent_div).append('<div id=\'correlation_plot\'></div>');
+        //$('#' + self.parent_div + '> #correlation_plot').remove();
+        this.el.find('#correlation_plot').remove();
+        var correlation_plot = $('<div id="correlation_plot"></div>')
+        .css({
+            'height': '100%',
+            'width': '68%',
+            'position': 'absolute',
+            'left': '32%',
+            'top': '0%',
+            'overflow': 'scroll'
+        }).appendTo(this.el);
+        //$('#' + self.parent_div).append('<div id=\'correlation_plot\'></div>');
 
         //Add attributes, style to div
+        /*
         $('#' + self.parent_div + '> #correlation_plot').height('100%');
         $('#' + self.parent_div + '> #correlation_plot').width('68%');
         $('#' + self.parent_div + '> #correlation_plot').css({
             'position': 'absolute', 'left': '32%', 'top': '0%', 'overflow': 'scroll'
         });
+        */
+        //$('#' + self.parent_div + '> #correlation_plot').append('<div id=\'graph\'></div>');
 
-        $('#' + self.parent_div + '> #correlation_plot').append('<div id=\'graph\'></div>');
-
-        var num = self.matrix_names.length - 1;
+        var num = this.matrix_names.length - 1;
         var entry_length = 20;
 
-        var index = $('#' + self.parent_div + '> #select_list').find('option:selected').index();
+        //var index = $('#' + self.parent_div + '> #select_list').find('option:selected').index();
+        var index = this.el.find('#select_list').find('option:selected').index();
+        //var index = 0;
 
         var margin = {top: 0, right: 20, bottom: 20, left: 20},
             offset = {top: 20, right: 20, bottom: 100, left: 40},
             width = num*entry_length - margin.left - margin.right,
-            height = $('#' + self.parent_div + '> #correlation_plot').height() - margin.top - margin.bottom;
+            //height = $('#' + self.parent_div + '> #correlation_plot').height() - margin.top - margin.bottom;
+            height = this.el.find('#correlation_plot').height() - margin.top - margin.bottom;
 
+        var graph = $('<div id="graph"></div>')
+            .css({
+                'height': height,
+                'width': width,
+                'position': 'absolute',
+                'left': '0%',
+                'top': margin.top
+            }).appendTo(this.el.find('#correlation_plot'));
+        /*
         $('#correlation_plot > #graph').height(height);
         $('#correlation_plot > #graph').width(width);
         $('#correlation_plot > #graph').css({
             'position': 'absolute', 'left': '0%', 'top': margin.top
         });
+        */
 
+        /*
+        var graph_tooltip = $('<div id=\'tooltip\'>test</div>')
+            .css({
+                'position': 'absolute',
+                'visibilty': 'hidden',
+                'z-index': '10'
+            }).appendTo(this.el);
+        */
+        /*
         $('#' + self.parent_div).append('<div id=\'tooltip\'>test</div>');
 
         $('#' + self.parent_div + '> #tooltip').css({
@@ -103,21 +172,27 @@ IndividualOverview.prototype = {
         });
 
         var graph_tooltip = d3.select('#' + self.parent_div + '> #tooltip');
-
+        */
         var sortable = [];
+        var correlation_matrix = this.correlation_matrix;
+        var matrix_names = this.matrix_names;
 
-        for (i = 0; i < self.correlation_matrix[index].length; i++) {
+        for (i = 0; i < correlation_matrix[index].length; i++) {
             if (i !== index) {
-                sortable.push([self.matrix_names[i], self.correlation_matrix[index][i]])
+                sortable.push([matrix_names[i], correlation_matrix[index][i]])
             }
         }
 
         sortable.sort(function(a, b) {return Math.abs(b[1]) - Math.abs(a[1])});
 
-        var y = d3.scale.linear().domain([-1,1]).range([height - offset.top - offset.bottom,0]);
-        var x = d3.scale.ordinal().domain(sortable.map(function(d) {return d[0];})).rangeBands([6,width - offset.left - offset.right]);
+        var y = d3.scale.linear()
+            .domain([-1,1])
+            .range([height - offset.top - offset.bottom,0]);
+        var x = d3.scale.ordinal()
+            .domain(sortable.map(function(d) {return d[0];}))
+            .rangeBands([6,width - offset.left - offset.right]);
 
-        var graph = d3.select('#correlation_plot > #graph').append('svg')
+        var graph = d3.select(this.el.find('#graph').get(0)).append('svg')
             .attr('width', width)
             .attr('height', height)
             .append('g');
@@ -132,8 +207,8 @@ IndividualOverview.prototype = {
             .orient('left')
             .ticks(5);
 
-        var matrix_names = self.matrix_names;
-        var div_offset = $('#' + self.parent_div + '> #correlation_plot').offset();
+        var div_offset = this.el.find('#correlation_plot').offset();
+        //var div_offset = $('#' + self.parent_div + '> #correlation_plot').offset();
 
         graph.append('g')
             .selectAll('rect')
@@ -203,8 +278,37 @@ IndividualOverview.prototype = {
             .style('stroke-dasharray', function (d) {if (d === 0) {return 'none';} else {return '5,5';}});
     },
     addInputText: function () {
-        var self = this;
 
+        var matrix_names = this.matrix_names;
+        var selectable = this.selectable;
+        renderSelectList = this.renderSelectList.bind(this);
+
+        this.el.find('#search_field').remove();
+
+        var search_field = $('<input></input>')
+            .attr({
+                'type': 'text',
+                'id': 'search_field',
+                'placeholder': 'Filter data list',
+                'outerWidth': '30%',
+                'outerHeight': '15%'
+            }).css({
+                'position': 'absolute',
+                'left': '0%',
+                'top': '0%',
+                'overflow': 'scroll'
+            }).on('input', function() {
+                value = this.value.toLowerCase();
+                if (value === '') {
+                    selectable = matrix_names;
+                } else {
+                    selectable = $.grep(matrix_names, function(n) {
+                        return (n.toLowerCase().includes(value));
+                    });
+                }
+                renderSelectList.call();
+            }).appendTo(this.el);
+        /*
         $('#' + self.parent_div + '> #search_field').remove();
         $('#' + self.parent_div).append('<input type=\'text\' id=\'search_field\'></input>');
 
@@ -214,6 +318,7 @@ IndividualOverview.prototype = {
         $('#' + self.parent_div + '> #search_field').css({
             'position': 'absolute', 'left': '0%', 'top': '0%', 'overflow': 'scroll'
         });
+
 
         $('#' + self.parent_div + '> #search_field').on("input", function() {
             value = this.value.toLowerCase();
@@ -226,6 +331,7 @@ IndividualOverview.prototype = {
             }
             self.renderSelectList();
         });
+        */
     },
     displayIndividualHeatmap: function () {
         var self = this;
