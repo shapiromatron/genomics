@@ -62,8 +62,8 @@ AnalysisOverview.prototype = {
                     .style('stroke-width', '1');
 
                 var clust_1 = (cluster_members[i].length === 1) ?
-                         cluster_members[i][0] :
-                         '(' + cluster_members[i].length + ') ' + cluster_medoids[i],
+                        cluster_members[i][0] :
+                        '(' + cluster_members[i].length + ') ' + cluster_medoids[i],
                     clust_2 = (cluster_members[j].length === 1) ?
                         cluster_members[j][0] :
                         '(' + cluster_members[j].length + ') ' + cluster_medoids[j],
