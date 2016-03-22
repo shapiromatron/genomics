@@ -398,7 +398,8 @@ IndividualOverview.prototype = {
     },
     displayIndividualHeatmap: function () {
         //var self = this;
-        var selected = this.matrix_names.indexOf(this.el.find('#select_list').find('option:selected').text());
+        var name = this.el.find('#select_list').find('option:selected').text();
+        var selected = this.matrix_names.indexOf(name);
         var index = this.matrix_ids[selected];
         console.log(selected);
         //var selected = $('#' + self.parent_div + '> #select_list option:selected').val();
@@ -408,6 +409,7 @@ IndividualOverview.prototype = {
                 var individual_heatmap = new IndividualHeatmap(
                     index,
                     matrix_names,
+                    name,
                     'ind_heatmap_modal_title',
                     'ind_heatmap_modal_body'
                 );
