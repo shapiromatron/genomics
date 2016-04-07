@@ -197,7 +197,7 @@ IndividualHeatmap.prototype = {
             .attr('height', height)
             .attr('width', width)
             .append('svg:g')
-            .attr('transform', 'translate(' + margins.left + ',' + margins.top + ',');
+            .attr('transform', 'translate(' + margins.left + ',' + margins.top + ')');
 
         var xAxis = d3.svg.axis().scale(x).ticks(4).tickSubdivide(true);
         graph.append('svg:g')
@@ -445,7 +445,6 @@ IndividualHeatmap.prototype = {
     },
     render: function() {
         this.modal_title.html(this.heatmap_name);
-
         var self = this;
         $.get(this.url(this.selected_value), function(data){
             var display_data = d3.tsv.parseRows(data);
