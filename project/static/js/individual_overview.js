@@ -399,8 +399,10 @@ IndividualOverview.prototype = {
     displayIndividualHeatmap: function () {
         //var self = this;
         var name = this.el.find('#select_list').find('option:selected').text(),
-            selected = this.matrix_names.indexOf(name),
-            matrix_id = this.matrix_ids[selected],
+            names = this.matrix_names,
+            ids = this.matrix_ids,
+            selected = names.indexOf(name),
+            matrix_id = ids[selected],
             modalTitle = $('#ind_heatmap_modal_title'),
             modalBody = $('#ind_heatmap_modal_body');
 
@@ -412,7 +414,8 @@ IndividualOverview.prototype = {
             .one('shown.bs.modal', function(){
                 var individual_heatmap = new IndividualHeatmap(
                     matrix_id,
-                    matrix_names,
+                    names,
+                    ids,
                     name,
                     modalTitle,
                     modalBody

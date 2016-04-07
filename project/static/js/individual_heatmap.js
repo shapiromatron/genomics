@@ -1,10 +1,13 @@
-var IndividualHeatmap = function(matrix_id, matrix_names, heatmap_name, modal_title, modal_body) {
+var IndividualHeatmap = function(matrix_id, matrix_names, matrix_ids, heatmap_name, modal_title, modal_body) {
     this.matrix_id = matrix_id;
     this.matrix_names = matrix_names;
+    this.matrix_ids = matrix_ids;
     this.heatmap_name = heatmap_name;
     this.modal_title = modal_title;
     this.modal_body = modal_body;
     this.selected_sort = null;
+
+    this.matrices = _.zip(this.matrix_ids, this.matrix_names);
 };
 IndividualHeatmap.prototype = {
     createResortOptions: function() {
@@ -38,11 +41,11 @@ IndividualHeatmap.prototype = {
 
         d3.select(select_list.get(0))
             .selectAll('option')
-            .data(this.matrix_names)
+            .data(this.matrices)
             .enter()
             .append('option')
-            .text(function(d) {return d;})
-            .attr('value', function(d) {return d;});
+            .text(function(d) {return d[1];})
+            .attr('value', function(d) {return d[0];});
 
         this.modal_body.find('#displayCorrelations').remove();
 
