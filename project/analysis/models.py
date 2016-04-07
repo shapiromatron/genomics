@@ -358,10 +358,19 @@ class Analysis(GenomicBinSettings):
     def get_sort_vector(self, id_):
         if not self.output:
             return False
-        # todo: get specific sort-vector instead of random
+
         output = self.output_json
-        idx = random.randint(0, len(output['sort_orders'])-1)
-        return output['sort_orders'][idx]
+
+        so_dict = {}
+        for so in output['sort_orders']:
+            so_dict[so['data_set_id']] = so
+
+        so = so_dict.get(id_)
+
+        if so is None:
+            raise ValueError('Invalid id')
+
+        return so
 
     def create_zip(self):
         """
