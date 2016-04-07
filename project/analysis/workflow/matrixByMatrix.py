@@ -35,7 +35,7 @@ class MatrixByMatrix():
             self.matrix_files,  = zip(*self.matrix_list)
 
     def createSortOrders(self):
-        self.sort_orders = []
+        self.sort_orders = {}
 
         for i, fn in enumerate(self.matrix_files):
             matrix_entries = dict()
@@ -48,15 +48,13 @@ class MatrixByMatrix():
                         "row_sum": sum(map(float, line.strip().split()[1:]))
                     }
 
-            self.sort_orders.append({
-                "data_set_id": self.matrix_ids[i],
-                "data_set": self.matrix_names[i],
-                "sort_order": sorted(
-                    matrix_entries,
-                    key=lambda x: (matrix_entries[x]["row_sum"]),
-                    reverse=True
-                )
-            })
+            order = sorted(
+                matrix_entries,
+                key=lambda x: (matrix_entries[x]["row_sum"]),
+                reverse=True
+            )
+
+            self.sort_orders[self.matrix_ids[i]] = order
 
     def createVectorList(self):
         vector_list = []

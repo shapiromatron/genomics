@@ -361,12 +361,7 @@ class Analysis(GenomicBinSettings):
 
         output = self.output_json
 
-        so_dict = {}
-        for so in output['sort_orders']:
-            so_dict[so['data_set_id']] = so
-
-        so = so_dict.get(id_)
-
+        so = output['sort_orders'].get(id_)
         if so is None:
             raise ValueError('Invalid id')
 
