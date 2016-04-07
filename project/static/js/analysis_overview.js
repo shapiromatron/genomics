@@ -62,8 +62,8 @@ AnalysisOverview.prototype = {
                     .style('stroke-width', '1');
 
                 var clust_1 = (cluster_members[i].length === 1) ?
-                         cluster_members[i][0] :
-                         '(' + cluster_members[i].length + ') ' + cluster_medoids[i],
+                        cluster_members[i][0] :
+                        '(' + cluster_members[i].length + ') ' + cluster_medoids[i],
                     clust_2 = (cluster_members[j].length === 1) ?
                         cluster_members[j][0] :
                         '(' + cluster_members[j].length + ') ' + cluster_medoids[j],
@@ -103,7 +103,8 @@ AnalysisOverview.prototype = {
         var height = vert.height(),
             width = vert.width(),
             row_number = this.cluster_members.length,
-            cluster_medoids = this.cluster_medoids;
+            cluster_medoids = this.cluster_medoids,
+            matrix_names = this.matrix_names;
 
         var svg = d3.select(vert.get(0))
             .append('svg')
@@ -119,7 +120,7 @@ AnalysisOverview.prototype = {
             .text(function(d,i) {
                 return (d.length > 1) ?
                     '(' + d.length + ') ' + cluster_medoids[i]:
-                    d[0];
+                    matrix_names[i];
             })
             .attr('x', function(d,i) {
                 return (((0.5 / row_number) * width) + i * (width / row_number));
@@ -148,7 +149,8 @@ AnalysisOverview.prototype = {
         var height = row_names.height(),
             width = row_names.width(),
             row_number = this.cluster_members.length,
-            cluster_medoids = this.cluster_medoids;
+            cluster_medoids = this.cluster_medoids
+            matrix_names = this.matrix_names;
 
         var svg = d3.select(row_names.get(0))
             .append('svg')
@@ -164,7 +166,7 @@ AnalysisOverview.prototype = {
             .text(function(d,i) {
                 return (d.length > 1)?
                     '(' + d.length + ') ' + cluster_medoids[i]:
-                    d[0];
+                    matrix_names[i];
             })
             .attr('x', 0)
             .attr('y', function(d, i) {

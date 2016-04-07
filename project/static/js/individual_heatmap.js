@@ -1,12 +1,15 @@
-var IndividualHeatmap = function(selected_value, matrix_names, modal_title, modal_body) {
+var IndividualHeatmap = function(selected_value, matrix_names, heatmap_name, modal_title, modal_body) {
     this.selected_value = selected_value;
     this.matrix_names = matrix_names;
+    this.heatmap_name = heatmap_name;
     this.modal_title = modal_title;
     this.modal_body = modal_body;
     this.selected_sort = null;
 };
 IndividualHeatmap.prototype = {
     addButtons: function() {
+        var modal_body = $('#' + this.modal_body);
+        /*
         var self = this;
 
         $('#' + self.modal_body + '> #display_correlations').remove();
@@ -16,12 +19,53 @@ IndividualHeatmap.prototype = {
         $('#' + self.modal_body + '> #display_correlations').css({
             'position': 'absolute', 'left': '5%', 'top': '84%', 'width': '20%'
         });
+        */
+        modal_body.find('#display_correlations').remove();
+        var reorder_button = $('<button>Reorder heatmap</button>')
+            .attr({
+                'id': 'displayCorrelations',
+                'class': 'btn btn-primary'
+            })
+            .css({
+                'width': '20%',
+                'position': 'absolute',
+                'top': '84%',
+                'left': '5%'
+            })
+            .appendTo(modal_body);
     },
     createSelect: function() {
-        var self = this;
+        //var self = this;
+        var modal_body = $('#' + this.modal_body);
 
         //Remove heatmap div if there; append heatmap div
-        $('#' + self.modal_body + '> #select_list').remove();
+        modal_body.find('#select_list').remove();
+        //$('#' + self.modal_body + '> #select_list').remove();
+
+        var select_list = $('<select></select>')
+            .attr({
+                'size': '12'
+            })
+            .css({
+                'height': '15%',
+                'width': '33.5%',
+                'font-size': '8px',
+                'position': 'absolute',
+                'top': '68%',
+                'left': '5%'
+            })
+            .appendTo(modal_body);
+
+        select_list.append('<option>Feature list order</option>')
+
+        d3.select(select_list.get(0))
+            .selectAll('option')
+            .data(this.matrix_names)
+            .enter()
+            .append('option')
+            .text(function(d) {return d;})
+            .attr('value', function(d) {return d;});
+        /*
         $('#' + self.modal_body).append('<select id=\'select_list\'></select>');
 
         //Add attributes, style to div
@@ -43,20 +87,49 @@ IndividualHeatmap.prototype = {
             .attr('value', function(d) {return d;});
 
         $('#' + self.modal_body + '> #select_list').prop('selectedIndex', '0');
+        */
     },
     url: function(id) {
         return "/dashboard/api/feature-list-count-matrix/" + id + "/plot/";
     },
     drawQuartiles: function(display_data) {
-        var self = this;
+        //var self = this;
+        var modal_body = $('#' + this.modal_body);
 
-        $('#' + self.modal_body + '> #quartile_plot').remove();
+        //$('#' + self.modal_body + '> #quartile_plot').remove();
+        modal_body.find('#quartile_plot').remove();
+
+        var quartile_plot = $('<div id="quartile_plot"></div>')
+            .css({
+                'position': 'absolute',
+                'left': '0%',
+                'top': '35%',
+                'height': '25%',
+                'width': '40%'
+            })
+            .appendTo(modal_body);
+        /*
         $('#' + self.modal_body).append('<div id=\'quartile_plot\'></div>');
 
         $('#' + self.modal_body + '> #quartile_plot').css({
             'position': 'absolute', 'left': '0%', 'top': '35%', 'height': '25%', 'width': '40%'
         });
+        */
 
+        modal_body.find('#quartile_label').remove();
+
+        var quartile_label = $('<div id="quartile_label"></div>')
+            .css({
+                'position': 'absolute',
+                'left': '5%',
+                'top': '33%',
+                'height': '2%',
+                'width': '30%'
+            })
+            .appendTo(modal_body);
+
+        quartile_label.append('<p>Quartiles, bin averages:</p>');
+        /*
         $('#' + self.modal_body + '> #quartile_label').remove();
         $('#' + self.modal_body).append('<div id=\'quartile_label\'></div>');
 
@@ -64,19 +137,32 @@ IndividualHeatmap.prototype = {
             'position': 'absolute', 'left': '5%', 'top': '33%', 'height': '2%', 'width': '30%'
         });
         $('#' + self.modal_body + '> #quartile_label').append('<p>Quartiles, bin averages:</p>');
+        */
+        modal_body.find('#quartile_legend').remove();
 
+        var quartile_legend = $('<div id="quartile_legend"></div>')
+            .css({
+                'position': 'absolute',
+                'left': '10%',
+                'top': '60%',
+                'height': '5%',
+                'width': '30%'
+            })
+            .appendTo(modal_body);
+        /*
         $('#' + self.modal_body + '> #quartile_legend').remove();
         $('#' + self.modal_body).append('<div id=\'quartile_legend\'></div>');
 
         $('#' + self.modal_body + '> #quartile_legend').css({
             'position': 'absolute', 'left': '10%', 'top': '60%', 'height': '5%', 'width': '30%'
         });
+        */
 
-        var height = $('#' + self.modal_body + '> #quartile_plot').height();
-        var width = $('#' + self.modal_body + '> #quartile_plot').width();
+        var height = quartile_plot.height();
+        var width = quartile_plot.width();
 
-        var legend_height = $('#' + self.modal_body + '> #quartile_legend').height();
-        var legend_width = $('#' + self.modal_body + '> #quartile_legend').width();
+        var legend_height = quartile_legend.height();
+        var legend_width = quartile_legend.width();
 
         var margins = {
             "top": 0.1 * height,
@@ -87,7 +173,7 @@ IndividualHeatmap.prototype = {
 
         var colors = ['red', 'orange', 'blue', 'black'];
 
-        var legend = d3.select('#' + self.modal_body + '> #quartile_legend')
+        var legend = d3.select(quartile_legend.get(0))
             .append("svg")
             .attr("height", legend_height)
             .attr("width", legend_width)
@@ -163,7 +249,8 @@ IndividualHeatmap.prototype = {
             .x(function(d) { return x(d[0]);})
             .y(function(d) { return y(d[1]);});
 
-        var graph = d3.select("#quartile_plot").append("svg:svg")
+        var graph = d3.select(quartile_plot.get(0))
+            .append("svg:svg")
             .attr("height", height)
             .attr("width", width)
             .append("svg:g")
@@ -191,8 +278,23 @@ IndividualHeatmap.prototype = {
         }
     },
     drawMetaPlot: function(display_data) {
-        var self = this;
+        var modal_body = $('#' + this.modal_body);
+        //var self = this;
 
+        modal_body.find('#metaplot_label').remove();
+
+        var metaplot_label = $('<div id="metaplot_label"></div>')
+            .css({
+                'position': 'absolute',
+                'left': '5%',
+                'top': '3%',
+                'height': '2%',
+                'width': '40%'
+            })
+            .appendTo(modal_body);
+
+        metaplot_label.append('<p>Bin averages:</p>');
+        /*
         $('#' + self.modal_body + '> #metaplot_label').remove();
         $('#' + self.modal_body).append('<div id=\'metaplot_label\'></div>');
 
@@ -201,16 +303,31 @@ IndividualHeatmap.prototype = {
         });
 
         $('#' + self.modal_body + '> #metaplot_label').append('<p>Bin averages:</p>');
+        */
 
+        modal_body.find('#metaplot').remove();
+
+        var metaplot = $('<div id="metaplot"></div>')
+            .css({
+                'position': 'absolute',
+                'left': '0%',
+                'top': '5%',
+                'height': '25%',
+                'width': '40%'
+            })
+            .appendTo(modal_body);
+
+        /*
         $('#' + self.modal_body + '> #metaplot').remove();
         $('#' + self.modal_body).append('<div id=\'metaplot\'></div>');
 
         $('#' + self.modal_body + '> #metaplot').css({
             'position': 'absolute', 'left': '0%', 'top': '5%', 'height': '25%', 'width': '40%'
         });
+        */
 
-        var height = $('#' + self.modal_body + '> #metaplot').height();
-        var width = $('#' + self.modal_body + '> #metaplot').width();
+        var height = metaplot.height();
+        var width = metaplot.width();
 
         var margins = {
             "top": 0.1 * height,
@@ -229,25 +346,25 @@ IndividualHeatmap.prototype = {
             window_values.push((val_1 + val_2)/2);
         }
 
-        var metaplot = new Array(display_data[1].length-1).fill(0);
+        var metaplot_data = new Array(display_data[1].length-1).fill(0);
 
         for (var i = 1; i < display_data.length; i++) {
             for (var j = 1; j < display_data[i].length; j++) {
-                metaplot[j-1] = metaplot[j-1] + parseFloat(display_data[i][j]);
+                metaplot_data[j-1] = metaplot_data[j-1] + parseFloat(display_data[i][j]);
             }
         }
 
-        metaplot = metaplot.map(function(obj) {
+        metaplot_data = metaplot_data.map(function(obj) {
             return (obj/row_number);
         });
 
         var scatter = [];
-        for (var i = 0; i < metaplot.length; i++) {
-            scatter.push([window_values[i], metaplot[i]]);
+        for (var i = 0; i < metaplot_data.length; i++) {
+            scatter.push([window_values[i], metaplot_data[i]]);
         }
 
         var y = d3.scale.linear()
-            .domain([0, d3.max(metaplot)])
+            .domain([0, d3.max(metaplot_data)])
             .range([(height - margins.top - margins.bottom), 0]);
         var x = d3.scale.linear()
             .domain([display_data[0][1].split(":")[0], display_data[0][display_data[0].length-1].split(":")[1]])
@@ -257,7 +374,8 @@ IndividualHeatmap.prototype = {
             .x(function(d) { return x(d[0]);})
             .y(function(d) { return y(d[1]);});
 
-        var graph = d3.select("#metaplot").append("svg:svg")
+        var graph = d3.select(metaplot.get(0))
+            .append("svg:svg")
             .attr("height", height)
             .attr("width", width)
             .append("svg:g")
@@ -277,8 +395,21 @@ IndividualHeatmap.prototype = {
         graph.append("svg:path").attr("d", line(scatter));
     },
     drawHeatmapHeader: function(display_data) {
-        var self = this;
+        var modal_body = $('#' + this.modal_body);
+        //var self = this;
 
+        modal_body.find('#heatmap_header').remove();
+
+        var heatmap_header = $('<div id=\'heatmap_header\'></div>')
+            .css({
+                'height': 0.10 * modal_body.height(),
+                'width': 0.55 * modal_body.width(),
+                'position': 'absolute',
+                'left': '40%',
+                'top': '0%'
+            })
+            .appendTo(modal_body);
+        /*
         $('#' + self.modal_body + '> #heatmap_header').remove();
         $('#' + self.modal_body).append('<div id=\'heatmap_header\'></div>');
 
@@ -287,16 +418,17 @@ IndividualHeatmap.prototype = {
         $('#' + self.modal_body + '> #heatmap_header').css({
             'position': 'absolute', 'left': '40%', 'top': '0%'
         });
+        */
 
-        var height = $('#' + self.modal_body + '> #heatmap_header').height();
-        var width = $('#' + self.modal_body + '> #heatmap_header').width();
+        var height = heatmap_header.height();
+        var width = heatmap_header.width();
 
         var range_start = parseInt(display_data[0][1].split(":")[0]);
         var range_end = parseInt(display_data[0][display_data[0].length-1].split(":")[1]);
 
         var zero_position = width/(range_end-range_start)*(0-range_start);
 
-        var svg = d3.select('#' + self.modal_body + "> #heatmap_header")
+        var svg = d3.select(heatmap_header.get(0))
             .append("svg")
             .attr("height", height)
             .attr("width", width)
@@ -342,6 +474,26 @@ IndividualHeatmap.prototype = {
             .style("text-anchor", "middle");
     },
     drawHeatmap: function(display_data) {
+        var modal_body = $('#' + this.modal_body);
+
+        modal_body.find('#heatmap_canvas').remove();
+
+        var heatmap_canvas = $('<canvas id="heatmap_canvas"></canvas>')
+            .prop({
+                'height': 0.85 * modal_body.height(),
+                'width': 0.55 * modal_body.width()
+            })
+            .css({
+                'position': 'absolute',
+                'left': '40%',
+                'top': '10%'
+            })
+            .appendTo(modal_body);
+
+        //heatmap_canvas.height(0.85 * modal_body.height());
+        //heatmap_canvas.width(0.55 * modal_body.width());
+
+        /*
         $('#' + this.modal_body + '> #heatmap_canvas').remove();
         $('#' + this.modal_body).append('<canvas id=\'heatmap_canvas\'></canvas>');
 
@@ -350,6 +502,7 @@ IndividualHeatmap.prototype = {
         $('#' + this.modal_body + '> #heatmap_canvas').css({
             'position': 'absolute', 'left': '40%', 'top': '10%'
         });
+        */
 
         // Get all but first row; remove first column
         var display_data = display_data.slice(1);
@@ -360,8 +513,8 @@ IndividualHeatmap.prototype = {
         var row_number = display_data.length;
         var col_number = display_data[0].length;
 
-        var height = $('#' + this.modal_body + '> #heatmap_canvas').height();
-        var width = $('#' + this.modal_body + '> #heatmap_canvas').width();
+        var height = heatmap_canvas.height();
+        var width = heatmap_canvas.width();
 
         var context = document.getElementById('heatmap_canvas').getContext('2d');
 
@@ -389,10 +542,9 @@ IndividualHeatmap.prototype = {
         }
     },
     render: function() {
+        $('#' + this.modal_title).html(this.heatmap_name);
+
         var self = this;
-
-        $('#' + self.modal_title).html(self.matrix_names[self.selected_value]);
-
         $.get(this.url(this.selected_value), function(data){
             var display_data = d3.tsv.parseRows(data);
             self.drawHeatmapHeader(display_data);
