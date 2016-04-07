@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+
+{% block crumbs %}
+<div class="row">
+    <ol class="breadcrumb">
+        <li><a href="{% url 'analysis:dashboard2' %}">Home</a></li>
+        {% block crumbs_inner %}{% endblock crumbs_inner %}
+    </ol>
+</div>
+{% endblock crumbs %}
+
+
+{% block mid_content %}
+<div class="row">
+
+    <div class="col-sm-10">
+        <h2>Completed analysis</h2>
+        <p>todo add list</p>
+
+        <h2>Analyses currently running</h2>
+        <p>todo add list</p>
+    </div>
+
+    <div class="col-sm-2">
+        <ul class="pull-right nav nav-pills nav-stacked">
+            <li><a class='pill' href='{% url 'analysis:manage_data' %}'>Manage data</a></li>
+            <li><a class='pill' href='#'>Proceed to run setup</a></li>
+        </ul>
+    </div>
+
+</div>
+{% endblock mid_content %}

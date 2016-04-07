@@ -1,0 +1,15 @@
+{% extends "analysis/dashboard2.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Create feature list{% endblock %}
+
+{% block crumbs_inner %}
+    <li><a href="{% url 'analysis:manage_data' %}">Data management</a></li>
+    <li class='active'>Create feature list</li>
+{% endblock crumbs_inner %}
+
+
+{% block mid_content %}
+    {% crispy form %}
+{% endblock %}

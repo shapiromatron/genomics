@@ -3,10 +3,10 @@ from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import HttpResponse
 from django.core.exceptions import PermissionDenied
-from django.views.generic import TemplateView, UpdateView, DetailView
+from django.views.generic import TemplateView, CreateView, UpdateView, DetailView, DeleteView
 
-from utils.views import OwnerOrStaff
-from . import models, tasks
+from utils.views import OwnerOrStaff, AddUserToFormMixin
+from . import models, forms, tasks
 
 
 class Home(TemplateView):
@@ -65,3 +65,72 @@ class CeleryTester(Home):
     def get(self, request, *args, **kwargs):
         tasks.debug_task.delay()
         return super().get(request, *args, **kwargs)
+
+
+# Dashboard crud views
+class Dashboard2(LoginRequiredMixin, TemplateView):
+    template_name = 'analysis/dashboard2.html'
+
+
+class ManageData(LoginRequiredMixin, TemplateView):
+    template_name = 'analysis/manage_data.html'
+
+
+# User dataset
+class UserDatasetCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
+    model = models.UserDataset
+    form_class = forms.UserDatasetForm
+
+
+class UserDatasetUpdate(OwnerOrStaff, UpdateView):
+    model = models.UserDataset
+    form_class = forms.UserDatasetForm
+
+
+class UserDatasetDelete(OwnerOrStaff, DeleteView):
+    model = models.UserDataset
+
+
+# Feature list
+class FeatureListCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
+    model = models.FeatureList
+    form_class = forms.FeatureListForm
+
+
+class FeatureListUpdate(OwnerOrStaff, UpdateView):
+    model = models.FeatureList
+    form_class = forms.FeatureListForm
+
+
+class FeatureListDelete(OwnerOrStaff, DeleteView):
+    model = models.FeatureList
+
+
+# Sort vector
+class SortVectorCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
+    model = models.SortVector
+    form_class = forms.SortVectorForm
+
+
+class SortVectorUpdate(OwnerOrStaff, UpdateView):
+    model = models.SortVector
+    form_class = forms.SortVectorForm
+
+
+class SortVectorDelete(OwnerOrStaff, DeleteView):
+    model = models.SortVector
+
+
+# Analysis
+class AnalysisCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
+    model = models.Analysis
+    form_class = forms.AnalysisForm
+
+
+class AnalysisUpdate(OwnerOrStaff, UpdateView):
+    model = models.Analysis
+    form_class = forms.AnalysisForm
+
+
+class AnalysisDelete(OwnerOrStaff, DeleteView):
+    model = models.Analysis

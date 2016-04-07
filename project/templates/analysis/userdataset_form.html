@@ -1,0 +1,15 @@
+{% extends "analysis/dashboard2.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Create user dataset{% endblock %}
+
+{% block crumbs_inner %}
+    <li><a href="{% url 'analysis:manage_data' %}">Data management</a></li>
+    <li class='active'>Create user dataset</li>
+{% endblock crumbs_inner %}
+
+
+{% block mid_content %}
+    {% crispy form %}
+{% endblock %}

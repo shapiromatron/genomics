@@ -1,0 +1,36 @@
+{% extends "analysis/dashboard2.html" %}
+
+{% block title %}Manage data{% endblock %}
+
+{% block crumbs_inner %}
+    <li class='active'>Data management</li>
+{% endblock crumbs_inner %}
+
+
+{% block mid_content %}
+<h1>Data management</h1>
+<div class="row">
+    <div class="col-sm-6">
+        <h2>Feature lists
+            <a href="{% url 'analysis:feature_list_create' %}"
+               class='btn btn-primary pull-right'>Create new</a>
+        </h2>
+        <p>todo add list</p>
+
+        <h2>Sort vectors
+            <a href="{% url 'analysis:sort_vector_create' %}"
+               class='btn btn-primary pull-right'>Create new</a>
+        </h2>
+        <p>todo add list</p>
+    </div>
+
+    <div class="col-sm-6">
+        <h2>User datasets
+            <a href="{% url 'analysis:user_dataset_create' %}"
+               class='btn btn-primary pull-right'>Create new</a>
+        </h2>
+        <p>todo add list</p>
+    </div>
+
+</div>
+{% endblock mid_content %}

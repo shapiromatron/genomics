@@ -29,6 +29,26 @@ urlpatterns = [
         views.Execute.as_view(),
         name='execute'),
 
+    url(r'^v2/$',
+        views.Dashboard2.as_view(),
+        name='dashboard2'),
+
+    url(r'^manage-data/$',
+        views.ManageData.as_view(),
+        name='manage_data'),
+
+    url(r'^create-user-dataset/$',
+        views.UserDatasetCreate.as_view(),
+        name='user_dataset_create'),
+
+    url(r'^create-feature-list/$',
+        views.FeatureListCreate.as_view(),
+        name='feature_list_create'),
+
+    url(r'^create-sort-vector/$',
+        views.SortVectorCreate.as_view(),
+        name='sort_vector_create'),
+
     url(r'^',
         views.Dashboard.as_view(),
         name='dashboard'),

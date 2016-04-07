@@ -54,6 +54,12 @@ class Dataset(models.Model):
     def __str__(self):
         return self.name
 
+    def get_form_cancel_url(self):
+        if self.id:
+            return self.get_absolute_url()
+        else:
+            return reverse('analysis:manage_data')
+
 
 HG19 = 1
 MM9 = 2
@@ -268,6 +274,12 @@ class Analysis(GenomicBinSettings):
 
     def get_visuals_url(self):
         return reverse('analysis:visual_testing', args=[self.pk, ])
+
+    def get_form_cancel_url(self):
+        if self.id:
+            return self.get_absolute_url()
+        else:
+            return reverse('analysis:manage_data')
 
     @property
     def user_datasets(self):
