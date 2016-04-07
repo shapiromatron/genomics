@@ -32,17 +32,9 @@
 <script type="text/javascript" src="{{STATIC_URL}}/js/analysis_overview.js"></script>
 <script>
     $(document).ready(function(){
-
-        var urls = {
-            summaryPlot: function(){
-                return "{% url 'analysis:api:analysis-plot' object.id %}";
-            },
-            sortVector: function(){
-                return "{% url 'analysis:api:analysis-sort-vector' object.id %}";
-            },
-        };
-
-        $.get(urls.summaryPlot(), function(data){
+        window.sortVectorRoot = '{% url 'analysis:api:analysis-sort-vector' object.id %}';
+        window.plotURL = '{% url 'analysis:api:analysis-plot' object.id %}';
+        $.get(window.plotURL, function(data){
             var overview = new AnalysisOverview($('#visual_panel_1'), data),
                 individual_overview = new IndividualOverview($('#visual_panel_2'), data);
             overview.render();

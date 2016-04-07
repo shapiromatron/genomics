@@ -1,5 +1,5 @@
-var IndividualHeatmap = function(matrix_id, matrix_names, matrix_ids, heatmap_name, modal_title, modal_body) {
-    this.matrix_id = matrix_id;
+var IndividualHeatmap = function(id, matrix_names, matrix_ids, heatmap_name, modal_title, modal_body) {
+    this.id = id;
     this.matrix_names = matrix_names;
     this.matrix_ids = matrix_ids;
     this.heatmap_name = heatmap_name;
@@ -10,8 +10,19 @@ var IndividualHeatmap = function(matrix_id, matrix_names, matrix_ids, heatmap_na
     this.matrices = _.zip(this.matrix_ids, this.matrix_names);
 };
 IndividualHeatmap.prototype = {
+    url: function(id) {
+        return '/dashboard/api/feature-list-count-matrix/' + id + '/plot/';
+    },
+    sortVectorUrl: function(id, vector_id){
+        return window.sortVectorRoot +'?id=' + vector_id;
+    },
+    getSortVector: function(vector_id){
+        $.get(this.sortVectorUrl(this.id, vector_id), function(d){
+            console.log(d);
+        });
+    },
     createResortOptions: function() {
-
+        var self = this;
         //Remove heatmap div if there; append heatmap div
         this.modal_body.find('#select_list').remove();
 
@@ -63,11 +74,9 @@ IndividualHeatmap.prototype = {
             })
             .appendTo(this.modal_body)
             .click(function(){
-                console.log(select_list.val());
+                var vector_id = select_list.val();
+                self.getSortVector(vector_id);
             });
-    },
-    url: function(id) {
-        return '/dashboard/api/feature-list-count-matrix/' + id + '/plot/';
     },
     drawQuartiles: function(display_data) {
 
@@ -449,7 +458,7 @@ IndividualHeatmap.prototype = {
     render: function() {
         this.modal_title.html(this.heatmap_name);
         var self = this;
-        $.get(this.url(this.matrix_id), function(data){
+        $.get(this.url(this.id), function(data){
             var display_data = d3.tsv.parseRows(data);
             self.drawHeatmapHeader(display_data);
             self.drawHeatmap(display_data);
