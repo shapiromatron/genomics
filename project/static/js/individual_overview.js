@@ -398,13 +398,10 @@ IndividualOverview.prototype = {
     },
     displayIndividualHeatmap: function () {
         //var self = this;
-        var name = this.el.find('#select_list').find('option:selected').text();
-        var selected = this.matrix_names.indexOf(name);
-        var index = this.matrix_ids[selected];
-        console.log(selected);
-        //var selected = $('#' + self.parent_div + '> #select_list option:selected').val();
-        //var matrix_names = this.matrix_names;
-        var modalTitle = $('#ind_heatmap_modal_title'),
+        var name = this.el.find('#select_list').find('option:selected').text(),
+            selected = this.matrix_names.indexOf(name),
+            matrix_id = this.matrix_ids[selected],
+            modalTitle = $('#ind_heatmap_modal_title'),
             modalBody = $('#ind_heatmap_modal_body');
 
         $('#flcModal')
@@ -414,7 +411,7 @@ IndividualOverview.prototype = {
             })
             .one('shown.bs.modal', function(){
                 var individual_heatmap = new IndividualHeatmap(
-                    index,
+                    matrix_id,
                     matrix_names,
                     name,
                     modalTitle,

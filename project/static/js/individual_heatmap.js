@@ -1,5 +1,5 @@
-var IndividualHeatmap = function(selected_value, matrix_names, heatmap_name, modal_title, modal_body) {
-    this.selected_value = selected_value;
+var IndividualHeatmap = function(matrix_id, matrix_names, heatmap_name, modal_title, modal_body) {
+    this.matrix_id = matrix_id;
     this.matrix_names = matrix_names;
     this.heatmap_name = heatmap_name;
     this.modal_title = modal_title;
@@ -446,7 +446,7 @@ IndividualHeatmap.prototype = {
     render: function() {
         this.modal_title.html(this.heatmap_name);
         var self = this;
-        $.get(this.url(this.selected_value), function(data){
+        $.get(this.url(this.matrix_id), function(data){
             var display_data = d3.tsv.parseRows(data);
             self.drawHeatmapHeader(display_data);
             self.drawHeatmap(display_data);
