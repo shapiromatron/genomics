@@ -404,14 +404,21 @@ IndividualOverview.prototype = {
         console.log(selected);
         //var selected = $('#' + self.parent_div + '> #select_list option:selected').val();
         //var matrix_names = this.matrix_names;
+        var modalTitle = $('#ind_heatmap_modal_title'),
+            modalBody = $('#ind_heatmap_modal_body');
+
         $('#flcModal')
+            .one('show.bs.modal', function(){
+                modalTitle.html('');
+                modalBody.html('');
+            })
             .one('shown.bs.modal', function(){
                 var individual_heatmap = new IndividualHeatmap(
                     index,
                     matrix_names,
                     name,
-                    'ind_heatmap_modal_title',
-                    'ind_heatmap_modal_body'
+                    modalTitle,
+                    modalBody
                 );
                 individual_heatmap.render();
             }).modal('show');

@@ -2,8 +2,8 @@ var IndividualHeatmap = function(selected_value, matrix_names, heatmap_name, mod
     this.selected_value = selected_value;
     this.matrix_names = matrix_names;
     this.heatmap_name = heatmap_name;
-    this.modal_title = $('#' + modal_title).html('');
-    this.modal_body = $('#' + modal_body).html('');
+    this.modal_title = modal_title;
+    this.modal_body = modal_body;
     this.selected_sort = null;
 };
 IndividualHeatmap.prototype = {
