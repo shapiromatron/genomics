@@ -55,6 +55,10 @@
         {% endblock content-outer %}
     </div>
 
+    {% block footer %}
+        {% include "includes/footer.html" %}
+    {% endblock footer %}
+
     {% block js %}
         {% if not debug %}
             <script charset="utf-8"
