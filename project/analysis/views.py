@@ -1,9 +1,8 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import HttpResponse
 from django.core.exceptions import PermissionDenied
-from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, UpdateView, DetailView
 
 from utils.views import OwnerOrStaff
@@ -19,12 +18,8 @@ class Home(TemplateView):
         return super(Home, self).get(request, *args, **kwargs)
 
 
-class Dashboard(TemplateView):
+class Dashboard(LoginRequiredMixin, TemplateView):
     template_name = 'analysis/dashboard.html'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
 
 class AnalysisReadOnlyMixin(object):
