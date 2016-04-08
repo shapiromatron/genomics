@@ -7,19 +7,24 @@ class BaseFormHelper(cf.FormHelper):
 
     error_text_inline = True
 
-    def __init__(self, form, **kwargs):
+    def __init__(self, form, horizontal=True, **kwargs):
         self.attrs = {}
         self.inputs = []
         self.kwargs = kwargs
 
         # horizontal boostrap form
-        self.form_class = 'form-horizontal'
-        self.label_class = 'col-lg-2'
-        self.field_class = 'col-lg-8'
+        if horizontal:
+            self.form_class = 'form-horizontal'
+            self.label_class = 'col-lg-2'
+            self.field_class = 'col-lg-8'
 
         self.form = form
         self.layout = self.build_default_layout()
-        self.addButtons()
+
+        buttons = self.kwargs.get('buttons')
+        if buttons is None:
+            buttons = self.get_buttons()
+        self.layout.append(buttons)
 
     def build_default_layout(self):
         layout = cfl.Layout(*self.form.fields.keys())
@@ -34,7 +39,7 @@ class BaseFormHelper(cf.FormHelper):
 
         return layout
 
-    def addButtons(self):
+    def get_buttons(self):
         btns = []
 
         # save button
@@ -44,4 +49,4 @@ class BaseFormHelper(cf.FormHelper):
         url = self.form.instance.get_form_cancel_url()
         btns.append(cfl.HTML('<a role="button" class="btn btn-default" href="{}">Cancel</a>'.format(url)))
 
-        self.layout.append(cfb.FormActions(*btns, css_class="form-actions"))
+        return cfb.FormActions(*btns, css_class="form-actions")

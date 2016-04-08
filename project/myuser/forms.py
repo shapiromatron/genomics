@@ -40,21 +40,19 @@ class RegistrationForm(forms.ModelForm):
         self.helper = self.setHelper()
 
     def setHelper(self):
-        inputs = {
-            'legend_text': 'Create an account'
-        }
-
-        helper = BaseFormHelper(self, **inputs)
-        helper.form_class = 'loginForm'
-
-        helper.layout.append(
-            cfb.FormActions(
-                cfl.Submit('login', 'Create account'),
-                cfl.HTML(
-                    '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
-                    .format(reverse('user:login'))),
-            )
+        buttons = cfb.FormActions(
+            cfl.Submit('login', 'Create account'),
+            cfl.HTML(
+                '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
+                .format(reverse('user:login'))),
         )
+
+        helper = BaseFormHelper(
+            self,
+            horizontal=False,
+            legend_text='Create an account',
+            buttons=buttons)
+        helper.form_class = 'loginForm'
 
         return helper
 
@@ -91,29 +89,25 @@ class LoginForm(AuthenticationForm):
         self.helper = self.setHelper()
 
     def setHelper(self):
-
-        inputs = {
-            'legend_text': 'Login',
-        }
-
-        helper = BaseFormHelper(self, **inputs)
-
-        helper.layout.append(
-            cfb.FormActions(
-                cfl.Submit('login', 'Login'),
-                cfl.HTML(
-                    '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
-                    .format(reverse('home'))),
-                cfl.HTML('<br><br>'),
-                cfl.HTML(
-                    '<a href="{0}">Forgot your password?</a><br>'
-                    .format(reverse('user:password_reset'))),
-                cfl.HTML(
-                    '<a href="{0}">Create an account</a><br>'
-                    .format(reverse('user:register'))),
-            )
+        buttons = cfb.FormActions(
+            cfl.Submit('login', 'Login'),
+            cfl.HTML(
+                '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
+                .format(reverse('home'))),
+            cfl.HTML('<br><br>'),
+            cfl.HTML(
+                '<a href="{0}">Forgot your password?</a><br>'
+                .format(reverse('user:password_reset'))),
+            cfl.HTML(
+                '<a href="{0}">Create an account</a><br>'
+                .format(reverse('user:register'))),
         )
-
+        helper = BaseFormHelper(
+            self,
+            horizontal=False,
+            legend_text='Login',
+            buttons=buttons,
+        )
         return helper
 
 
@@ -124,28 +118,24 @@ class ResetPasswordEmailForm(PasswordResetForm):
         self.helper = self.setHelper()
 
     def setHelper(self):
-
-        inputs = {
-            'legend_text': 'Password reset',
-            'help_text': """
-                Forgotten your password, or creating a new
-                account? Enter your email address below, and we'll email
-                instructions for setting a new password.
-            """
-        }
-
-        helper = BaseFormHelper(self, **inputs)
-
-        helper.layout.append(
-            cfb.FormActions(
-                cfl.Submit('submit', 'Submit'),
-                cfl.HTML(
-                    '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
-                    .format(reverse('user:login'))),
-            )
+        help_text = """
+            Forgotten your password, or creating a new
+            account? Enter your email address below, and we'll email
+            instructions for setting a new password.
+        """
+        buttons = cfb.FormActions(
+            cfl.Submit('submit', 'Submit'),
+            cfl.HTML(
+                '<a role="button" class="btn btn-default" href="{}">Cancel</a>'
+                .format(reverse('user:login'))),
         )
-
-        return helper
+        return BaseFormHelper(
+            self,
+            horizontal=False,
+            legend_text='Password reset',
+            help_text=help_text,
+            buttons=buttons,
+        )
 
 
 class ResetPasswordForm(SetPasswordForm):
@@ -161,21 +151,19 @@ class ResetPasswordForm(SetPasswordForm):
         return pw
 
     def setHelper(self):
-        inputs = {
-            'legend_text': 'Update your password',
-            'help_text': u"""
-                Please enter your new password twice so we can verify you
-                typed it in correctly.
-            """
-        }
-
-        helper = BaseFormHelper(self, **inputs)
-        helper.form_class = 'loginForm'
-
-        helper.layout.append(
-            cfb.FormActions(
-                cfl.Submit('submit', 'Change my password'),
-            )
+        help_text = u"""
+            Please enter your new password twice so we can verify you
+            typed it in correctly.
+        """
+        buttons = cfb.FormActions(
+            cfl.Submit('submit', 'Change my password'),
         )
-
+        helper = BaseFormHelper(
+            self,
+            horizontal=False,
+            legend_text='Update your password',
+               help_text=help_text,
+            buttons=buttons,
+        )
+        helper.form_class = 'loginForm'
         return helper
