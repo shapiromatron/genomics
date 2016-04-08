@@ -37,17 +37,29 @@ urlpatterns = [
         views.ManageData.as_view(),
         name='manage_data'),
 
-    url(r'^create-user-dataset/$',
+    url(r'^user-dataset/create/$',
         views.UserDatasetCreate.as_view(),
         name='user_dataset_create'),
 
-    url(r'^create-feature-list/$',
+    url(r'^user-dataset/(?P<pk>\d+)/$',
+        views.UserDatasetDetail.as_view(),
+        name='user_dataset'),
+
+    url(r'^feature-list/create/$',
         views.FeatureListCreate.as_view(),
         name='feature_list_create'),
 
-    url(r'^create-sort-vector/$',
+    url(r'^feature-list/(?P<pk>\d+)/$',
+        views.FeatureListDetail.as_view(),
+        name='feature_list'),
+
+    url(r'^sort-vector/create/$',
         views.SortVectorCreate.as_view(),
         name='sort_vector_create'),
+
+    url(r'^sort-vector/(?P<pk>\d+)/$',
+        views.SortVectorDetail.as_view(),
+        name='sort_vector'),
 
     url(r'^',
         views.Dashboard.as_view(),

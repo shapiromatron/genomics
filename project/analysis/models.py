@@ -103,6 +103,9 @@ class UserDataset(GenomicDataset):
     expiration_date = models.DateTimeField(
         null=True)
 
+    def get_absolute_url(self):
+        return reverse('analysis:user_dataset', args=[self.pk, ])
+
 
 class EncodeDataset(GenomicDataset):
     data_ambiguous = models.FileField(
@@ -171,12 +174,18 @@ class FeatureList(Dataset):
         blank=True,
         max_length=256)
 
+    def get_absolute_url(self):
+        return reverse('analysis:feature_list', args=[self.pk, ])
+
 
 class SortVector(Dataset):
     feature_list = models.ForeignKey(
         FeatureList)
     text = models.TextField(
         blank=True)
+
+    def get_absolute_url(self):
+        return reverse('analysis:sort_vector', args=[self.pk, ])
 
 
 class AnalysisDatasets(models.Model):

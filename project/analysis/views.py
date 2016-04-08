@@ -75,50 +75,78 @@ class Dashboard2(LoginRequiredMixin, TemplateView):
 class ManageData(LoginRequiredMixin, TemplateView):
     template_name = 'analysis/manage_data.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['feature_lists'] = models.FeatureList.objects.filter(owner=self.request.user)
+        context['sort_vectors'] = models.SortVector.objects.filter(owner=self.request.user)
+        context['user_datasets'] = models.UserDataset.objects.filter(owner=self.request.user)
+        return context
+
 
 # User dataset
+class UserDatasetDetail(OwnerOrStaff, DetailView):
+    model = models.UserDataset
+
+
 class UserDatasetCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
     model = models.UserDataset
     form_class = forms.UserDatasetForm
+    success_url = reverse_lazy('analysis:manage_data')
 
 
 class UserDatasetUpdate(OwnerOrStaff, UpdateView):
     model = models.UserDataset
     form_class = forms.UserDatasetForm
+    success_url = reverse_lazy('analysis:manage_data')
 
 
 class UserDatasetDelete(OwnerOrStaff, DeleteView):
     model = models.UserDataset
+    success_url = reverse_lazy('analysis:manage_data')
 
 
 # Feature list
+class FeatureListDetail(OwnerOrStaff, DetailView):
+    model = models.FeatureList
+
+
 class FeatureListCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
     model = models.FeatureList
     form_class = forms.FeatureListForm
+    success_url = reverse_lazy('analysis:manage_data')
 
 
 class FeatureListUpdate(OwnerOrStaff, UpdateView):
     model = models.FeatureList
     form_class = forms.FeatureListForm
+    success_url = reverse_lazy('analysis:manage_data')
 
 
 class FeatureListDelete(OwnerOrStaff, DeleteView):
     model = models.FeatureList
+    success_url = reverse_lazy('analysis:manage_data')
 
 
 # Sort vector
+class SortVectorDetail(OwnerOrStaff, DetailView):
+    model = models.SortVector
+
+
 class SortVectorCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
     model = models.SortVector
     form_class = forms.SortVectorForm
+    success_url = reverse_lazy('analysis:manage_data')
 
 
 class SortVectorUpdate(OwnerOrStaff, UpdateView):
     model = models.SortVector
     form_class = forms.SortVectorForm
+    success_url = reverse_lazy('analysis:manage_data')
 
 
 class SortVectorDelete(OwnerOrStaff, DeleteView):
     model = models.SortVector
+    success_url = reverse_lazy('analysis:manage_data')
 
 
 # Analysis

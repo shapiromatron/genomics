@@ -1,0 +1,24 @@
+{% if object_list %}
+    <table class='table table-condensed'>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Public</th>
+                <th>Validated</th>
+                <th>Last Updated</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td><a href="{{object.get_absolute_url}}">{{object.name}}</a></td>
+                <td>{{object.public}}</td>
+                <td>{{object.validated}}</td>
+                <td>{{object.last_updated}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class='help-block'>No feature lists have been created.</p>
+{% endif %}
