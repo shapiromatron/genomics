@@ -6,7 +6,7 @@ The development instructions here list setup for both the backend (a Python djan
 
 Requires the following software before beginning:
 
-- Python 2.7
+- Python 3.4+
 - PostgreSQL 9.4+
 - Python virtualenv and virtualenvwrapper
 
