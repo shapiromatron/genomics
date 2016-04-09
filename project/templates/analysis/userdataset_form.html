@@ -6,7 +6,12 @@
 
 {% block crumbs_inner %}
     <li><a href="{% url 'analysis:manage_data' %}">Data management</a></li>
-    <li class='active'>Create user dataset</li>
+    {% if object %}
+        <li><a href="{{object.get_absolute_url}}">{{object.name}}</a></li>
+        <li class='active'>Update</li>
+    {% else %}
+        <li class='active'>Create user dataset</li>
+    {% endif %}
 {% endblock crumbs_inner %}
 
 

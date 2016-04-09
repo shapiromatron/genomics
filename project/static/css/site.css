@@ -35,7 +35,7 @@ body {
     min-height: 100%;
     height: auto;
     /* Negative indent footer by its height */
-    margin: 0 auto 6em;
+    margin: 0 auto 7em;
 }
 #wrap > .container-fluid {
     padding: 65px 15px 0;
