@@ -1,0 +1,44 @@
+{% extends "analysis/dashboard2.html" %}
+
+{% block title %}{{object.name}}{% endblock %}
+
+{% block crumbs_inner %}
+    <li><a href="{% url 'analysis:manage_data' %}">Data management</a></li>
+    <li class='active'>{{object.name}}</li>
+{% endblock crumbs_inner %}
+
+
+{% block mid_content %}
+
+{% include "analysis/detail_action.html" %}
+
+<table class='table table-condensed'>
+    <tbody>
+        <tr>
+            <th style='width: 15%'>Description</th>
+            <td style='width: 85%'>{{object.description}}</td>
+        </tr>
+        <tr>
+            <th>Public</th>
+            <td>{{object.public|fabool}}</td>
+        </tr>
+        <tr>
+            <th>Validated</th>
+            <td>{{object.validated|fabool}}</td>
+        </tr>
+        <tr>
+            <th>Genome assembly</th>
+            <td>{{object.get_genome_assembly_display}}</td>
+        </tr>
+        <tr>
+            <th>Date created</th>
+            <td>{{object.created}}</td>
+        </tr>
+        <tr>
+            <th>Date updated</th>
+            <td>{{object.last_updated}}</td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock %}

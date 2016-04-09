@@ -1,0 +1,12 @@
+<h2>
+    <span>{{object.name}}</span>
+    <div class='dropdown pull-right'>
+        <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
+        Actions <span class="caret"></span>
+        </button>
+        <ul class='dropdown-menu'>
+            <li><a href='{{object.get_absolute_url}}'>Update</a></li>
+            <li><a href='{{object.get_absolute_url}}'>Delete</a></li>
+        </ul>
+    </div>
+</h2>
