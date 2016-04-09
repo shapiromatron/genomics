@@ -1,0 +1,9 @@
+<div class="alert deleteConfirmFormDiv">
+    <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to delete?</p>
+        <button class="btn btn-danger" type="submit">Confirm delete</button>
+        <span>&nbsp;</span>
+        <a class="btn btn-default" href="{{object.get_absolute_url}}">Cancel</a>
+    </form>
+</div>

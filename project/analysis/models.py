@@ -106,6 +106,12 @@ class UserDataset(GenomicDataset):
     def get_absolute_url(self):
         return reverse('analysis:user_dataset', args=[self.pk, ])
 
+    def get_update_url(self):
+        return reverse('analysis:user_dataset_update', args=[self.pk, ])
+
+    def get_delete_url(self):
+        return reverse('analysis:user_dataset_delete', args=[self.pk, ])
+
 
 class EncodeDataset(GenomicDataset):
     data_ambiguous = models.FileField(
@@ -177,6 +183,12 @@ class FeatureList(Dataset):
     def get_absolute_url(self):
         return reverse('analysis:feature_list', args=[self.pk, ])
 
+    def get_update_url(self):
+        return reverse('analysis:feature_list_update', args=[self.pk, ])
+
+    def get_delete_url(self):
+        return reverse('analysis:feature_list_delete', args=[self.pk, ])
+
 
 class SortVector(Dataset):
     feature_list = models.ForeignKey(
@@ -186,6 +198,12 @@ class SortVector(Dataset):
 
     def get_absolute_url(self):
         return reverse('analysis:sort_vector', args=[self.pk, ])
+
+    def get_update_url(self):
+        return reverse('analysis:sort_vector_update', args=[self.pk, ])
+
+    def get_delete_url(self):
+        return reverse('analysis:sort_vector_delete', args=[self.pk, ])
 
 
 class AnalysisDatasets(models.Model):

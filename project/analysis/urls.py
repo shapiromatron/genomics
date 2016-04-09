@@ -37,6 +37,7 @@ urlpatterns = [
         views.ManageData.as_view(),
         name='manage_data'),
 
+    # user dataset
     url(r'^user-dataset/create/$',
         views.UserDatasetCreate.as_view(),
         name='user_dataset_create'),
@@ -45,6 +46,15 @@ urlpatterns = [
         views.UserDatasetDetail.as_view(),
         name='user_dataset'),
 
+    url(r'^user-dataset/(?P<pk>\d+)/update/$',
+        views.UserDatasetUpdate.as_view(),
+        name='user_dataset_update'),
+
+    url(r'^user-dataset/(?P<pk>\d+)/delete/$',
+        views.UserDatasetDelete.as_view(),
+        name='user_dataset_delete'),
+
+    # feature list
     url(r'^feature-list/create/$',
         views.FeatureListCreate.as_view(),
         name='feature_list_create'),
@@ -53,6 +63,15 @@ urlpatterns = [
         views.FeatureListDetail.as_view(),
         name='feature_list'),
 
+    url(r'^feature-list/(?P<pk>\d+)/update/$',
+        views.FeatureListUpdate.as_view(),
+        name='feature_list_update'),
+
+    url(r'^feature-list/(?P<pk>\d+)/delete/$',
+        views.FeatureListDelete.as_view(),
+        name='feature_list_delete'),
+
+    # sort vector
     url(r'^sort-vector/create/$',
         views.SortVectorCreate.as_view(),
         name='sort_vector_create'),
@@ -60,6 +79,14 @@ urlpatterns = [
     url(r'^sort-vector/(?P<pk>\d+)/$',
         views.SortVectorDetail.as_view(),
         name='sort_vector'),
+
+    url(r'^sort-vector/(?P<pk>\d+)/update/$',
+        views.SortVectorUpdate.as_view(),
+        name='sort_vector_update'),
+
+    url(r'^sort-vector/(?P<pk>\d+)/delete/$',
+        views.SortVectorDelete.as_view(),
+        name='sort_vector_delete'),
 
     url(r'^',
         views.Dashboard.as_view(),

@@ -129,6 +129,11 @@ input[type=number] {
   text-decoration: none;
 }
 
+/* delete confirmations */
+.deleteConfirmFormDiv {
+  border: 2px solid #c9302c;
+  background-color: #efefef;
+}
 
 /* encode dataset */
 .encodeDatasetSelect option:hover {

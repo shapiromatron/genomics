@@ -1,0 +1,12 @@
+{% extends "analysis/userdataset_detail.html" %}
+
+{% block title %}Delete {{object.name}}{% endblock %}
+
+{% block crumbs_inner %}
+{% include 'analysis/delete_crumbs.html' %}
+{% endblock crumbs_inner %}
+
+{% block mid_content %}
+{{block.super}}
+{% include 'analysis/delete_confirm.html' %}
+{% endblock mid_content %}
