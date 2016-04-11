@@ -140,6 +140,7 @@ class AnalysisDelete(OwnerOrStaff, DeleteView):
 # analysis non-CRUD
 class AnalysisReadOnlyMixin(object):
 
+    # TODO - standardize permissions checks - use this or OwnerOrStaff mixin?
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
         if not obj.user_can_view(self.request.user):
