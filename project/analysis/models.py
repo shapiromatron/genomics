@@ -307,10 +307,10 @@ class Analysis(GenomicBinSettings):
         return reverse('analysis:analysis', args=[self.pk, ])
 
     def get_execute_url(self):
-        return reverse('analysis:execute', args=[self.pk, ])
+        return reverse('analysis:analysis_execute', args=[self.pk, ])
 
     def get_visuals_url(self):
-        return reverse('analysis:visual_testing', args=[self.pk, ])
+        return reverse('analysis:analysis_visual', args=[self.pk, ])
 
     def get_form_cancel_url(self):
         if self.id:

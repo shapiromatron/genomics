@@ -43,17 +43,17 @@ urlpatterns = [
         views.AnalysisDelete.as_view(),
         name='analysis_delete'),
 
-    url(r'^analysis/(?P<pk>\d+)/visuals/$',
-        views.VisualTestingObject.as_view(),
-        name='visual_testing'),
+    url(r'^analysis/(?P<pk>\d+)/visual/$',
+        views.AnalysisVisual.as_view(),
+        name='analysis_visual'),
 
     url(r'^analysis/(?P<pk>\d+)/zip/$',
         views.AnalysisZip.as_view(),
         name='analysis_zip'),
 
     url(r'^analysis/(?P<pk>\d+)/execute/$',
-        views.Execute.as_view(),
-        name='execute'),
+        views.AnalysisExecute.as_view(),
+        name='analysis_execute'),
 
     # user dataset
     url(r'^user-dataset/create/$',

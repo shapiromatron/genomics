@@ -22,52 +22,13 @@ class DashboardOld(LoginRequiredMixin, TemplateView):
     template_name = 'analysis/dashboard_old.html'
 
 
-class AnalysisReadOnlyMixin(object):
-
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        if not obj.user_can_view(self.request.user):
-            raise PermissionDenied()
-        return obj
-
-
-class VisualTestingObject(AnalysisReadOnlyMixin, DetailView):
-    """
-    Temporary view used for visual testing
-    """
-    model = models.Analysis
-    template_name = 'analysis/visual_testing.html'
-
-
-class Execute(OwnerOrStaff, UpdateView):
-    http_method_names = ('post', )
-    model = models.Analysis
-
-    def post(self, context, **response_kwargs):
-        obj = self.get_object()
-        obj.execute()
-        return JsonResponse({'run': True})
-
-
-class AnalysisZip(AnalysisReadOnlyMixin, DetailView):
-    model = models.Analysis
-
-    def get(self, context, **response_kwargs):
-        obj = self.get_object()
-        zip_ = obj.create_zip()
-        zip_.seek(0)
-        response = HttpResponse(zip_, content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename="{}.zip"'.format(obj)
-        return response
-
-
 class CeleryTester(Home):
     def get(self, request, *args, **kwargs):
         tasks.debug_task.delay()
         return super().get(request, *args, **kwargs)
 
 
-# Dashboard crud views
+# Dashboard CRUD views
 class Dashboard(LoginRequiredMixin, TemplateView):
     template_name = 'analysis/dashboard.html'
 
@@ -89,7 +50,7 @@ class ManageData(LoginRequiredMixin, TemplateView):
         return context
 
 
-# User dataset
+# User dataset CRUD
 class UserDatasetDetail(OwnerOrStaff, DetailView):
     model = models.UserDataset
 
@@ -111,7 +72,7 @@ class UserDatasetDelete(OwnerOrStaff, DeleteView):
     success_url = reverse_lazy('analysis:manage_data')
 
 
-# Feature list
+# Feature list CRUD
 class FeatureListDetail(OwnerOrStaff, DetailView):
     model = models.FeatureList
 
@@ -133,7 +94,7 @@ class FeatureListDelete(OwnerOrStaff, DeleteView):
     success_url = reverse_lazy('analysis:manage_data')
 
 
-# Sort vector
+# Sort vector CRUD
 class SortVectorDetail(OwnerOrStaff, DetailView):
     model = models.SortVector
 
@@ -155,7 +116,7 @@ class SortVectorDelete(OwnerOrStaff, DeleteView):
     success_url = reverse_lazy('analysis:manage_data')
 
 
-# Analysis
+# Analysis CRUD
 class AnalysisDetail(OwnerOrStaff, DetailView):
     model = models.Analysis
 
@@ -174,3 +135,43 @@ class AnalysisUpdate(OwnerOrStaff, UpdateView):
 class AnalysisDelete(OwnerOrStaff, DeleteView):
     model = models.Analysis
     success_url = reverse_lazy('analysis:dashboard')
+
+
+# analysis non-CRUD
+class AnalysisReadOnlyMixin(object):
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if not obj.user_can_view(self.request.user):
+            raise PermissionDenied()
+        return obj
+
+
+class AnalysisVisual(AnalysisReadOnlyMixin, DetailView):
+    """
+    Temporary view used for visual testing
+    """
+    model = models.Analysis
+    template_name = 'analysis/analysis_visual.html'
+
+
+class AnalysisExecute(OwnerOrStaff, UpdateView):
+    http_method_names = ('post', )
+    model = models.Analysis
+
+    def post(self, context, **response_kwargs):
+        obj = self.get_object()
+        obj.execute()
+        return JsonResponse({'run': True})
+
+
+class AnalysisZip(AnalysisReadOnlyMixin, DetailView):
+    model = models.Analysis
+
+    def get(self, context, **response_kwargs):
+        obj = self.get_object()
+        zip_ = obj.create_zip()
+        zip_.seek(0)
+        response = HttpResponse(zip_, content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="{}.zip"'.format(obj)
+        return response

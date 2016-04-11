@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "analysis/dashboard.html" %}
 
 {% load render_bundle from webpack_loader %}
 
@@ -6,6 +6,12 @@
     <link rel="stylesheet" type="text/css" media="all"
           href="{{STATIC_URL}}css/visuals.css">
 {% endblock extra_css %}
+
+
+{% block crumbs_inner %}
+    <li><a href="{{object.get_absolute_url}}">{{object.name}}</a></li>
+    <li class='active'>Visualization</li>
+{% endblock crumbs_inner %}
 
 
 {% block mid_content %}
