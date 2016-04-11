@@ -19,7 +19,9 @@ module.exports = {
         filename: '[name]-[hash].js',
     },
 
-    externals: {},
+    externals: {
+        'jquery': '$',
+    },
 
     plugins: [
         new webpack.NoErrorsPlugin(),

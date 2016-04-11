@@ -66,16 +66,11 @@
                 src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
             <script charset="utf-8"
                 src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
-            <script charset="utf-8"
-                src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.8/d3.min.js"></script>
-
         {% else %}
             <script charset="utf-8"
                 src="{{ STATIC_URL}}lib/js/jquery.min.js"></script>
             <script charset="utf-8"
                 src="{{ STATIC_URL}}lib/js/bootstrap.min.js"></script>
-            <script charset="utf-8"
-                src="{{ STATIC_URL}}lib/js/d3.min.js"></script>
         {% endif %}
         <script charset="utf-8" src="{{STATIC_URL}}js/site.js"></script>
     {% endblock js %}

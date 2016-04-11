@@ -1,3 +1,8 @@
+import $ from 'jquery';
+import d3 from 'd3';
+import _ from 'underscore';
+
+
 var IndividualHeatmap = function(id, matrix_names, matrix_ids, heatmap_name, modal_title, modal_body) {
     this.id = id;
     this.matrix_names = matrix_names;
@@ -197,7 +202,7 @@ IndividualHeatmap.prototype = {
             .domain([0, max_value])
             .range([(height - margins.top - margins.bottom), 0]);
         var x = d3.scale.linear()
-            .domain([parseInt(display_data[0][1].split(":")[0]), parseInt(display_data[0][display_data[0].length-1].split(":")[1])])
+            .domain([parseInt(display_data[0][1].split(':')[0]), parseInt(display_data[0][display_data[0].length-1].split(':')[1])])
             .range([0, (width - margins.left - margins.right)]);
 
         var line = d3.svg.line()
@@ -217,7 +222,7 @@ IndividualHeatmap.prototype = {
             .attr('transform', 'translate(0,' + (height - margins.top - margins.bottom) + ')')
             .call(xAxis);
 
-        var yAxisLeft = d3.svg.axis().scale(y).ticks(2).orient("left");
+        var yAxisLeft = d3.svg.axis().scale(y).ticks(2).orient('left');
         graph.append('svg:g')
             .attr('class', 'y axis')
             .call(yAxisLeft);
@@ -441,7 +446,7 @@ IndividualHeatmap.prototype = {
 
         var colorScale = d3.scale.linear()
             .domain([0, data_max])
-            .range(['white','red']);
+            .range(['white', 'red']);
 
         var scale_x = width/col_number,
             scale_y = height/row_number;
@@ -468,3 +473,5 @@ IndividualHeatmap.prototype = {
         });
     },
 };
+
+export default IndividualHeatmap;

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
+{% load render_bundle from webpack_loader %}
+
 {% block extra_css %}
     <link rel="stylesheet" type="text/css" media="all"
           href="{{STATIC_URL}}css/visuals.css">
 {% endblock extra_css %}
-
 
 
 {% block mid_content %}
@@ -24,23 +25,12 @@
 {% endblock mid_content %}
 
 
-
 {% block extra_js %}
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-<script type="text/javascript" src="{{STATIC_URL}}/js/individual_heatmap.js"></script>
-<script type="text/javascript" src="{{STATIC_URL}}/js/individual_overview.js"></script>
-<script type="text/javascript" src="{{STATIC_URL}}/js/analysis_overview.js"></script>
-<script>
-    $(document).ready(function(){
-        window.sortVectorRoot = '{% url 'analysis:api:analysis-sort-vector' object.id %}';
-        window.plotURL = '{% url 'analysis:api:analysis-plot' object.id %}';
-        $.get(window.plotURL, function(data){
-            var overview = new AnalysisOverview($('#visual_panel_1'), data),
-                individual_overview = new IndividualOverview($('#visual_panel_2'), data);
-            overview.render();
-            individual_overview.render();
-        });
-
-    });
+<script id="config" type="text/json" charset="utf-8">
+    {
+        "sortVectorRoot": "{% url 'analysis:api:analysis-sort-vector' object.id %}",
+        "plotURL": "{% url 'analysis:api:analysis-plot' object.id %}"
+    }
 </script>
+{% render_bundle 'main' %}
 {% endblock extra_js %}

@@ -1,3 +1,7 @@
+import $ from 'jquery';
+import d3 from 'd3';
+
+
 var AnalysisOverview = function(el, data) {
     this.el = el;
     this.dendrogram = data['dendrogram'];
@@ -149,7 +153,7 @@ AnalysisOverview.prototype = {
         var height = row_names.height(),
             width = row_names.width(),
             row_number = this.cluster_members.length,
-            cluster_medoids = this.cluster_medoids
+            cluster_medoids = this.cluster_medoids,
             matrix_names = this.matrix_names;
 
         var svg = d3.select(row_names.get(0))
@@ -323,3 +327,6 @@ AnalysisOverview.prototype = {
         this.drawLegend();
     },
 };
+
+
+export default AnalysisOverview;
