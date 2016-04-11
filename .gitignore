@@ -10,3 +10,6 @@ project/node_modules/*
 project/static/bundles*
 project/webpack-stats.json
 project/django_project/apache_wsgi.py
+
+project/analysis/workflow/validateFiles
+project/analysis/workflow/bigWigAverageOverBed

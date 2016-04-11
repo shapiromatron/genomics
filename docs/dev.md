@@ -43,6 +43,7 @@ to the `/project` path in the repository.
 ```
 python manage.py migrate
 python manage.py createsuperuser
+python manage.py download_ucsc_tools
 ```
 
 ### Setting up React and Javascript webpack.
