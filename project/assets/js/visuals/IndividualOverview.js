@@ -1,10 +1,9 @@
 import $ from 'jquery';
 import d3 from 'd3';
-import IndividualHeatmap from 'visuals/individual_overview';
+import IndividualHeatmap from 'visuals/IndividualHeatmap';
 
 
 var IndividualOverview = function(el, data) {
-    console.log('read')
     this.el = el;
     this.dendrogram = data['dendrogram'];
     this.cluster_members = data['cluster_members'];
@@ -31,7 +30,6 @@ IndividualOverview.prototype = {
         }
 
         //Remove heatmap div if there; append heatmap div
-        console.log('adsfas')
         this.el.find('#select_list').remove();
         var select_list = $('<select id="select_list"></select>')
             .attr({
