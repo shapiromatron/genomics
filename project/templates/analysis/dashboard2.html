@@ -18,16 +18,16 @@
 
     <div class="col-sm-10">
         <h2>Completed analysis</h2>
-        <p>todo add list</p>
+        {% include 'analysis/manage_data_table.html' with object_list=analysis_complete %}
 
         <h2>Analyses currently running</h2>
-        <p>todo add list</p>
+        {% include 'analysis/manage_data_table.html' with object_list=analysis_running %}
     </div>
 
     <div class="col-sm-2">
         <ul class="pull-right nav nav-pills nav-stacked">
             <li><a class='pill' href='{% url 'analysis:manage_data' %}'>Manage data</a></li>
-            <li><a class='pill' href='#'>Proceed to run setup</a></li>
+            <li><a class='pill' href='{% url 'analysis:analysis_create' %}'>Proceed to run setup</a></li>
         </ul>
     </div>
 

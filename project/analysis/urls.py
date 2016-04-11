@@ -17,6 +17,32 @@ urlpatterns = [
     url(r'^api/',
         include(router.urls, namespace='api')),
 
+    url(r'^v2/$',
+        views.Dashboard2.as_view(),
+        name='dashboard2'),
+
+    url(r'^manage-data/$',
+        views.ManageData.as_view(),
+        name='manage_data'),
+
+    # analysis CRUD
+    url(r'^analysis/create/$',
+        views.AnalysisCreate.as_view(),
+        name='analysis_create'),
+
+    url(r'^analysis/(?P<pk>\d+)/$',
+        views.AnalysisDetail.as_view(),
+        name='analysis'),
+
+    url(r'^analysis/(?P<pk>\d+)/update/$',
+        views.AnalysisUpdate.as_view(),
+        name='analysis_update'),
+
+    # analysis non-CRUD
+    url(r'^analysis/(?P<pk>\d+)/delete/$',
+        views.AnalysisDelete.as_view(),
+        name='analysis_delete'),
+
     url(r'^analysis/(?P<pk>\d+)/visuals/$',
         views.VisualTestingObject.as_view(),
         name='visual_testing'),
@@ -28,14 +54,6 @@ urlpatterns = [
     url(r'^analysis/(?P<pk>\d+)/execute/$',
         views.Execute.as_view(),
         name='execute'),
-
-    url(r'^v2/$',
-        views.Dashboard2.as_view(),
-        name='dashboard2'),
-
-    url(r'^manage-data/$',
-        views.ManageData.as_view(),
-        name='manage_data'),
 
     # user dataset
     url(r'^user-dataset/create/$',
@@ -54,7 +72,7 @@ urlpatterns = [
         views.UserDatasetDelete.as_view(),
         name='user_dataset_delete'),
 
-    # feature list
+    # feature list CRUD
     url(r'^feature-list/create/$',
         views.FeatureListCreate.as_view(),
         name='feature_list_create'),
@@ -71,7 +89,7 @@ urlpatterns = [
         views.FeatureListDelete.as_view(),
         name='feature_list_delete'),
 
-    # sort vector
+    # sort vector CRUD
     url(r'^sort-vector/create/$',
         views.SortVectorCreate.as_view(),
         name='sort_vector_create'),
@@ -88,6 +106,7 @@ urlpatterns = [
         views.SortVectorDelete.as_view(),
         name='sort_vector_delete'),
 
+    # default dashboard (deprecated)
     url(r'^',
         views.Dashboard.as_view(),
         name='dashboard'),

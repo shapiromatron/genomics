@@ -75,4 +75,15 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
 
     class Meta:
         model = models.Analysis
-        exclude = ('owner', )
+        exclude = (
+            'owner', 'validated', 'start_time', 'end_time', 'output',
+            'datasets',
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['feature_list'].queryset = \
+            models.FeatureList.objects.filter(owner=self.instance.owner)
+        self.fields['sort_vector'].queryset = \
+            models.SortVector.objects.filter(owner=self.instance.owner)

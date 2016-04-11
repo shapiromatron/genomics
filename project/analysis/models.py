@@ -1,7 +1,6 @@
 import json
 import os
 import uuid
-import random
 import io
 import zipfile
 
@@ -296,6 +295,17 @@ class Analysis(GenomicBinSettings):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def is_running(cls, owner):
+        return cls.objects.filter(end_time__isnull=True, owner=owner)
+
+    @classmethod
+    def is_complete(cls, owner):
+        return cls.objects.filter(end_time__isnull=False, owner=owner)
+
+    def get_absolute_url(self):
+        return reverse('analysis:analysis', args=[self.pk, ])
+
     def get_execute_url(self):
         return reverse('analysis:execute', args=[self.pk, ])
 
@@ -306,7 +316,13 @@ class Analysis(GenomicBinSettings):
         if self.id:
             return self.get_absolute_url()
         else:
-            return reverse('analysis:manage_data')
+            return reverse('analysis:dashboard2')
+
+    def get_update_url(self):
+        return reverse('analysis:analysis_update', args=[self.pk, ])
+
+    def get_delete_url(self):
+        return reverse('analysis:analysis_delete', args=[self.pk, ])
 
     @property
     def user_datasets(self):

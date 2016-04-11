@@ -1,0 +1,89 @@
+{% extends "analysis/dashboard2.html" %}
+
+{% load fabool %}
+
+{% block title %}{{object.name}}{% endblock %}
+
+{% block crumbs_inner %}
+    <li class='active'>{{object.name}}</li>
+{% endblock crumbs_inner %}
+
+
+{% block mid_content %}
+
+{% include "analysis/detail_action.html" %}
+
+<table class='table table-condensed'>
+    <tbody>
+        <tr>
+            <th style='width: 15%'>Description</th>
+            <td style='width: 85%'>{{object.description}}</td>
+        </tr>
+        <tr>
+            <th>Anchor</th>
+            <td>{{object.anchor}}</td>
+        </tr>
+        <tr>
+            <th>Bin start</th>
+            <td>{{object.bin_start}}</td>
+        </tr>
+        <tr>
+            <th>Number of bins</th>
+            <td>{{object.bin_number}}</td>
+        </tr>
+        <tr>
+            <th>Bin size</th>
+            <td>{{object.bin_size}}</td>
+        </tr>
+        <tr>
+            <th>Public</th>
+            <td>{{object.public|fabool}}</td>
+        </tr>
+        <tr>
+            <th>Validated</th>
+            <td>{{object.validated|fabool}}</td>
+        </tr>
+        <tr>
+            <th>Genome assembly</th>
+            <td>{{object.get_genome_assembly_display}}</td>
+        </tr>
+        <tr>
+            <th>Date created</th>
+            <td>{{object.created}}</td>
+        </tr>
+        <tr>
+            <th>Date updated</th>
+            <td>{{object.last_updated}}</td>
+        </tr>
+        <tr>
+            <th>Feature list</th>
+            <td><a href="{{object.feature_list.get_absolute_url}}">{{object.feature_list}}</a></td>
+        </tr>
+        <tr>
+            <th>Sort vector</th>
+            <td>
+                {% if object.sort_vector %}
+                <a href="{{object.sort_vector.get_absolute_url}}">{{object.sort_vector}}</a>
+                {% else %}
+                <span>&lt;none&gt;</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>User datasets</th>
+            <td><i>TODO: add</i></td>
+        </tr>
+        <tr>
+            <th>ENCODE datasets</th>
+            <td><i>TODO: add</i></td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="well well-sm">
+    <a class='btn btn-primary' href="{{object.get_execute_url}}">Execute</a>
+    <a class='btn btn-primary' href="{{object.get_visuals_url}}">View visualizations</a>
+</div>
+
+
+{% endblock %}

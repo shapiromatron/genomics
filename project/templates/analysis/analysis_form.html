@@ -1,0 +1,19 @@
+{% extends "analysis/dashboard2.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Create feature list{% endblock %}
+
+{% block crumbs_inner %}
+    {% if object %}
+        <li><a href="{{object.get_absolute_url}}">{{object.name}}</a></li>
+        <li class='active'>Update</li>
+    {% else %}
+        <li class='active'>Create analysis</li>
+    {% endif %}
+{% endblock crumbs_inner %}
+
+
+{% block mid_content %}
+    {% crispy form %}
+{% endblock %}
