@@ -118,7 +118,7 @@ input[type=number] {
   -moz-appearance:textfield;
 }
 
-/* Fix bootstrap 3 pills */
+/* Fix bs3 pills */
 .pill {
   color: #fff;
   background-color: #337ab7;
@@ -127,6 +127,11 @@ input[type=number] {
   background-color: #1C4468 !important;
   color: #fff;
   text-decoration: none;
+}
+
+/* fix bs3 crumbs */
+.breadcrumb {
+  margin-bottom: 0.5em;
 }
 
 /* delete confirmations */
