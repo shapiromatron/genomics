@@ -1,26 +1,26 @@
 export default {
     dashboard: {
         name: 'Home',
-        url: '/dashboard/',
+        url: '/dashboard/old/',
     },
     data_management: {
         name: 'Data management',
-        url: '/dashboard/data-management/',
+        url: '/dashboard/old/data-management/',
     },
     user_dataset: {
         name: 'User datasets',
-        url: '/dashboard/user-datasets/',
+        url: '/dashboard/old/user-datasets/',
     },
     feature_list: {
         name: 'Feature lists',
-        url: '/dashboard/feature-lists/',
+        url: '/dashboard/old/feature-lists/',
     },
     sort_vector: {
         name: 'Sort vectors',
-        url: '/dashboard/sort-vectors/',
+        url: '/dashboard/old/sort-vectors/',
     },
     analysis: {
         name: 'Analyses',
-        url: '/dashboard/analyses/',
+        url: '/dashboard/old/analyses/',
     },
 };

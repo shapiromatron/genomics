@@ -18,8 +18,8 @@ class Home(TemplateView):
         return super(Home, self).get(request, *args, **kwargs)
 
 
-class Dashboard(LoginRequiredMixin, TemplateView):
-    template_name = 'analysis/dashboard.html'
+class DashboardOld(LoginRequiredMixin, TemplateView):
+    template_name = 'analysis/dashboard_old.html'
 
 
 class AnalysisReadOnlyMixin(object):
@@ -68,8 +68,8 @@ class CeleryTester(Home):
 
 
 # Dashboard crud views
-class Dashboard2(LoginRequiredMixin, TemplateView):
-    template_name = 'analysis/dashboard2.html'
+class Dashboard(LoginRequiredMixin, TemplateView):
+    template_name = 'analysis/dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -163,7 +163,7 @@ class AnalysisDetail(OwnerOrStaff, DetailView):
 class AnalysisCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
     model = models.Analysis
     form_class = forms.AnalysisForm
-    success_url = reverse_lazy('analysis:dashboard2')
+    success_url = reverse_lazy('analysis:dashboard')
 
 
 class AnalysisUpdate(OwnerOrStaff, UpdateView):
@@ -173,4 +173,4 @@ class AnalysisUpdate(OwnerOrStaff, UpdateView):
 
 class AnalysisDelete(OwnerOrStaff, DeleteView):
     model = models.Analysis
-    success_url = reverse_lazy('analysis:dashboard2')
+    success_url = reverse_lazy('analysis:dashboard')

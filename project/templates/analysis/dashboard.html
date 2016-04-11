@@ -1,26 +1,35 @@
 {% extends "base.html" %}
 
-{% load render_bundle from webpack_loader %}
+{% block title %}Dashboard{% endblock %}
+
+
+{% block crumbs %}
+<div class="row">
+    <ol class="breadcrumb">
+        <li><a href="{% url 'analysis:dashboard' %}">Home</a></li>
+        {% block crumbs_inner %}{% endblock crumbs_inner %}
+    </ol>
+</div>
+{% endblock crumbs %}
 
 
 {% block mid_content %}
-<div id="react-main"></div>
+<div class="row">
+
+    <div class="col-sm-10">
+        <h2>Completed analysis</h2>
+        {% include 'analysis/manage_data_table.html' with object_list=analysis_complete %}
+
+        <h2>Analyses currently running</h2>
+        {% include 'analysis/manage_data_table.html' with object_list=analysis_running %}
+    </div>
+
+    <div class="col-sm-2">
+        <ul class="pull-right nav nav-pills nav-stacked">
+            <li><a class='pill' href='{% url 'analysis:manage_data' %}'>Manage data</a></li>
+            <li><a class='pill' href='{% url 'analysis:analysis_create' %}'>Proceed to run setup</a></li>
+        </ul>
+    </div>
+
+</div>
 {% endblock mid_content %}
-
-
-{% block extra_js %}
-<script id="config" type="text/json" charset="utf-8">
-    {
-        "user_dataset": "{% url 'analysis:api:user-dataset-list' %}",
-        "encode_dataset": "{% url 'analysis:api:encode-dataset-list' %}",
-        "encode_dataset_options": "{% url 'analysis:api:encode-dataset-field-options' %}",
-        "encode_dataset": "{% url 'analysis:api:encode-dataset-list' %}",
-        "feature_list": "{% url 'analysis:api:feature-list-list' %}",
-        "sort_vector": "{% url 'analysis:api:sort-vector-list' %}",
-        "analysis": "{% url 'analysis:api:analysis-list' %}",
-        "analysis": "{% url 'analysis:api:analysis-list' %}",
-        "csrf": "{% csrf_token %}"
-    }
-</script>
-{% render_bundle 'main' %}
-{% endblock extra_js %}

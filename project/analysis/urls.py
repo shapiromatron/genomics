@@ -17,9 +17,9 @@ urlpatterns = [
     url(r'^api/',
         include(router.urls, namespace='api')),
 
-    url(r'^v2/$',
-        views.Dashboard2.as_view(),
-        name='dashboard2'),
+    url(r'^$',
+        views.Dashboard.as_view(),
+        name='dashboard'),
 
     url(r'^manage-data/$',
         views.ManageData.as_view(),
@@ -107,8 +107,8 @@ urlpatterns = [
         name='sort_vector_delete'),
 
     # default dashboard (deprecated)
-    url(r'^',
-        views.Dashboard.as_view(),
-        name='dashboard'),
+    url(r'^old/',
+        views.DashboardOld.as_view(),
+        name='dashboard_old'),
 
 ]

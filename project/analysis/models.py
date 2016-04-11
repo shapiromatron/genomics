@@ -316,7 +316,7 @@ class Analysis(GenomicBinSettings):
         if self.id:
             return self.get_absolute_url()
         else:
-            return reverse('analysis:dashboard2')
+            return reverse('analysis:dashboard')
 
     def get_update_url(self):
         return reverse('analysis:analysis_update', args=[self.pk, ])
