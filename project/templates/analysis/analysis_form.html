@@ -1,8 +1,9 @@
 {% extends "analysis/dashboard.html" %}
 
 {% load crispy_forms_tags %}
+{% load render_bundle from webpack_loader %}
 
-{% block title %}Create feature list{% endblock %}
+{% block title %}Create new analysis{% endblock %}
 
 {% block crumbs_inner %}
     {% if object %}
@@ -15,5 +16,11 @@
 
 
 {% block mid_content %}
-    {% crispy form %}
+    <div id='analysis_form' style='display: none'>
+        {% crispy form %}
+    </div>
 {% endblock %}
+
+{% block extra_js %}
+{% render_bundle 'main' %}
+{% endblock extra_js %}

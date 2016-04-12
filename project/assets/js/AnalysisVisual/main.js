@@ -1,8 +1,8 @@
 import _ from 'underscore';
 import $ from 'jquery';
 
-import AnalysisOverview from 'visuals/AnalysisOverview';
-import IndividualOverview from 'visuals/IndividualOverview';
+import AnalysisOverview from './AnalysisOverview';
+import IndividualOverview from './IndividualOverview';
 
 
 let startup = function(){

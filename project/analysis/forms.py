@@ -30,9 +30,10 @@ class BaseFormMixin(object):
                 widget.attrs['class'] = 'span12'
 
         inputs = {}
+
         if self.instance.id:
             # update
-            pass
+            inputs["legend_text"] = 'Update {}'.format(self.instance)
         else:
             # create
             if self.CREATE_LEGEND:
@@ -50,7 +51,10 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
 
     class Meta:
         model = models.UserDataset
-        exclude = ('owner', 'borrowers', 'validated', 'url', 'expiration_date',)
+        exclude = (
+            'owner', 'borrowers', 'validated',
+            'url', 'expiration_date',
+        )
 
 
 class FeatureListForm(BaseFormMixin, forms.ModelForm):
@@ -75,15 +79,17 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
 
     class Meta:
         model = models.Analysis
-        exclude = (
-            'owner', 'validated', 'start_time', 'end_time', 'output',
-            'datasets',
+        fields = (
+            'name', 'description', 'genome_assembly',
+            'feature_list', 'sort_vector', 'public',
+            'anchor', 'bin_start', 'bin_size',
+            'bin_number', 'datasets',
         )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.fields['feature_list'].queryset = \
             models.FeatureList.objects.filter(owner=self.instance.owner)
         self.fields['sort_vector'].queryset = \
             models.SortVector.objects.filter(owner=self.instance.owner)
+        self.fields['datasets'].widget = forms.HiddenInput()

@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import d3 from 'd3';
-import IndividualHeatmap from 'visuals/IndividualHeatmap';
+import IndividualHeatmap from './IndividualHeatmap';
 
 
 class IndividualOverview {
