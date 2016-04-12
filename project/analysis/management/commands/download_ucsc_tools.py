@@ -45,6 +45,7 @@ class Command(BaseCommand):
                 with open(path, 'wb') as f:
                     r.raw.decode_content = True
                     shutil.copyfileobj(r.raw, f)
+                    os.chmod(path, 0o751)
             else:
                 self.stderr.write("URL returned a non-200 status (possible error?)")
 
