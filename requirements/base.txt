@@ -11,10 +11,12 @@ flower==0.8.4
 redis==2.10.3
 scipy==0.16.1
 numpy==1.10.1
-matplotlib==1.5.1
 pandas==0.17.0
 XlsxWriter==0.7.7
 xlrd==0.9.4
 jupyter==1.0.0
 runipy==0.1.5
 django-extensions==1.6.1
+
+# downgraded for easy mac development environment :(
+matplotlib==1.4.3  
