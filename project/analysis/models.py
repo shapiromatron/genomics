@@ -330,7 +330,7 @@ class Analysis(GenomicBinSettings):
 
     @property
     def encode_datasets(self):
-        return EncodeDataset.objects.filter(id__in=self.datasets.values_list('id' ,flat=True))
+        return EncodeDataset.objects.filter(id__in=self.datasets.values_list('id', flat=True))
 
     @property
     def analysis_user_datasets(self):
