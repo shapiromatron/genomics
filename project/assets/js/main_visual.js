@@ -13,7 +13,7 @@ let startup = function(){
 
         // render plots
         $.get(window.plotURL, function(data){
-            var overview = new AnalysisOverview($('#visual_panel_1'), data),
+            let overview = new AnalysisOverview($('#visual_panel_1'), data),
                 individual_overview = new IndividualOverview($('#visual_panel_2'), data);
             overview.render();
             individual_overview.render();

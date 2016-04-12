@@ -3,18 +3,20 @@ import d3 from 'd3';
 import IndividualHeatmap from 'visuals/IndividualHeatmap';
 
 
-var IndividualOverview = function(el, data) {
-    this.el = el;
-    this.dendrogram = data['dendrogram'];
-    this.cluster_members = data['cluster_members'];
-    this.cluster_display = data['max_abs_correlation_values'];
-    this.correlation_matrix = data['correlation_matrix'];
-    this.matrix_ids = data['matrix_ids'];
-    this.matrix_names = data['matrix_names'];
-    this.cluster_medoids = data['cluster_medoids'];
-};
-IndividualOverview.prototype = {
-    renderSelectList: function() {
+class IndividualOverview {
+
+    constructor(el, data) {
+        this.el = el;
+        this.dendrogram = data['dendrogram'];
+        this.cluster_members = data['cluster_members'];
+        this.cluster_display = data['max_abs_correlation_values'];
+        this.correlation_matrix = data['correlation_matrix'];
+        this.matrix_ids = data['matrix_ids'];
+        this.matrix_names = data['matrix_names'];
+        this.cluster_medoids = data['cluster_medoids'];
+    }
+
+    renderSelectList() {
         function addOptions(el, option_array) {
             var select = el.find('#select_list');
 
@@ -82,8 +84,9 @@ IndividualOverview.prototype = {
             })
 
             .appendTo(this.el);
-    },
-    addDisplayButtons: function() {
+    }
+
+    addDisplayButtons() {
         this.el.find('#display_heatmap').remove();
         $('<button>Display individual heatmap</button>')
             .attr({
@@ -97,8 +100,9 @@ IndividualOverview.prototype = {
             }).click(
                 this.displayIndividualHeatmap.bind(this)
             ).appendTo(this.el);
-    },
-    displayCorrelations: function() {
+    }
+
+    displayCorrelations() {
         this.el.find('#correlation_plot').remove();
         $('<div id="correlation_plot">')
             .css({
@@ -226,8 +230,9 @@ IndividualOverview.prototype = {
             .style('stroke', 'black')
             .style('stroke-width', 1)
             .style('stroke-dasharray', function (d) {if (d === 0) {return 'none';} else {return '5,5';}});
-    },
-    displayIndividualHeatmap: function () {
+    }
+
+    displayIndividualHeatmap () {
         var name = this.el.find('#select_list').find('option:selected').text(),
             names = this.matrix_names,
             ids = this.matrix_ids,
@@ -252,12 +257,14 @@ IndividualOverview.prototype = {
                 );
                 individual_heatmap.render();
             }).modal('show');
-    },
-    render: function() {
+    }
+
+    render() {
         this.renderSelectList();
         this.addDisplayButtons();
         this.displayCorrelations();
-    },
-};
+    }
+
+}
 
 export default  IndividualOverview;

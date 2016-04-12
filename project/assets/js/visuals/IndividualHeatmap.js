@@ -3,30 +3,35 @@ import d3 from 'd3';
 import _ from 'underscore';
 
 
-var IndividualHeatmap = function(id, matrix_names, matrix_ids, heatmap_name, modal_title, modal_body) {
-    this.id = id;
-    this.matrix_names = matrix_names;
-    this.matrix_ids = matrix_ids;
-    this.heatmap_name = heatmap_name;
-    this.modal_title = modal_title;
-    this.modal_body = modal_body;
-    this.selected_sort = null;
+class IndividualHeatmap {
 
-    this.matrices = _.zip(this.matrix_ids, this.matrix_names);
-};
-IndividualHeatmap.prototype = {
-    url: function(id) {
+    constructor (id, matrix_names, matrix_ids, heatmap_name, modal_title, modal_body) {
+        this.id = id;
+        this.matrix_names = matrix_names;
+        this.matrix_ids = matrix_ids;
+        this.heatmap_name = heatmap_name;
+        this.modal_title = modal_title;
+        this.modal_body = modal_body;
+        this.selected_sort = null;
+
+        this.matrices = _.zip(this.matrix_ids, this.matrix_names);
+    }
+
+    url(id) {
         return '/dashboard/api/feature-list-count-matrix/' + id + '/plot/';
-    },
-    sortVectorUrl: function(id, vector_id){
+    }
+
+    sortVectorUrl(id, vector_id){
         return window.sortVectorRoot +'?id=' + vector_id;
-    },
-    getSortVector: function(vector_id){
+    }
+
+    getSortVector(vector_id){
         $.get(this.sortVectorUrl(this.id, vector_id), function(d){
             console.log(d);
         });
-    },
-    createResortOptions: function() {
+    }
+
+    createResortOptions() {
         var self = this;
         //Remove heatmap div if there; append heatmap div
         this.modal_body.find('#select_list').remove();
@@ -82,8 +87,9 @@ IndividualHeatmap.prototype = {
                 var vector_id = select_list.val();
                 self.getSortVector(vector_id);
             });
-    },
-    drawQuartiles: function(display_data) {
+    }
+
+    drawQuartiles(display_data) {
 
         this.modal_body.find('#quartile_plot').remove();
         var quartile_plot = $('<div id="quartile_plot"></div>')
@@ -236,8 +242,9 @@ IndividualHeatmap.prototype = {
             graph.append('svg:path').attr('d', line(scatter))
                 .style('stroke', line_color);
         }
-    },
-    drawMetaPlot: function(display_data) {
+    }
+
+    drawMetaPlot(display_data) {
         var modal_body = this.modal_body;
 
         modal_body.find('#metaplot_label').remove();
@@ -331,8 +338,9 @@ IndividualHeatmap.prototype = {
             .call(yAxisLeft);
 
         graph.append('svg:path').attr('d', line(scatter));
-    },
-    drawHeatmapHeader: function(display_data) {
+    }
+
+    drawHeatmapHeader(display_data) {
         var modal_body = this.modal_body;
         //var self = this;
 
@@ -407,8 +415,9 @@ IndividualHeatmap.prototype = {
             .attr('font-size', '12px')
             .attr('fill', 'black')
             .style('text-anchor', 'middle');
-    },
-    drawHeatmap: function(display_data) {
+    }
+
+    drawHeatmap(display_data) {
         var modal_body = this.modal_body;
 
         modal_body.find('#heatmap_canvas').remove();
@@ -459,8 +468,9 @@ IndividualHeatmap.prototype = {
                 context.fillRect(j,i,1,1);
             }
         }
-    },
-    render: function() {
+    }
+
+    render() {
         this.modal_title.html(this.heatmap_name);
         var self = this;
         $.get(this.url(this.id), function(data){
@@ -471,7 +481,8 @@ IndividualHeatmap.prototype = {
             self.drawQuartiles(display_data);
             self.createResortOptions();
         });
-    },
-};
+    }
+
+}
 
 export default IndividualHeatmap;

@@ -2,17 +2,19 @@ import $ from 'jquery';
 import d3 from 'd3';
 
 
-var AnalysisOverview = function(el, data) {
-    this.el = el;
-    this.dendrogram = data['dendrogram'];
-    this.cluster_members = data['cluster_members'];
-    this.cluster_display = data['max_abs_correlation_values'];
-    this.correlation_matrix = data['correlation_matrix'];
-    this.matrix_names = data['matrix_names'];
-    this.cluster_medoids = data['cluster_medoids'];
-};
-AnalysisOverview.prototype = {
-    drawHeatmap: function() {
+class AnalysisOverview{
+
+    constructor(el, data) {
+        this.el = el;
+        this.dendrogram = data['dendrogram'];
+        this.cluster_members = data['cluster_members'];
+        this.cluster_display = data['max_abs_correlation_values'];
+        this.correlation_matrix = data['correlation_matrix'];
+        this.matrix_names = data['matrix_names'];
+        this.cluster_medoids = data['cluster_medoids'];
+    }
+
+    drawHeatmap() {
         // remove existing heatmap
         this.el.find('#heatmap').remove();
 
@@ -87,8 +89,9 @@ AnalysisOverview.prototype = {
             });
 
         $('[data-toggle="tooltip"]').tooltip();
-    },
-    writeVertNames: function () {
+    }
+
+    writeVertNames() {
         // remove existing
         this.el.find('#vert_names').remove();
 
@@ -134,8 +137,9 @@ AnalysisOverview.prototype = {
                 var rot = (((0.5/row_number)*width) + i*(width/row_number));
                 return 'rotate(90 ' + rot + ',0)';
             });
-    },
-    writeRowNames: function() {
+    }
+
+    writeRowNames() {
 
         this.el.find('#row_names').remove();
 
@@ -176,8 +180,9 @@ AnalysisOverview.prototype = {
             .attr('y', function(d, i) {
                 return (((0.5 / row_number) * height) + i * (height / row_number));
             });
-    },
-    writeDendrogram: function() {
+    }
+
+    writeDendrogram() {
 
         this.el.find('#dendrogram').remove();
 
@@ -230,8 +235,9 @@ AnalysisOverview.prototype = {
             .attr('x2', function(d) { return d.x2; })
             .attr('y1', function(d) { return d.y1; })
             .attr('y2', function(d) { return d.y2; });
-    },
-    drawLegend: function() {
+    }
+
+    drawLegend() {
         // remove existing
         this.el.find('#legend').remove();
 
@@ -318,15 +324,16 @@ AnalysisOverview.prototype = {
             .attr('font-size', '12px')
             .attr('fill', 'black')
             .style('text-anchor', 'middle');
-    },
-    render: function() {
+    }
+
+    render() {
         this.drawHeatmap();
         this.writeRowNames();
         this.writeVertNames();
         this.writeDendrogram();
         this.drawLegend();
-    },
-};
+    }
+}
 
 
 export default AnalysisOverview;
