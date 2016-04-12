@@ -393,7 +393,15 @@ class Analysis(GenomicBinSettings):
         # TODO: cache using redis
         if not hasattr(self, '_output_json'):
             with open(self.output.path, 'r') as f:
-                self._output_json = json.loads(f.read())
+                output = json.loads(f.read())
+
+            # convert JSON str keys to int keys
+            sort_orders = output['sort_orders']
+            for k, v in sort_orders.items():
+                sort_orders[int(k)] = sort_orders.pop(k)
+
+            self._output_json = output
+
         return self._output_json
 
     def get_summary_plot(self):
