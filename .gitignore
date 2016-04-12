@@ -13,3 +13,5 @@ project/django_project/apache_wsgi.py
 
 project/analysis/workflow/validateFiles
 project/analysis/workflow/bigWigAverageOverBed
+
+data/*
