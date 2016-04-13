@@ -2,10 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 
-// import AnalysisRoot from 'AnalysisForm/Root';
+import Root from './containers/Root';
 
 
 let wrapAdditionalSettings = function($el){
+    /*
+        with DOM content already rendered using django template, add a wrap
+        to show/hide additional configuration settings
+    */
 
     let extra = $('<div>').attr('class', 'hidden');
     $el.find('#div_id_public').closest('.form-group').appendTo(extra);
@@ -47,7 +51,8 @@ let wrapAdditionalSettings = function($el){
 let renderEncodePicker = function($el){
     let reactEntry = $('<div>');
     $el.find('.form-actions').before(reactEntry);
-    // ReactDOM.render(<AnalysisRoot />, reactEntry.get(0));
+    let config = JSON.parse(document.getElementById('config').textContent);
+    ReactDOM.render(<Root config={config}/>, reactEntry.get(0));
 };
 
 const startup = function(){

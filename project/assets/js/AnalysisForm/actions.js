@@ -1,12 +1,30 @@
 import $ from 'jquery';
 import _ from 'underscore';
-import * as types from 'constants/ActionTypes';
+
+import * as types from './constants';
 import h from 'utils/helpers';
 
 
-function requestContent() {
+
+export function requestContent(config){
+    return (dispatch, getState) => {
+        let userDatasets = $.get(config.user_dataset),
+            encode = $.get(config.encode_dataset),
+            encodeOpts = $.get(config.encode_dataset_options);
+
+        $.when(userDatasets, encode, encodeOpts)
+            .done(function(userDatasets, encode, encodeOpts){
+                dispatch(receiveContent(userDatasets[0], encode[0].results, encodeOpts[0]));
+            });
+    };
+}
+
+function receiveContent(userDatasets, encodeDatasetsAvailable, encodeOptions){
     return {
-        type: types.AN_REQUEST,
+        type: types.AN_RECEIVE_CONTENT,
+        userDatasets: _.indexBy(userDatasets, 'id'),
+        encodeDatasetsAvailable: _.indexBy(encodeDatasetsAvailable, 'id'),
+        encodeOptions,
     };
 }
 

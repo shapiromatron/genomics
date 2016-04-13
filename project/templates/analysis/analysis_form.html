@@ -22,5 +22,12 @@
 {% endblock %}
 
 {% block extra_js %}
+<script id="config" type="text/json" charset="utf-8">
+    {
+        "user_dataset": "{% url 'analysis:api:user-dataset-list' %}",
+        "encode_dataset": "{% url 'analysis:api:encode-dataset-list' %}",
+        "encode_dataset_options": "{% url 'analysis:api:encode-dataset-field-options' %}"
+    }
+</script>
 {% render_bundle 'main' %}
 {% endblock extra_js %}

@@ -216,13 +216,6 @@ class Form extends React.Component {
 
                     </div>
 
-                    <hr />
-                    <h3>User-uploaded genome datasets </h3>
-                    <UserDatasetSelection />
-
-                    <hr />
-                    <h3>ENCODE data selection</h3>
-                    <EncodeDatasetFiltering />
 
                     <hr />
                     <div className='form-actions'>

@@ -1,19 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Component from 'components/Analysis/List';
+import Component from '../components/Form';
 
 
 class Container extends React.Component {
     render() {
-        return <Component objects={this.props.objects}/>;
+        return <Component isReady={this.props.isReady} />;
     }
 }
 
 
 function mapStateToProps(state) {
     return {
-        objects: state.analysis,
+        isReady: state.startupContentReceived,
     };
 }
 

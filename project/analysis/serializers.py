@@ -6,6 +6,7 @@ from . import models
 
 class UserDatasetSerializer(serializers.ModelSerializer):
     genome_assembly_display = serializers.ReadOnlyField(source='get_genome_assembly_display')
+    url = serializers.ReadOnlyField(source='get_absolute_url')
 
     class Meta:
         model = models.UserDataset
