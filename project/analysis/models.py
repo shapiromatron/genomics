@@ -299,11 +299,11 @@ class Analysis(GenomicBinSettings):
         return self.name
 
     @classmethod
-    def is_running(cls, owner):
+    def running(cls, owner):
         return cls.objects.filter(end_time__isnull=True, owner=owner)
 
     @classmethod
-    def is_complete(cls, owner):
+    def complete(cls, owner):
         return cls.objects.filter(end_time__isnull=False, owner=owner)
 
     def get_absolute_url(self):
@@ -369,24 +369,8 @@ class Analysis(GenomicBinSettings):
         return list(self.analysisdatasets_set.values_list('count_matrix', flat=True))
 
     @property
-    def status(self):
-        if self.start_time:
-            return 'COMPLETE' if self.end_time else 'RUNNING'
-        else:
-            return 'NOT STARTED'
-
-    def init_execution_status(self):
-        cache.set('analysis-{}-complete'.format(self.id), 0)
-        cache.set('analysis-{}-total'.format(self.id), 10)
-
-    def increment_execution_status(self):
-        key = 'analysis-{}-complete'.format(self.id)
-        cache.set(key, cache.get(key) + 1)
-
-    def get_execution_status(self):
-        complete = cache.get('analysis-{}-complete'.format(self.id), 0)
-        ofTotal = float(cache.get('analysis-{}-total'.format(self.id), 1))
-        return complete / ofTotal
+    def is_complete(self):
+        return True if self.start_time and self.end_time else False
 
     def execute(self):
         tasks.execute_analysis.delay(self.id)
@@ -483,6 +467,27 @@ class Analysis(GenomicBinSettings):
                 z.write(ds.count_matrix.matrix.path, 'count_matrix/{}.txt'.format(ds.display_name))
 
         return f
+
+    @property
+    def cache_key_total(self):
+        return 'analysis-{}-total'.format(self.id)
+
+    @property
+    def cache_key_complete(self):
+        return 'analysis-{}-complete'.format(self.id)
+
+    def init_execution_status(self):
+        cache.set(self.cache_key_complete, 0)
+        cache.set(self.cache_key_total, self.datasets.count() + 1)
+
+    def increment_execution_status(self):
+        current = cache.get(self.cache_key_complete)
+        cache.set(self.cache_key_complete, current + 1)
+
+    def get_execution_status(self):
+        complete = cache.get(self.cache_key_complete)
+        ofTotal = float(cache.get(self.cache_key_total))
+        return complete / ofTotal
 
 
 class FeatureListCountMatrix(GenomicBinSettings):

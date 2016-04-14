@@ -34,8 +34,8 @@ class Dashboard(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['analysis_running'] = models.Analysis.is_running(self.request.user)
-        context['analysis_complete'] = models.Analysis.is_complete(self.request.user)
+        context['analysis_running'] = models.Analysis.running(self.request.user)
+        context['analysis_complete'] = models.Analysis.complete(self.request.user)
         return context
 
 
@@ -164,16 +164,11 @@ class AnalysisExecute(OwnerOrStaff, DetailView):
         self.object = self.get_object()
 
         if request.is_ajax():
-            self.object.increment_execution_status()
-            return JsonResponse({'fractionComplete': self.object.get_execution_status()})
+            complete = self.object.get_execution_status()
+            return JsonResponse({'fractionComplete': complete})
 
-        self.object.init_execution_status()
+        self.object.execute()
         return super().get(request, *args, **kwargs)
-
-    def post(self, context, **response_kwargs):
-        obj = self.get_object()
-        obj.execute()
-        return JsonResponse()
 
 
 class AnalysisZip(AnalysisReadOnlyMixin, DetailView):

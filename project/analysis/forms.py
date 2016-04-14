@@ -129,6 +129,9 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
         if self.instance.id:
             self.fields['datasets_json'].initial = self.instance.get_form_datasets()
 
+        self.instance.start_time = None
+        self.instance.end_time = None
+
     def clean(self):
         cleaned_data = super().clean()
 

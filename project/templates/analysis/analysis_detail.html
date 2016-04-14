@@ -93,8 +93,11 @@
 </table>
 
 <div class="well well-sm">
-    <a class='btn btn-primary' href="{{object.get_execute_url}}">Execute</a>
-    <a class='btn btn-primary' href="{{object.get_visuals_url}}">Visualization</a>
+    {% if object.is_complete %}
+        <a class='btn btn-primary' href="{{object.get_visuals_url}}">Visualization</a>
+    {% else %}
+        <a class='btn btn-primary' href="{{object.get_execute_url}}">Execute</a>
+    {% endif %}
 </div>
 
 
