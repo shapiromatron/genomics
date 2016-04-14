@@ -57,7 +57,13 @@ function receiveEncodeDatasets(json){
 }
 
 
-
+// ---- Change user-selected ENOCDE to include
+export function changeSelectedEncode(encodeSelected){
+    return {
+        type: types.AN_SELECTED_ENCODE,
+        encodeSelected,
+    };
+}
 
 
 

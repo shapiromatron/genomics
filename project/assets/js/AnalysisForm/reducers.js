@@ -6,6 +6,7 @@ let defaultState = {
     userDatasets: null,
     encodeDatasetsAvailable: {},
     encodeOptions: null,
+    encodeSelected: [],
     genome_assembly: null,
 };
 
@@ -30,6 +31,11 @@ export default function (state=defaultState, action) {
     case types.AN_RECIEVE_ENCODE:
         return Object.assign({}, state, {
             encodeDatasetsAvailable: action.encodeDatasetsAvailable,
+        });
+
+    case types.AN_SELECTED_ENCODE:
+        return Object.assign({}, state, {
+            encodeSelected: action.encodeSelected,
         });
 
     default:

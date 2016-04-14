@@ -1,7 +1,7 @@
 export const AN_STARTUP =               'AN_STARTUP';
 export const AN_GENOME_CHANGE =         'AN_GENOME_CHANGE';
 export const AN_RECIEVE_ENCODE =        'AN_RECIEVE_ENCODE';
-
+export const AN_SELECTED_ENCODE =       'AN_SELECTED_ENCODE';
 
 export const AN_REQUEST =               'AN_REQUEST';
 export const AN_REQUEST_ENCODE =        'AN_REQUEST_ENCODE';

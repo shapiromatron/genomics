@@ -1,9 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import _ from 'underscore';
 
 import Component from '../components/EncodeDatasetFiltering';
 
-import {requestEncodeDatasets} from '../actions';
+import {
+    requestEncodeDatasets,
+    changeSelectedEncode,
+} from '../actions';
 
 
 class Container extends React.Component {
@@ -14,17 +18,16 @@ class Container extends React.Component {
     }
 
     handleSelectionChange(additions, deletions){
-        console.log('to fix');
-        // let selected = _.indexBy(this.props.model.editObject.analysis_encode_datasets, 'dataset');
-        // if(additions){
-        //     additions
-        //         .filter(d => _.isUndefined(selected[d.dataset]))
-        //         .forEach(d => selected[d.dataset] = d);
-        // }
-        // if(deletions){
-        //     deletions.forEach(d => delete selected[d.dataset]);
-        // }
-        // this.props.dispatch(changeEditObject('analysis_encode_datasets', _.values(selected)));
+        let selected = _.indexBy(this.props.encodeSelected, 'dataset');
+        if(additions){
+            additions
+                .filter(d => _.isUndefined(selected[d.dataset]))
+                .forEach(d => selected[d.dataset] = d);
+        }
+        if(deletions){
+            deletions.forEach(d => delete selected[d.dataset]);
+        }
+        this.props.dispatch(changeSelectedEncode(_.values(selected)));
     }
 
     render() {
@@ -35,7 +38,7 @@ class Container extends React.Component {
                 handleApplyFilters={this.handleApplyFilters.bind(this)}
                 availableDatasets={this.props.encodeDatasetsAvailable}
                 handleSelectionChange={this.handleSelectionChange.bind(this)}
-                selectedDatasets={[]} // to fix
+                selectedDatasets={this.props.encodeSelected}
             />
         );
     }
@@ -46,7 +49,7 @@ function mapStateToProps(state) {
         genome_assembly: state.genome_assembly,
         encodeOptions: state.encodeOptions,
         encodeDatasetsAvailable: state.encodeDatasetsAvailable,
-        editObject: {analysis_encode_datasets: []},
+        encodeSelected: state.encodeSelected,
     };
 }
 export default connect(mapStateToProps)(Container);
