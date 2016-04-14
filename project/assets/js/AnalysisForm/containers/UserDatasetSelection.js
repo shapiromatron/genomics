@@ -5,20 +5,22 @@ import { connect } from 'react-redux';
 import Component from '../components/UserDatasetSelection';
 import RequireGenomeAssembly from '../components/RequireGenomeAssembly';
 
+import {
+    changeSelectedUserDatasets,
+} from '../actions';
 
 
 class Container extends React.Component {
 
     handleUserDatasetChange (includes, removes) {
-        console.log('to fix');
-        // let selected = _.indexBy(this.props.object.analysis_user_datasets, 'dataset');
-        // if(includes){
-        //     selected[includes.dataset] = includes;
-        // }
-        // if(removes){
-        //     delete selected[removes];
-        // }
-        // this.props.dispatch(changeEditObject('analysis_user_datasets', _.values(selected)));
+        let selected = _.indexBy(this.props.userDatasetsSelected, 'dataset');
+        if(includes){
+            selected[includes.dataset] = includes;
+        }
+        if(removes){
+            delete selected[removes];
+        }
+        this.props.dispatch(changeSelectedUserDatasets(_.values(selected)));
     }
 
 
@@ -29,7 +31,7 @@ class Container extends React.Component {
         return (
             <Component
                 allDatasets={_.values(this.props.userDatasets)}
-                selectedDatasets={[]} // to fix
+                selectedDatasets={this.props.userDatasetsSelected}
                 genome_assembly={this.props.genome_assembly}
                 handleUserDatasetChange={this.handleUserDatasetChange.bind(this)}/>
         );

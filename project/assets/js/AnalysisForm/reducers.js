@@ -3,11 +3,12 @@ import * as types from './constants';
 let defaultState = {
     config: null,
     startupContentReceived: false,
+    genome_assembly: null,
     userDatasets: null,
+    userDatasetsSelected: [],
     encodeDatasetsAvailable: {},
     encodeOptions: null,
     encodeSelected: [],
-    genome_assembly: null,
 };
 
 
@@ -36,6 +37,11 @@ export default function (state=defaultState, action) {
     case types.AN_SELECTED_ENCODE:
         return Object.assign({}, state, {
             encodeSelected: action.encodeSelected,
+        });
+
+    case types.AN_SELECTED_USER_DATASETS:
+        return Object.assign({}, state, {
+            userDatasetsSelected: action.userDatasetsSelected,
         });
 
     default:
