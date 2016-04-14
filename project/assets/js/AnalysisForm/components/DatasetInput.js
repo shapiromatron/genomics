@@ -13,7 +13,7 @@ class Component extends React.Component {
         });
 
         // apply to django-managed field
-        $(this.props.datasets_json_selector).html(json);
+        $(this.props.datasets_json_selector).val(json);
 
         // apply to this field to ensure DOM propagation
         return (

@@ -25,7 +25,7 @@ class Root extends React.Component {
                 encodeSelected: [],
             };
         try{
-            ds = JSON.parse($(this.props.config.datasets_json_selector).html());
+            ds = JSON.parse($(this.props.config.datasets_json_selector).val());
         } catch (e) {
             ds = {};
         }

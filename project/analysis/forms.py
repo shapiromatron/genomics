@@ -108,7 +108,7 @@ class DatasetField(forms.CharField):
 class AnalysisForm(BaseFormMixin, forms.ModelForm):
     CREATE_LEGEND = 'Create analysis'
 
-    datasets_json = DatasetField(widget=forms.Textarea)
+    datasets_json = DatasetField(widget=forms.HiddenInput)
 
     class Meta:
         model = models.Analysis
