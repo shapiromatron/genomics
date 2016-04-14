@@ -156,14 +156,24 @@ class AnalysisVisual(AnalysisReadOnlyMixin, DetailView):
     template_name = 'analysis/analysis_visual.html'
 
 
-class AnalysisExecute(OwnerOrStaff, UpdateView):
-    http_method_names = ('post', )
+class AnalysisExecute(OwnerOrStaff, DetailView):
     model = models.Analysis
+    template_name = 'analysis/analysis_execute.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if request.is_ajax():
+            self.object.increment_execution_status()
+            return JsonResponse({'fractionComplete': self.object.get_execution_status()})
+
+        self.object.init_execution_status()
+        return super().get(request, *args, **kwargs)
 
     def post(self, context, **response_kwargs):
         obj = self.get_object()
         obj.execute()
-        return JsonResponse({'run': True})
+        return JsonResponse()
 
 
 class AnalysisZip(AnalysisReadOnlyMixin, DetailView):

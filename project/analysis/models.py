@@ -7,6 +7,7 @@ import itertools
 
 from django.db import models
 from django.conf import settings
+from django.core.cache import cache
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.urlresolvers import reverse
 from django.contrib.postgres.fields import JSONField
@@ -373,6 +374,19 @@ class Analysis(GenomicBinSettings):
             return 'COMPLETE' if self.end_time else 'RUNNING'
         else:
             return 'NOT STARTED'
+
+    def init_execution_status(self):
+        cache.set('analysis-{}-complete'.format(self.id), 0)
+        cache.set('analysis-{}-total'.format(self.id), 10)
+
+    def increment_execution_status(self):
+        key = 'analysis-{}-complete'.format(self.id)
+        cache.set(key, cache.get(key) + 1)
+
+    def get_execution_status(self):
+        complete = cache.get('analysis-{}-complete'.format(self.id), 0)
+        ofTotal = float(cache.get('analysis-{}-total'.format(self.id), 1))
+        return complete / ofTotal
 
     def execute(self):
         tasks.execute_analysis.delay(self.id)
