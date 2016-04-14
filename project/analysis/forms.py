@@ -86,6 +86,12 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
             'bin_number', 'datasets',
         )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        datasets = cleaned_data.get("datasets", [])
+        if len(datasets) < 2:
+            raise forms.ValidationError('At least two datasets are required.')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['feature_list'].queryset = \
