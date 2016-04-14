@@ -20,6 +20,8 @@ export default function (state=defaultState, action) {
             startupContentReceived: true,
             userDatasets: action.userDatasets,
             encodeOptions: action.encodeOptions,
+            userDatasetsSelected: action.userDatasetsSelected,
+            encodeSelected: action.encodeSelected,
             config: action.config,
         });
 

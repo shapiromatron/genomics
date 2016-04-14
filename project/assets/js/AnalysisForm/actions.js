@@ -6,24 +6,26 @@ import h from 'utils/helpers';
 
 
 // ---- Initial startup actions
-export function requestContent(config){
+export function requestContent(config, userDatasetsSelected, encodeSelected){
     return (dispatch, getState) => {
         let userDatasets = $.get(config.user_dataset),
             encodeOpts = $.get(config.encode_dataset_options);
 
         $.when(userDatasets, encodeOpts)
             .done(function(userDatasets, encodeOpts){
-                dispatch(receiveContent(config, userDatasets[0], encodeOpts[0]));
+                dispatch(receiveContent(config, userDatasets[0], encodeOpts[0], userDatasetsSelected, encodeSelected));
             });
     };
 }
 
-function receiveContent(config, userDatasets, encodeOptions){
+function receiveContent(config, userDatasets, encodeOptions, userDatasetsSelected, encodeSelected){
     return {
         type: types.STARTUP,
         userDatasets: _.indexBy(userDatasets, 'id'),
         config,
         encodeOptions,
+        userDatasetsSelected,
+        encodeSelected,
     };
 }
 

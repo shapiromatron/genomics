@@ -16,7 +16,11 @@ class Container extends React.Component {
         return <Component
             isReady={this.props.isReady}
             genome_assembly_selector={this.props.genome_assembly_selector}
-            handleGenomeAssemblyChange={this.handleGenomeAssemblyChange.bind(this)} />;
+            datasets_json_selector={this.props.datasets_json_selector}
+            handleGenomeAssemblyChange={this.handleGenomeAssemblyChange.bind(this)}
+            userDatasetsSelected={this.props.userDatasetsSelected}
+            encodeSelected={this.props.encodeSelected}
+            />;
     }
 }
 
@@ -24,6 +28,8 @@ class Container extends React.Component {
 function mapStateToProps(state) {
     return {
         isReady: state.startupContentReceived,
+        userDatasetsSelected: state.userDatasetsSelected,
+        encodeSelected: state.encodeSelected,
     };
 }
 

@@ -1,3 +1,5 @@
+import itertools
+import json
 from django import forms
 
 from utils.forms import BaseFormHelper
@@ -74,8 +76,39 @@ class SortVectorForm(BaseFormMixin, forms.ModelForm):
         exclude = ('owner', 'borrowers', 'validated', )
 
 
+class DatasetField(forms.CharField):
+
+    def get_datasets(self, value):
+        d = json.loads(value)
+        return {
+            'userDatasets': d.get('userDatasets', []),
+            'encodeDatasets': d.get('encodeDatasets', []),
+        }
+
+    def is_valid(self, cleaned):
+        d = self.get_datasets(cleaned)
+        if len(d['userDatasets']) + len(d['encodeDatasets']) < 2:
+            raise forms.ValidationError("At least two datasets are required.")
+
+        for obj in itertools.chain(d['userDatasets'], d['encodeDatasets']):
+            if 'dataset' not in obj or 'display_name' not in obj:
+                raise forms.ValidationError("At least two datasets are required.")
+
+        return True
+
+    def clean(self, value):
+        # ensure valid JSON
+        try:
+            json.loads(value)
+            return value
+        except json.decoder.JSONDecodeError:
+            raise forms.ValidationError('JSON format required.')
+
+
 class AnalysisForm(BaseFormMixin, forms.ModelForm):
     CREATE_LEGEND = 'Create analysis'
+
+    datasets_json = DatasetField(widget=forms.Textarea)
 
     class Meta:
         model = models.Analysis
@@ -83,14 +116,8 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
             'name', 'description', 'genome_assembly',
             'feature_list', 'sort_vector', 'public',
             'anchor', 'bin_start', 'bin_size',
-            'bin_number', 'datasets',
+            'bin_number',
         )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        datasets = cleaned_data.get("datasets", [])
-        if len(datasets) < 2:
-            raise forms.ValidationError('At least two datasets are required.')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -98,4 +125,11 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
             models.FeatureList.objects.filter(owner=self.instance.owner)
         self.fields['sort_vector'].queryset = \
             models.SortVector.objects.filter(owner=self.instance.owner)
-        self.fields['datasets'].widget = forms.HiddenInput()
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        ds = cleaned_data['datasets_json']
+        if not self.fields['datasets_json'].is_valid(ds):
+            raise forms.ValidationError("Improper dataset specification")
+
