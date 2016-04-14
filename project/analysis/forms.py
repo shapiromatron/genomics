@@ -126,6 +126,9 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
         self.fields['sort_vector'].queryset = \
             models.SortVector.objects.filter(owner=self.instance.owner)
 
+        if self.instance.id:
+            self.fields['datasets_json'].initial = self.instance.get_form_datasets()
+
     def clean(self):
         cleaned_data = super().clean()
 
@@ -133,3 +136,21 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
         if not self.fields['datasets_json'].is_valid(ds):
             raise forms.ValidationError("Improper dataset specification")
 
+    def _save_m2m(self):
+        ds = self.fields['datasets_json']\
+                .get_datasets(self.cleaned_data['datasets_json'])
+
+        # out with the old
+        models.AnalysisDatasets.objects\
+            .filter(analysis=self.instance)\
+            .delete()
+
+        # in with the new
+        objects = [
+            models.AnalysisDatasets(
+                analysis_id=self.instance.id,
+                dataset_id=d['dataset'],
+                display_name=d['display_name']
+            ) for d in itertools.chain(ds['userDatasets'], ds['encodeDatasets'])
+        ]
+        models.AnalysisDatasets.objects.bulk_create(objects)

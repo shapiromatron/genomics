@@ -3,6 +3,7 @@ import os
 import uuid
 import io
 import zipfile
+import itertools
 
 from django.db import models
 from django.conf import settings
@@ -340,6 +341,19 @@ class Analysis(GenomicBinSettings):
     @property
     def analysis_encode_datasets(self):
         return self.analysisdatasets_set.filter(dataset__in=self.encode_datasets)
+
+    def get_form_datasets(self):
+        uds = list(self.analysis_user_datasets.values('dataset_id', 'display_name'))
+        eds = list(self.analysis_encode_datasets.values('dataset_id', 'display_name'))
+
+        for ds in itertools.chain(uds, eds):
+            ds['dataset'] = ds['dataset_id']
+            del ds['dataset_id']
+
+        return json.dumps({
+            "userDatasets": uds,
+            "encodeDatasets": eds,
+        })
 
     class Meta:
         verbose_name_plural = 'Analyses'
