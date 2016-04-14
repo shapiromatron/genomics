@@ -15,7 +15,7 @@ let defaultState = {
 export default function (state=defaultState, action) {
     switch (action.type) {
 
-    case types.AN_STARTUP:
+    case types.STARTUP:
         return Object.assign({}, state, {
             startupContentReceived: true,
             userDatasets: action.userDatasets,
@@ -23,23 +23,23 @@ export default function (state=defaultState, action) {
             config: action.config,
         });
 
-    case types.AN_GENOME_CHANGE:
+    case types.GENOME_CHANGE:
         return Object.assign({}, state, {
             genome_assembly: action.value,
             encodeDatasetsAvailable: {},
         });
 
-    case types.AN_RECIEVE_ENCODE:
+    case types.RECIEVE_ENCODE:
         return Object.assign({}, state, {
             encodeDatasetsAvailable: action.encodeDatasetsAvailable,
         });
 
-    case types.AN_SELECTED_ENCODE:
+    case types.SELECTED_ENCODE:
         return Object.assign({}, state, {
             encodeSelected: action.encodeSelected,
         });
 
-    case types.AN_SELECTED_USER_DATASETS:
+    case types.SELECTED_USER_DATASETS:
         return Object.assign({}, state, {
             userDatasetsSelected: action.userDatasetsSelected,
         });
