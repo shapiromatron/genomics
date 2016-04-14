@@ -97,20 +97,9 @@ class EncodeDatasetFiltering extends React.Component {
         });
     }
 
-    renderNoAssembly(){
-        return (
-            <p className='help-block'>Please select a genomic assembly.</p>
-        );
-    }
-
     render() {
         let opts = this.props.options,
             vals = this.state.filters;
-
-
-        if (!this.props.genome_assembly){
-            return this.renderNoAssembly();
-        }
 
         return (
             <div>

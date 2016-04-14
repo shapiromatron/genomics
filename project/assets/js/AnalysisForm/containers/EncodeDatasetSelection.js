@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import _ from 'underscore';
 
 import Component from '../components/EncodeDatasetFiltering';
+import RequireGenomeAssembly from '../components/RequireGenomeAssembly';
 
 import {
     requestEncodeDatasets,
@@ -31,6 +32,10 @@ class Container extends React.Component {
     }
 
     render() {
+        if (!_.isFinite(this.props.genome_assembly)){
+            return <RequireGenomeAssembly />;
+        }
+
         return (
             <Component
                 genome_assembly={this.props.genome_assembly}
