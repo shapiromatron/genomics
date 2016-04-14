@@ -1,22 +1,35 @@
 import * as types from './constants';
 
 let defaultState = {
+    config: null,
     startupContentReceived: false,
     userDatasets: null,
-    encodeDatasetsAvailable: null,
+    encodeDatasetsAvailable: {},
     encodeOptions: null,
+    genome_assembly: null,
 };
 
 
 export default function (state=defaultState, action) {
     switch (action.type) {
 
-    case types.AN_RECEIVE_CONTENT:
+    case types.AN_STARTUP:
         return Object.assign({}, state, {
             startupContentReceived: true,
             userDatasets: action.userDatasets,
-            encodeDatasetsAvailable: action.encodeDatasetsAvailable,
             encodeOptions: action.encodeOptions,
+            config: action.config,
+        });
+
+    case types.AN_GENOME_CHANGE:
+        return Object.assign({}, state, {
+            genome_assembly: action.value,
+            encodeDatasetsAvailable: {},
+        });
+
+    case types.AN_RECIEVE_ENCODE:
+        return Object.assign({}, state, {
+            encodeDatasetsAvailable: action.encodeDatasetsAvailable,
         });
 
     default:

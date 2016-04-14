@@ -23,7 +23,7 @@ class Root extends React.Component {
     render() {
         return (
             <Provider store={store}>
-                <Form />
+                <Form genome_assembly_selector={this.props.config.genome_assembly_selector} />
             </Provider>
         );
     }

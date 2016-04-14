@@ -3,12 +3,14 @@ import { connect } from 'react-redux';
 
 import Component from '../components/EncodeDatasetFiltering';
 
+import {requestEncodeDatasets} from '../actions';
+
 
 class Container extends React.Component {
 
     handleApplyFilters(filters){
-        console.log('to fix');
-        // this.props.dispatch(requestEncodeDatasets(filters));
+        filters['genome_assembly'] = this.props.genome_assembly;
+        this.props.dispatch(requestEncodeDatasets(filters));
     }
 
     handleSelectionChange(additions, deletions){
@@ -28,6 +30,7 @@ class Container extends React.Component {
     render() {
         return (
             <Component
+                genome_assembly={this.props.genome_assembly}
                 options={this.props.encodeOptions}
                 handleApplyFilters={this.handleApplyFilters.bind(this)}
                 availableDatasets={this.props.encodeDatasetsAvailable}
@@ -40,6 +43,7 @@ class Container extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        genome_assembly: state.genome_assembly,
         encodeOptions: state.encodeOptions,
         encodeDatasetsAvailable: state.encodeDatasetsAvailable,
         editObject: {analysis_encode_datasets: []},

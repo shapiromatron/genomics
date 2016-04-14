@@ -97,9 +97,21 @@ class EncodeDatasetFiltering extends React.Component {
         });
     }
 
+    renderNoAssembly(){
+        return (
+            <p className='help-block'>Please select a genomic assembly.</p>
+        );
+    }
+
     render() {
         let opts = this.props.options,
             vals = this.state.filters;
+
+
+        if (!this.props.genome_assembly){
+            return this.renderNoAssembly();
+        }
+
         return (
             <div>
             {this.renderDatasetDetailPopup()}
@@ -265,8 +277,10 @@ class EncodeDatasetFiltering extends React.Component {
                 <div className="popover-content">
                     <table className='table table-condensed table-hover'>
                         <thead>
-                            <th>Field</th>
-                            <th>Value</th>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
                         </thead>
                         <tbody>
                             <tr><td>Data type</td><td>{object.data_type}</td></tr>
@@ -284,6 +298,7 @@ class EncodeDatasetFiltering extends React.Component {
 }
 
 EncodeDatasetFiltering.propTypes = {
+    genome_assembly: React.PropTypes.number.isRequired,
     options: React.PropTypes.object.isRequired,
     handleApplyFilters: React.PropTypes.func.isRequired,
     availableDatasets: React.PropTypes.object.isRequired,

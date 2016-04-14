@@ -5,34 +5,62 @@ import * as types from './constants';
 import h from 'utils/helpers';
 
 
-
+// ---- Initial startup actions
 export function requestContent(config){
     return (dispatch, getState) => {
         let userDatasets = $.get(config.user_dataset),
-            encode = $.get(config.encode_dataset),
             encodeOpts = $.get(config.encode_dataset_options);
 
-        $.when(userDatasets, encode, encodeOpts)
-            .done(function(userDatasets, encode, encodeOpts){
-                dispatch(receiveContent(userDatasets[0], encode[0].results, encodeOpts[0]));
+        $.when(userDatasets, encodeOpts)
+            .done(function(userDatasets, encodeOpts){
+                dispatch(receiveContent(config, userDatasets[0], encodeOpts[0]));
             });
     };
 }
 
-function receiveContent(userDatasets, encodeDatasetsAvailable, encodeOptions){
+function receiveContent(config, userDatasets, encodeOptions){
     return {
-        type: types.AN_RECEIVE_CONTENT,
+        type: types.AN_STARTUP,
         userDatasets: _.indexBy(userDatasets, 'id'),
-        encodeDatasetsAvailable: _.indexBy(encodeDatasetsAvailable, 'id'),
+        config,
         encodeOptions,
     };
 }
 
-function requestEncodeContent() {
+
+// ---- Genomic assembly changes
+export function genomeAssemblyChange(value){
     return {
-        type: types.AN_REQUEST_ENCODE,
+        type: types.AN_GENOME_CHANGE,
+        value: value,
     };
 }
+
+
+// ---- Request new encode options
+export function requestEncodeDatasets(query){
+    return (dispatch, getState) => {
+        let state = getState(),
+            opts = $.param(query, false),
+            url = `${state.config.encode_dataset}?${opts}`;
+        return fetch(url, h.fetchGet)
+            .then(response => response.json())
+            .then(json => dispatch(receiveEncodeDatasets(json.results)))
+            .catch((ex) => console.error('Encode dataset parsing failed', ex));
+    };
+}
+function receiveEncodeDatasets(json){
+    return {
+        type: types.AN_RECIEVE_ENCODE,
+        encodeDatasetsAvailable: _.indexBy(json, 'id'),
+    };
+}
+
+
+
+
+
+
 
 function receiveObjects(json) {
     return {
@@ -45,20 +73,6 @@ function receiveObject(item){
     return {
         type: types.AN_RECIEVE_OBJECT,
         item,
-    };
-}
-
-function receiveEncodeOpts(json){
-    return {
-        type: types.AN_RECIEVE_ENCODE_OPTIONS,
-        json,
-    };
-}
-
-function receiveEncodeDatasets(json){
-    return {
-        type: types.AN_RECIEVE_ENCODE_DATASETS,
-        json,
     };
 }
 
@@ -113,30 +127,6 @@ export function fetchObjectsIfNeeded() {
     };
 }
 
-export function fetchEncodeOptionsIfNeeded(){
-    return (dispatch, getState) => {
-        let state = getState();
-        if (state.analysis.encodeOptions) return;
-        dispatch(requestEncodeContent());
-        return fetch(state.config.encode_dataset_options, h.fetchGet)
-            .then(response => response.json())
-            .then(json => dispatch(receiveEncodeOpts(json)))
-            .catch((ex) => console.error('Encode dataset options parsing failed', ex));
-    };
-}
-
-export function requestEncodeDatasets(query){
-    return (dispatch, getState) => {
-        let state = getState(),
-            opts = $.param(query, false),
-            url = `${state.config.encode_dataset}?${opts}`;
-        console.log(url);
-        return fetch(url, h.fetchGet)
-            .then(response => response.json())
-            .then(json => dispatch(receiveEncodeDatasets(json.results)))
-            .catch((ex) => console.error('Encode dataset parsing failed', ex));
-    };
-}
 
 export function patchObject(id, patch, cb){
     cb = cb || h.noop;
