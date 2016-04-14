@@ -270,6 +270,7 @@ class Analysis(GenomicBinSettings):
         FeatureList)
     sort_vector = models.ForeignKey(
         SortVector,
+        blank=True,
         null=True)
     validated = models.BooleanField(
         default=False)
