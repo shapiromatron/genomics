@@ -431,6 +431,12 @@ class Analysis(GenomicBinSettings):
             'cluster_medoids': output['cluster_medoids']
         }
 
+    def get_ks(self, id_):
+        if not self.output:
+            return False
+        output = self.output_json
+        return {'p-value': str(id_) + ': 0.05'}
+
     def get_sort_vector(self, id_):
         if not self.output:
             return False
