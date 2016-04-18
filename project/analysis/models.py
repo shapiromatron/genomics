@@ -194,8 +194,8 @@ class FeatureList(Dataset):
 class SortVector(Dataset):
     feature_list = models.ForeignKey(
         FeatureList)
-    text = models.TextField(
-        blank=True)
+    vector = models.FileField(
+        max_length=256)
 
     def get_absolute_url(self):
         return reverse('analysis:sort_vector', args=[self.pk, ])
@@ -386,7 +386,7 @@ class Analysis(GenomicBinSettings):
 
         sv = None
         if self.sort_vector:
-            sv = self.sort_vector.text   # todo - use file?
+            sv = self.sort_vector.vector.path
 
         mm = MatrixByMatrix(
             matrix_list=matrix_list,
@@ -456,7 +456,7 @@ class Analysis(GenomicBinSettings):
 
             # write sort vector
             if self.sort_vector:
-                z.writestr('sort_vector.txt', self.sort_vector.text.encode('utf-8'))
+                z.write(self.sort_vector.vector.path, arcname='sort_vector.txt')
 
             # write output JSON
             if self.output:
