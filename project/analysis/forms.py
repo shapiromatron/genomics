@@ -54,12 +54,28 @@ class BaseFormMixin(object):
 class UserDatasetForm(BaseFormMixin, forms.ModelForm):
     CREATE_LEGEND = 'Create user dataset'
 
+    stranded = forms.BooleanField(
+        required=False)
+
     class Meta:
         model = models.UserDataset
-        exclude = (
-            'owner', 'borrowers', 'validated',
-            'url', 'expiration_date',
+        fields = (
+            'name', 'description', 'genome_assembly', 'stranded',
+            'url_ambiguous', 'url_plus', 'url_minus',
         )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        stranded = cleaned_data['stranded']
+        if stranded:
+            if cleaned_data.get('url_plus') == '':
+                self.add_error('url_plus', 'This field is required.')
+            if cleaned_data.get('url_minus') == '':
+                self.add_error('url_minus', 'This field is required.')
+        else:
+            if cleaned_data.get('url_ambiguous') == '':
+                self.add_error('url_ambiguous', 'This field is required.')
 
 
 class FeatureListForm(BaseFormMixin, forms.ModelForm):
@@ -132,6 +148,7 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
         if self.instance.id:
             self.fields['datasets_json'].initial = self.instance.get_form_datasets()
 
+        # todo - be smarter about this; only delete results if needed.
         self.instance.start_time = None
         self.instance.end_time = None
 

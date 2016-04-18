@@ -89,6 +89,10 @@ class GenomicDataset(Dataset):
 
 
 class UserDataset(GenomicDataset):
+
+    URL_HELP = 'URL for downloading user-dataset, must be publicly available without authentication.'  # noqa
+    DATATYPES = ('a', 'p', 'm')
+
     data_ambiguous = models.FileField(
         blank=True,
         max_length=256)
@@ -98,11 +102,41 @@ class UserDataset(GenomicDataset):
     data_minus = models.FileField(
         blank=True,
         max_length=256)
+    url_ambiguous = models.URLField(
+        blank=True,
+        verbose_name='URL (strands unspecified)',
+        help_text=URL_HELP)
+    url_plus = models.URLField(
+        blank=True,
+        verbose_name='URL (plus-strand)',
+        help_text=URL_HELP)
+    url_minus = models.URLField(
+        blank=True,
+        verbose_name='URL (minus-strand)',
+        help_text=URL_HELP)
     url = models.URLField(
         max_length=256,
         null=True)
     expiration_date = models.DateTimeField(
         null=True)
+
+    def download_required(self, field):
+        if field not in self.DATATYPES:
+            raise ValueError('Unknown field type')
+        if field == 'a':
+            return self.data_ambiguous.name == '' and self.url_ambiguous != ''
+        elif field == 'p':
+            return self.data_plus.name == '' and self.url_plus != ''
+        elif field == 'm':
+            return self.data_minus.name == '' and self.url_minus != ''
+
+    def get_file_path(self, field):
+        if field not in self.DATATYPES:
+            raise ValueError('Unknown field type')
+        return os.path.join(
+            settings.MEDIA_ROOT,
+            "{}-{}.bigWig".format(self.id, field)
+        )
 
     def get_absolute_url(self):
         return reverse('analysis:user_dataset', args=[self.pk, ])
