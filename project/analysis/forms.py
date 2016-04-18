@@ -22,6 +22,9 @@ class BaseFormMixin(object):
         if owner:
             self.instance.owner = owner
 
+        if 'description' in self.fields:
+            self.fields['description'].widget.attrs['rows'] = 3
+
         self.helper = self.setHelper()
 
     def setHelper(self):
