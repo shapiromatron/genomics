@@ -1,8 +1,9 @@
 {% extends "analysis/dashboard.html" %}
 
 {% load crispy_forms_tags %}
+{% load render_bundle from webpack_loader %}
 
-{% block title %}Create feature list{% endblock %}
+{% block title %}Create new analysis{% endblock %}
 
 {% block crumbs_inner %}
     {% if object %}
@@ -15,5 +16,20 @@
 
 
 {% block mid_content %}
-    {% crispy form %}
+    <div id='analysis_form' style='display: none'>
+        {% crispy form %}
+    </div>
 {% endblock %}
+
+{% block extra_js %}
+<script id="config" type="text/json" charset="utf-8">
+    {
+        "user_dataset": "{% url 'analysis:api:user-dataset-list' %}",
+        "encode_dataset": "{% url 'analysis:api:encode-dataset-list' %}",
+        "encode_dataset_options": "{% url 'analysis:api:encode-dataset-field-options' %}",
+        "genome_assembly_selector": "#id_genome_assembly",
+        "datasets_json_selector": "#id_datasets_json"
+    }
+</script>
+{% render_bundle 'main' %}
+{% endblock extra_js %}

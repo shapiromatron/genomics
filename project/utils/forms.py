@@ -16,7 +16,7 @@ class BaseFormHelper(cf.FormHelper):
         if horizontal:
             self.form_class = 'form-horizontal'
             self.label_class = 'col-lg-2'
-            self.field_class = 'col-lg-8'
+            self.field_class = 'col-lg-10'
 
         self.form = form
         self.layout = self.build_default_layout()

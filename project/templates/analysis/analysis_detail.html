@@ -71,18 +71,33 @@
         </tr>
         <tr>
             <th>User datasets</th>
-            <td><i>TODO: add</i></td>
+            <td>
+                <ul>
+                    {% for ds in object.analysis_user_datasets %}
+                        <li><a href="{{ds.dataset.subclass.get_absolute_url}}">{{ds.display_name}}</a></li>
+                    {% endfor %}
+                </ul>
+            </td>
         </tr>
         <tr>
             <th>ENCODE datasets</th>
-            <td><i>TODO: add</i></td>
+            <td>
+                <ul>
+                    {% for ds in object.analysis_encode_datasets %}
+                        <li>{{ds.display_name}}</li>
+                    {% endfor %}
+                </ul>
+            </td>
         </tr>
     </tbody>
 </table>
 
 <div class="well well-sm">
-    <a class='btn btn-primary' href="{{object.get_execute_url}}">Execute</a>
-    <a class='btn btn-primary' href="{{object.get_visuals_url}}">Visualization</a>
+    {% if object.is_complete %}
+        <a class='btn btn-primary' href="{{object.get_visuals_url}}">Visualization</a>
+    {% else %}
+        <a class='btn btn-primary' href="{{object.get_execute_url}}">Execute</a>
+    {% endif %}
 </div>
 
 

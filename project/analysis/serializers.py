@@ -6,6 +6,7 @@ from . import models
 
 class UserDatasetSerializer(serializers.ModelSerializer):
     genome_assembly_display = serializers.ReadOnlyField(source='get_genome_assembly_display')
+    url = serializers.ReadOnlyField(source='get_absolute_url')
 
     class Meta:
         model = models.UserDataset
@@ -56,7 +57,6 @@ class AnalysisSerializer(serializers.ModelSerializer):
     analysis_encode_datasets = AnalysisDatasetsSerializer(many=True)
     genome_assembly_display = serializers.ReadOnlyField(source='get_genome_assembly_display')
     anchor_display = serializers.ReadOnlyField(source='get_anchor_display')
-    status = serializers.ReadOnlyField()
 
     class Meta:
         model = models.Analysis

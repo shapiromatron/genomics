@@ -5,7 +5,7 @@ class OwnerOrStaff(object):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        if not self.request.user.is_staff and obj.user != self.request.user:
+        if not self.request.user.is_staff and obj.owner != self.request.user:
             raise PermissionDenied()
         return obj
 

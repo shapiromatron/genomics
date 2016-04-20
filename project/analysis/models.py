@@ -3,9 +3,11 @@ import os
 import uuid
 import io
 import zipfile
+import itertools
 
 from django.db import models
 from django.conf import settings
+from django.core.cache import cache
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.urlresolvers import reverse
 from django.contrib.postgres.fields import JSONField
@@ -270,6 +272,7 @@ class Analysis(GenomicBinSettings):
         FeatureList)
     sort_vector = models.ForeignKey(
         SortVector,
+        blank=True,
         null=True)
     validated = models.BooleanField(
         default=False)
@@ -296,11 +299,11 @@ class Analysis(GenomicBinSettings):
         return self.name
 
     @classmethod
-    def is_running(cls, owner):
+    def running(cls, owner):
         return cls.objects.filter(end_time__isnull=True, owner=owner)
 
     @classmethod
-    def is_complete(cls, owner):
+    def complete(cls, owner):
         return cls.objects.filter(end_time__isnull=False, owner=owner)
 
     def get_absolute_url(self):
@@ -330,7 +333,7 @@ class Analysis(GenomicBinSettings):
 
     @property
     def encode_datasets(self):
-        return EncodeDataset.objects.filter(id__in=self.datasets.values_list('id' ,flat=True))
+        return EncodeDataset.objects.filter(id__in=self.datasets.values_list('id', flat=True))
 
     @property
     def analysis_user_datasets(self):
@@ -339,6 +342,19 @@ class Analysis(GenomicBinSettings):
     @property
     def analysis_encode_datasets(self):
         return self.analysisdatasets_set.filter(dataset__in=self.encode_datasets)
+
+    def get_form_datasets(self):
+        uds = list(self.analysis_user_datasets.values('dataset_id', 'display_name'))
+        eds = list(self.analysis_encode_datasets.values('dataset_id', 'display_name'))
+
+        for ds in itertools.chain(uds, eds):
+            ds['dataset'] = ds['dataset_id']
+            del ds['dataset_id']
+
+        return json.dumps({
+            "userDatasets": uds,
+            "encodeDatasets": eds,
+        })
 
     class Meta:
         verbose_name_plural = 'Analyses'
@@ -353,11 +369,8 @@ class Analysis(GenomicBinSettings):
         return list(self.analysisdatasets_set.values_list('count_matrix', flat=True))
 
     @property
-    def status(self):
-        if self.start_time:
-            return 'COMPLETE' if self.end_time else 'RUNNING'
-        else:
-            return 'NOT STARTED'
+    def is_complete(self):
+        return True if self.start_time and self.end_time else False
 
     def execute(self):
         tasks.execute_analysis.delay(self.id)
@@ -393,7 +406,15 @@ class Analysis(GenomicBinSettings):
         # TODO: cache using redis
         if not hasattr(self, '_output_json'):
             with open(self.output.path, 'r') as f:
-                self._output_json = json.loads(f.read())
+                output = json.loads(f.read())
+
+            # convert JSON str keys to int keys
+            sort_orders = output['sort_orders']
+            for k, v in sort_orders.items():
+                sort_orders[int(k)] = sort_orders.pop(k)
+
+            self._output_json = output
+
         return self._output_json
 
     def get_summary_plot(self):
@@ -446,6 +467,27 @@ class Analysis(GenomicBinSettings):
                 z.write(ds.count_matrix.matrix.path, 'count_matrix/{}.txt'.format(ds.display_name))
 
         return f
+
+    @property
+    def cache_key_total(self):
+        return 'analysis-{}-total'.format(self.id)
+
+    @property
+    def cache_key_complete(self):
+        return 'analysis-{}-complete'.format(self.id)
+
+    def init_execution_status(self):
+        cache.set(self.cache_key_complete, 0)
+        cache.set(self.cache_key_total, self.datasets.count() + 1)
+
+    def increment_execution_status(self):
+        current = cache.get(self.cache_key_complete)
+        cache.set(self.cache_key_complete, current + 1)
+
+    def get_execution_status(self):
+        complete = cache.get(self.cache_key_complete)
+        ofTotal = float(cache.get(self.cache_key_total))
+        return complete / ofTotal
 
 
 class FeatureListCountMatrix(GenomicBinSettings):

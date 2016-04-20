@@ -4,6 +4,7 @@ from celery.decorators import task
 from celery import group, chain
 from django.apps import apps
 from django.utils import timezone
+from django.core.cache import cache
 
 logger = get_task_logger(__name__)
 
@@ -50,6 +51,7 @@ def reset_analysis_startup(analysis_id):
     analysis.start_time = timezone.now()
     analysis.end_time = None
     analysis.save()
+    analysis.init_execution_status()
 
 
 @task()
@@ -64,6 +66,7 @@ def execute_count_matrix(analysis_id, ads_id, isEncode, dataset_id):
     FeatureListCountMatrix = apps.get_model('analysis', 'FeatureListCountMatrix')
     ads.count_matrix = FeatureListCountMatrix.execute(analysis, dataset)
     ads.save()
+    analysis.increment_execution_status()
 
 
 @task()
@@ -73,3 +76,4 @@ def execute_matrix_combination(analysis_id):
     analysis.output = analysis.execute_mat2mat()
     analysis.end_time = timezone.now()
     analysis.save()
+    analysis.increment_execution_status()

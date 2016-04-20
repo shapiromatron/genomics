@@ -1,3 +1,5 @@
+import itertools
+import json
 from django import forms
 
 from utils.forms import BaseFormHelper
@@ -30,9 +32,10 @@ class BaseFormMixin(object):
                 widget.attrs['class'] = 'span12'
 
         inputs = {}
+
         if self.instance.id:
             # update
-            pass
+            inputs["legend_text"] = 'Update {}'.format(self.instance)
         else:
             # create
             if self.CREATE_LEGEND:
@@ -50,7 +53,10 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
 
     class Meta:
         model = models.UserDataset
-        exclude = ('owner', 'borrowers', 'validated', 'url', 'expiration_date',)
+        exclude = (
+            'owner', 'borrowers', 'validated',
+            'url', 'expiration_date',
+        )
 
 
 class FeatureListForm(BaseFormMixin, forms.ModelForm):
@@ -70,20 +76,84 @@ class SortVectorForm(BaseFormMixin, forms.ModelForm):
         exclude = ('owner', 'borrowers', 'validated', )
 
 
+class DatasetField(forms.CharField):
+
+    def get_datasets(self, value):
+        d = json.loads(value)
+        return {
+            'userDatasets': d.get('userDatasets', []),
+            'encodeDatasets': d.get('encodeDatasets', []),
+        }
+
+    def is_valid(self, cleaned):
+        d = self.get_datasets(cleaned)
+        if len(d['userDatasets']) + len(d['encodeDatasets']) < 2:
+            raise forms.ValidationError("At least two datasets are required.")
+
+        for obj in itertools.chain(d['userDatasets'], d['encodeDatasets']):
+            if 'dataset' not in obj or 'display_name' not in obj:
+                raise forms.ValidationError("At least two datasets are required.")
+
+        return True
+
+    def clean(self, value):
+        # ensure valid JSON
+        try:
+            json.loads(value)
+            return value
+        except json.decoder.JSONDecodeError:
+            raise forms.ValidationError('JSON format required.')
+
+
 class AnalysisForm(BaseFormMixin, forms.ModelForm):
     CREATE_LEGEND = 'Create analysis'
 
+    datasets_json = DatasetField(widget=forms.HiddenInput)
+
     class Meta:
         model = models.Analysis
-        exclude = (
-            'owner', 'validated', 'start_time', 'end_time', 'output',
-            'datasets',
+        fields = (
+            'name', 'description', 'genome_assembly',
+            'feature_list', 'sort_vector', 'public',
+            'anchor', 'bin_start', 'bin_size',
+            'bin_number',
         )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.fields['feature_list'].queryset = \
             models.FeatureList.objects.filter(owner=self.instance.owner)
         self.fields['sort_vector'].queryset = \
             models.SortVector.objects.filter(owner=self.instance.owner)
+
+        if self.instance.id:
+            self.fields['datasets_json'].initial = self.instance.get_form_datasets()
+
+        self.instance.start_time = None
+        self.instance.end_time = None
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        ds = cleaned_data['datasets_json']
+        if not self.fields['datasets_json'].is_valid(ds):
+            raise forms.ValidationError("Improper dataset specification")
+
+    def _save_m2m(self):
+        ds = self.fields['datasets_json']\
+                .get_datasets(self.cleaned_data['datasets_json'])
+
+        # out with the old
+        models.AnalysisDatasets.objects\
+            .filter(analysis=self.instance)\
+            .delete()
+
+        # in with the new
+        objects = [
+            models.AnalysisDatasets(
+                analysis_id=self.instance.id,
+                dataset_id=d['dataset'],
+                display_name=d['display_name']
+            ) for d in itertools.chain(ds['userDatasets'], ds['encodeDatasets'])
+        ]
+        models.AnalysisDatasets.objects.bulk_create(objects)
