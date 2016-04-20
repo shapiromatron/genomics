@@ -38,8 +38,8 @@ class IndividualOverview {
                 'size': '12',
             })
             .css({
-                'height': '40%',
-                'weight': '30%',
+                'height': '55%',
+                'width': '30%',
                 'font-size': '8px',
                 'position': 'absolute',
                 'top': '20%',
@@ -68,6 +68,8 @@ class IndividualOverview {
                 'position': 'absolute',
                 'left': '0%',
                 'top': '0%',
+                'width': '30%',
+                'height': '15%',
                 'overflow': 'scroll',
             })
 
