@@ -1,9 +1,10 @@
+import json
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import HttpResponse
 from django.core.exceptions import PermissionDenied
-from django.views.generic import TemplateView, CreateView, UpdateView, DetailView, DeleteView
+from django.views.generic import TemplateView, CreateView, UpdateView, DetailView, DeleteView, ListView
 
 from utils.views import OwnerOrStaff, AddUserToFormMixin
 from . import models, forms, tasks
@@ -70,6 +71,29 @@ class UserDatasetUpdate(OwnerOrStaff, UpdateView):
 class UserDatasetDelete(OwnerOrStaff, DeleteView):
     model = models.UserDataset
     success_url = reverse_lazy('analysis:manage_data')
+
+
+# User dataset CRUD
+class DatasetDownloadList(LoginRequiredMixin, ListView):
+    model = models.DatasetDownload
+
+    def get_queryset(self):
+        return self.model.objects.filter(owner=self.request.user)
+
+
+class DatasetDownloadDetail(OwnerOrStaff, DetailView):
+    model = models.DatasetDownload
+
+
+class DatasetDownloadCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
+    model = models.DatasetDownload
+    form_class = forms.DatasetDownloadForm
+    success_url = reverse_lazy('analysis:dataset_download_list')
+
+
+class DatasetDownloadDelete(OwnerOrStaff, DeleteView):
+    model = models.DatasetDownload
+    success_url = reverse_lazy('analysis:dataset_download_list')
 
 
 # Feature list CRUD

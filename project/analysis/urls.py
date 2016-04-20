@@ -72,6 +72,20 @@ urlpatterns = [
         views.UserDatasetDelete.as_view(),
         name='user_dataset_delete'),
 
+    # download dataset
+    url(r'^datasets/$',
+        views.DatasetDownloadList.as_view(),
+        name='dataset_download_list'),
+    url(r'^dataset-download/create/$',
+        views.DatasetDownloadCreate.as_view(),
+        name='dataset_download_create'),
+    url(r'^dataset-download/(?P<pk>\d+)/$',
+        views.DatasetDownloadDetail.as_view(),
+        name='dataset_download'),
+    url(r'^dataset-download/(?P<pk>\d+)/delete/$',
+        views.DatasetDownloadDelete.as_view(),
+        name='dataset_download_delete'),
+
     # feature list CRUD
     url(r'^feature-list/create/$',
         views.FeatureListCreate.as_view(),

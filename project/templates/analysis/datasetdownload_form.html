@@ -1,0 +1,51 @@
+{% extends "analysis/dashboard.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Upload dataset{% endblock %}
+
+{% block crumbs_inner %}
+    <li><a href="{% url 'analysis:manage_data' %}">Data management</a></li>
+    <li class='active'>Upload new dataset</li>
+{% endblock crumbs_inner %}
+
+
+{% block mid_content %}
+    {% crispy form %}
+{% endblock %}
+
+
+{% block extra_js %}
+<script type="text/javascript">
+var showFileList = function(files){
+        var lis;
+        if (files.length > 0){
+            lis = files.map(function(d){return '<li>' + d + '</li>';}).join('');
+        } else {
+            lis = '<li><i>None</i></li>';
+        }
+        $('#filesUl').html(lis);
+    },
+    checkFileName = function(files){
+        $('#id_filename').keyup(function(e){
+            var lis = $('#filesUl li');
+            var newFn = e.target.value + '.bigWig';
+            if (files.indexOf(newFn)>0){
+                lis.each(function(i, d){
+                    if (d.textContent == newFn)
+                        $(d).addClass('bg-danger');
+                });
+            } else {
+                lis.removeClass('bg-danger');
+            }
+        });
+    };
+
+$(document).ready(function(){
+    var files = JSON.parse('{{existing_files|safe}}');
+    showFileList(files);
+    checkFileName(files);
+});
+
+</script>
+{% endblock extra_js %}

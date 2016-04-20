@@ -1,6 +1,7 @@
 import itertools
 import json
 from django import forms
+import crispy_forms.layout as cfl
 
 from utils.forms import BaseFormHelper
 
@@ -76,6 +77,37 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
         else:
             if cleaned_data.get('url_ambiguous') == '':
                 self.add_error('url_ambiguous', 'This field is required.')
+
+
+class DatasetDownloadForm(BaseFormMixin, forms.ModelForm):
+    CREATE_LEGEND = 'Upload a new dataset'
+
+    files_template = """
+        <div class='row'>
+            <div class='col-md-10 col-md-offset-2'
+                <h3>Files you've already uploaded (beware of name conflicts): </h3>
+                <ul id='filesUl'>
+                </ul>
+            </div>
+        </div>
+    """
+
+    class Meta:
+        model = models.DatasetDownload
+        fields = ('url', 'filename')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.layout.insert(
+            len(self.helper.layout)-1,
+            cfl.HTML(self.files_template)
+        )
+
+    def clean_filename(self):
+        fn = self.cleaned_data['filename']
+        if fn + '.bigWig' in self.instance.owner.files:
+            raise forms.ValidationError("File already exists!")
+        return fn
 
 
 class FeatureListForm(BaseFormMixin, forms.ModelForm):

@@ -47,6 +47,10 @@ class User(authModels.AbstractBaseUser):
     def path(self):
         return os.path.join(settings.USERDATA_PATH, str(self.id))
 
+    @property
+    def files(self):
+        return os.listdir(self.path)
+
     def get_full_name(self):
         return self.email
 

@@ -1,7 +1,9 @@
 import json
+import hashlib
 import os
 import uuid
 import io
+import requests
 import zipfile
 import itertools
 
@@ -11,6 +13,7 @@ from django.core.cache import cache
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.urlresolvers import reverse
 from django.contrib.postgres.fields import JSONField
+from django.utils.timezone import now
 
 from utils.models import ReadOnlyFileSystemStorage, get_random_filename
 
@@ -68,6 +71,103 @@ GENOME_ASSEMBLY_CHOICES = (
     (HG19, 'hg19'),
     (MM9,  'mm9'),
 )
+
+
+class DatasetDownload(models.Model):
+    NOT_STARTED = 0
+    STARTED = 1
+    FINISHED_ERROR = 2
+    FINISHED_SUCCESS = 3
+    STATUS_CHOICES = (
+        (NOT_STARTED, 'not-started'),
+        (STARTED, 'started'),
+        (FINISHED_ERROR, 'finished with errors'),
+        (FINISHED_SUCCESS, 'successfully completed'),
+    )
+    CHUNK = 1024 * 1024
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        related_name='%(class)s',)
+    url = models.URLField()
+    filename = models.CharField(
+        help_text='Filename (no extension)',
+        max_length=100)
+    filesize = models.FloatField(
+        null=True)
+    md5 = models.CharField(
+        max_length=64,
+        null=True)
+    status_code = models.PositiveSmallIntegerField(
+        default=NOT_STARTED,
+        choices=STATUS_CHOICES)
+    status = models.TextField(
+        blank=True,
+        null=True)
+    start_time = models.DateTimeField(
+        blank=True,
+        null=True)
+    end_time = models.DateTimeField(
+        blank=True,
+        null=True)
+
+    def get_absolute_url(self):
+        return reverse('analysis:dataset_download', args=[self.pk, ])
+
+    def get_delete_url(self):
+        return reverse('analysis:dataset_download_delete', args=[self.pk, ])
+
+    def get_form_cancel_url(self):
+        return reverse('analysis:dataset_download_list')
+
+    def get_full_path(self):
+        return os.path.join(self.owner.path, self.filename + '.bigWig')
+
+    def get_filename(self):
+        return self.get_full_path().split(self.owner.path + '/')[1]
+
+    def download(self):
+        fn = self.get_full_path()
+        self.reset()
+        try:
+            r = requests.get(self.url, stream=True)
+            with open(fn, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=self.CHUNK):
+                    if chunk:  # filter out keep-alive new chunks
+                        f.write(chunk)
+            self.end_time = now()
+            self.status_code = self.FINISHED_SUCCESS
+            self.md5 = self.get_md5()
+            self.filesize = os.path.getsize(fn)
+        except Exception as e:
+            self.start_time = None
+            self.status_code = self.FINISHED_ERROR
+            self.status = str(e)
+        self.save()
+
+    def get_md5(self):
+        # equivalent to "md5 -q $FN"
+        fn = self.get_full_path()
+        hasher = hashlib.md5()
+        with open(fn, "rb") as f:
+            for block in iter(lambda: f.read(self.CHUNK), b''):
+                hasher.update(block)
+        return hasher.hexdigest()
+
+    def reset(self):
+        self.status_code = self.STARTED
+        self.status = ''
+        self.start_time = now()
+        self.end_time = None
+        self.filesize = None
+        self.md5 = ''
+        self.save()
+
+    def delete_file(self):
+        fn = self.get_full_path()
+        if os.path.exists(fn):
+            os.remove(fn)
 
 
 class GenomicDataset(Dataset):

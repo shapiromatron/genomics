@@ -82,27 +82,6 @@ def execute_matrix_combination(analysis_id):
 
 
 @task()
-def download_user_datasets(id_):
-    ds = apps.get_model('analysis', 'UserDataset').objects.get(id=id_)
-    dls = []
-    if ds.download_required('a'):
-        dls.append(download_user_dataset.si(ds.url_ambiguous, ds.get_file_path('a')))
-    if ds.download_required('p'):
-        dls.append(download_user_dataset.si(ds.url_plus, ds.get_file_path('p')))
-    if ds.download_required('m'):
-        dls.append(download_user_dataset.si(ds.url_minus, ds.get_file_path('m')))
-    import pdb; pdb.set_trace()
-    return group(dls)()
-
-
-@task()
-def download_user_dataset(url, fn):
-    try:
-        r = requests.get(url, stream=True)
-        with open(fn, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=1024 * 1024):
-                if chunk:  # filter out keep-alive new chunks
-                    f.write(chunk)
-        return True
-    except requests.exceptions.ConnectionError:
-        return False
+def download_dataset(id_):
+    dd = apps.get_model('analysis', 'DatasetDownload').objects.get(id=id_)
+    dd.download()
