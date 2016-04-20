@@ -5,6 +5,7 @@ import numpy
 from scipy import stats
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import squareform, pdist
+from scipy.cluster.vq import kmeans2, whiten
 import os
 import json
 
@@ -194,7 +195,8 @@ class MatrixByMatrix():
                         for cm4 in cm2:
                             index_1 = self.matrix_ids.index(cm3)
                             index_2 = self.matrix_ids.index(cm4)
-                            ccvs2.append(self.correlation_matrix[index_1][index_2])
+                            ccvs2.append(
+                                self.correlation_matrix[index_1][index_2])
                     ccvs.append(ccvs2)
             self.cluster_correlation_values.append(ccvs)
 
@@ -236,6 +238,7 @@ class MatrixByMatrix():
             sort_orders=self.sort_orders,
             cluster_medoids=self.cluster_medoids,
             sort_vector=getattr(self, 'sort_vector', None),
+            feature_clusters=self.kmeans_results
         )
 
     def writeJson(self, fn):
@@ -266,12 +269,65 @@ class MatrixByMatrix():
 
         return lst
 
+    def createFeatureMatrix(self):
+        self.vector_matrix = None
+        headers = None
+        row_names = []
+
+        for entry in self.matrix_list:
+            matrix_fn = entry[2]
+            with open(matrix_fn) as f:
+                # DEAL WITH HEADERS
+                # IF EMPTY, POPULATE HEADERS
+                if not headers:
+                    headers = next(f).strip().split()
+                # ELSE, CHECK IF CONSISTENT
+                else:
+                    if headers != next(f).strip().split():
+                        raise ValueError('Headers not consistent across \
+                            matrices')
+
+                # POPULATE TEMPORARY MATRIX
+                matrix_temp = []
+                for line in f:
+                    matrix_temp.append(line.strip().split())
+
+                # ADD SUM TO VECTOR MATRIX
+                if not self.vector_matrix:
+                    self.vector_matrix = []
+                    for i, entry in enumerate(matrix_temp):
+                        row_name = entry[0]
+                        row_values = numpy.array(entry[1:]).astype(float)
+                        row_names.append(row_name)
+                        self.vector_matrix.append([numpy.sum(row_values)])
+                else:
+                    for i, entry in enumerate(matrix_temp):
+                        row_name = entry[0]
+                        row_values = numpy.array(entry[1:]).astype(float)
+                        if row_name != row_names[i]:
+                            raise ValueError('Row names do not match across \
+                                matrices')
+                        self.vector_matrix[i].append(numpy.sum(row_values))
+
+    def performFeatureClustering(self):
+        self.kmeans_results = dict()
+        whitened = whiten(self.vector_matrix)
+        for i in range(2, 11):
+            centroids, labels = kmeans2(whitened, i)
+            self.kmeans_results[i] = {
+                'centroids': centroids.tolist(),
+                'labels': labels.tolist()
+                }
+
     def execute(self):
         self.readMatrixFiles()
         self.createSortOrders()
         self.createCorrelationMatrix()
         self.performClustering()
         self.findClusterCorrelationValues()
+
+        self.createFeatureMatrix()
+        self.performFeatureClustering()
 
 
 @click.command()
