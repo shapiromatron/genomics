@@ -119,12 +119,12 @@ class IndividualOverview {
         var num = this.matrix_names.length - 1,
             entry_length = 20,
             index = this.matrix_names.indexOf(this.el.find('#select_list').find('option:selected').text()),
-            margin = {top: 0, right: 20, bottom: 20, left: 20},
-            offset = {top: 20, right: 20, bottom: 100, left: 40},
+            margin = {top: 0, right: 0, bottom: 20, left: 0},
+            offset = {top: 20, right: 0, bottom: 100, left: 40},
             width = (num*entry_length > this.el.find('#correlation_plot').width())
                 ? (num*entry_length - margin.left - margin.right)
                 : (this.el.find('#correlation_plot').width() - margin.left - margin.right),
-            height = this.el.find('#correlation_plot').height() - margin.top - margin.bottom;
+            height = this.el.find('#correlation_plot').height();
 
         $('<div id="graph">')
             .css({
