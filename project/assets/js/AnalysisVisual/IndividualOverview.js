@@ -119,7 +119,9 @@ class IndividualOverview {
             index = this.matrix_names.indexOf(this.el.find('#select_list').find('option:selected').text()),
             margin = {top: 0, right: 20, bottom: 20, left: 20},
             offset = {top: 20, right: 20, bottom: 100, left: 40},
-            width = num*entry_length - margin.left - margin.right,
+            width = (num*entry_length > this.el.find('#correlation_plot').width())
+                ? (num*entry_length - margin.left - margin.right)
+                : (this.el.find('#correlation_plot').width() - margin.left - margin.right),
             height = this.el.find('#correlation_plot').height() - margin.top - margin.bottom;
 
         $('<div id="graph">')
@@ -157,7 +159,8 @@ class IndividualOverview {
 
         var xAxis = d3.svg.axis()
             .scale(x)
-            .orient('bottom');
+            .orient('bottom')
+            .outerTickSize(0);
 
         var yAxis = d3.svg.axis()
             .scale(y)
@@ -173,9 +176,21 @@ class IndividualOverview {
             .attr('x', function(d) { return offset.left + x(d[0]); })
             .attr('width', x.rangeBand() - 2)
             .attr('y', function(d) { return offset.top + y(Math.max(0,d[1])); })
-            .attr('height', function(d) { return Math.abs(y(0) - y(d[1])); })
+            .attr('height', function(d) { return Math.abs(y(0) - y(d[1])); });
+
+
+        graph.append('g')
+            .selectAll('rect')
+            .data(sortable)
+            .enter()
+            .append('rect')
+            .style('fill', 'transparent')
+            .attr('x', function(d) { return offset.left + x(d[0]); })
+            .attr('width', x.rangeBand() - 2)
+            .attr('y', offset.top)
+            .attr('height', y(-1))
             .on('mouseover', function (d) {
-                d3.select(this).style('stroke', 'black').style('stroke-width', '1');
+                //d3.select(this).style('stroke', 'black').style('stroke-width', '1');
                 var content = (d[0] + '<br/>' + d[1].toFixed(2));
                 $(this).tooltip({
                     container: 'body',
@@ -184,10 +199,12 @@ class IndividualOverview {
                     animation: false,
                 });
                 $(this).tooltip('show');
-            })
+            });
+            /*
             .on('mouseout', function () {
                 d3.select(this).style('stroke', 'none');
             });
+            */
 
         $('[data-toggle="tooltip"]').tooltip();
 
