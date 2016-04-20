@@ -1,7 +1,15 @@
+#analysis_selection_panel {
+    height: 50px;
+    width: 95%;
+    position: relative;
+    margin-top: 20px;
+}
+
 #visual_panel_1 {
     height: 500px;
     width: 95%;
     position: relative;
+    margin-top: 20px;
 }
 
 #visual_panel_2 {
