@@ -218,6 +218,16 @@ class MatrixByMatrix():
             self.max_abs_correlation_values.append(max_abs_cv)
 
     def getOutputDict(self):
+        # make values more portable for output JSON
+        for key in self.kmeans_results:
+            for i in range(len(self.kmeans_results[key]['centroids'])):
+                for j, val in enumerate(
+                        self.kmeans_results[key]['centroids'][i]):
+                    self.kmeans_results[key]['centroids'][i][j] = \
+                        '%.2f' % round(val, 2)
+        for entry in self.vector_matrix:
+            for i, val in enumerate(entry):
+                entry[i] = '%.2f' % round(val, 2)
         # Return an output dict of the analysis results
         return dict(
             bin_parameters={
@@ -238,7 +248,8 @@ class MatrixByMatrix():
             sort_orders=self.sort_orders,
             cluster_medoids=self.cluster_medoids,
             sort_vector=getattr(self, 'sort_vector', None),
-            feature_clusters=self.kmeans_results
+            feature_clusters=self.kmeans_results,
+            feature_vectors=self.vector_matrix
         )
 
     def writeJson(self, fn):
@@ -328,7 +339,6 @@ class MatrixByMatrix():
 
         self.createFeatureMatrix()
         self.performFeatureClustering()
-
 
 @click.command()
 @click.argument('matrix_list_fn', type=str)
