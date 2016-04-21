@@ -9,6 +9,7 @@ class FeatureClusteringOverview{
         this.matrix_names = data['matrix_names'];
         this.feature_clusters = data['feature_clusters'];
         this.feature_vectors = data['feature_vectors'];
+        this.dendrogram = data['dendrogram'];
     }
 
     drawHeatmap(k) {
@@ -123,8 +124,67 @@ class FeatureClusteringOverview{
             });
     }
 
+    drawDendrogram() {
+        this.el.find('#dendrogram').remove();
+
+        var dendro = $('<div id="dendrogram">')
+            .css({
+                'position': 'absolute',
+                'left': '40%',
+                'top': '0%',
+                'overflow': 'visible',
+                'height': '20%',
+                'width': '60%',
+            }).appendTo(this.el);
+
+        var line_coords = [],
+            x_max = parseFloat(Math.max(...[].concat.apply([], this.dendrogram['icoord']))),
+            y_max = parseFloat(Math.max(...[].concat.apply([], this.dendrogram['dcoord']))),
+            x_min = parseFloat(Math.min(...[].concat.apply([], this.dendrogram['icoord']))),
+            y_min = parseFloat(Math.min(...[].concat.apply([], this.dendrogram['dcoord']))),
+            height = dendro.height(),
+            width = dendro.width(),
+            ceiling = 0.05*dendro.height(),
+            leaf_num = this.dendrogram['leaves'].length,
+            icoords = this.dendrogram['icoord'],
+            dcoords = this.dendrogram['dcoord'],
+            leafHeight = ((0.5/leaf_num)*width);
+
+        for(var i=0; i<icoords.length; i++){
+            for(var j=0; j<3; j++){
+                line_coords.push({
+                    // y1: leafHeight+((parseFloat(icoords[i][j])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
+                    // y2: leafHeight+((parseFloat(icoords[i][parseInt(j)+1])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
+                    // x1: width-((parseFloat(dcoords[i][j])-x_min)/(x_max-x_min))*width,
+                    // x2: width-((parseFloat(dcoords[i][parseInt(j)+1])-x_min)/(x_max-x_min))*width,
+                    y1: height-((parseFloat(dcoords[i][j])-y_min)/(y_max-y_min))*(height-ceiling),
+                    y2: height-((parseFloat(dcoords[i][j+1])-y_min)/(y_max-y_min))*(height-ceiling),
+                    x1: leafHeight+((parseFloat(icoords[i][j])-x_min)/(x_max-x_min))*(width*((leaf_num-1)/leaf_num)),
+                    x2: leafHeight+((parseFloat(icoords[i][j+1])-x_min)/(x_max-x_min))*(width*((leaf_num-1)/leaf_num)),
+                });
+            }
+        }
+
+        var svg = d3.select(dendro.get(0))
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+
+        svg.append('g')
+            .selectAll('line')
+            .data(line_coords)
+            .enter()
+            .append('line')
+            .attr('class', 'dendroLine')
+            .attr('x1', function(d) { return d.x1; })
+            .attr('x2', function(d) { return d.x2; })
+            .attr('y1', function(d) { return d.y1; })
+            .attr('y2', function(d) { return d.y2; });
+    }
+
     render() {
         this.drawHeatmap(2);
+        this.drawDendrogram();
     }
 }
 
