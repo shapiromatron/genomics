@@ -10,6 +10,9 @@ class FeatureClusteringOverview{
         this.feature_clusters = data['feature_clusters'];
         this.feature_vectors = data['feature_vectors'];
         this.dendrogram = data['dendrogram'];
+        this.matrix_names = data['matrix_names'];
+        this.cluster_medoids = data['cluster_medoids'];
+        this.cluster_members = data['cluster_members'];
     }
 
     drawHeatmap(k) {
@@ -19,13 +22,13 @@ class FeatureClusteringOverview{
         // create heatmap
         var heatmap = $('<canvas id="heatmap"></canvas>')
             .prop({
-                'height': 0.80 * this.el.height(),
+                'height': 0.60 * this.el.height(),
                 'width': 0.60 * this.el.width(),
             })
             .css({
                 'position': 'absolute',
                 'left': '40%',
-                'top': '20%',
+                'top': '40%',
             })
             .appendTo(this.el);
 
@@ -71,11 +74,11 @@ class FeatureClusteringOverview{
         // add cluster bars
         var heatmap_clusters = $('<div id="heatmap_clusters">')
             .css({
-                'height': '80%',
+                'height': '60%',
                 'width': '3%',
                 'position': 'absolute',
                 'left': '36%',
-                'top': '20%',
+                'top': '40%',
             }).appendTo(this.el);
 
         var cluster_colors = ['red','blue'];
@@ -153,10 +156,6 @@ class FeatureClusteringOverview{
         for(var i=0; i<icoords.length; i++){
             for(var j=0; j<3; j++){
                 line_coords.push({
-                    // y1: leafHeight+((parseFloat(icoords[i][j])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
-                    // y2: leafHeight+((parseFloat(icoords[i][parseInt(j)+1])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
-                    // x1: width-((parseFloat(dcoords[i][j])-x_min)/(x_max-x_min))*width,
-                    // x2: width-((parseFloat(dcoords[i][parseInt(j)+1])-x_min)/(x_max-x_min))*width,
                     y1: height-((parseFloat(dcoords[i][j])-y_min)/(y_max-y_min))*(height-ceiling),
                     y2: height-((parseFloat(dcoords[i][j+1])-y_min)/(y_max-y_min))*(height-ceiling),
                     x1: leafHeight+((parseFloat(icoords[i][j])-x_min)/(x_max-x_min))*(width*((leaf_num-1)/leaf_num)),
@@ -182,9 +181,58 @@ class FeatureClusteringOverview{
             .attr('y2', function(d) { return d.y2; });
     }
 
+    writeVertNames() {
+        // remove existing
+        this.el.find('#vert_names').remove();
+
+        // create new
+        var vert = $('<div id="vert_names">')
+            .css({
+                'position': 'absolute',
+                'left': '40%',
+                'top': '21%',
+                'overflow': 'hidden',
+                'height': '18%',
+                'width': '60%',
+            }).appendTo(this.el);
+
+        //Draw SVGs
+        var height = vert.height(),
+            width = vert.width(),
+            row_number = this.cluster_members.length,
+            cluster_medoids = this.cluster_medoids,
+            matrix_names = this.matrix_names;
+
+        var svg = d3.select(vert.get(0))
+            .append('svg')
+            .attr('height', height)
+            .attr('width', width);
+
+        svg.append('g')
+            .selectAll('text')
+            .data(this.cluster_members)
+            .enter()
+            .append('text')
+            .attr('class', 'heatmapLabelText')
+            .text(function(d,i) {
+                return (d.length > 1) ?
+                    '(' + d.length + ') ' + cluster_medoids[i]:
+                    matrix_names[i];
+            })
+            .attr('x', function(d,i) {
+                return (((0.5 / row_number) * width) + i * (width / row_number));
+            })
+            .attr('y', 0)
+            .attr('transform', function(d,i) {
+                var rot = (((0.5/row_number)*width) + i*(width/row_number));
+                return 'rotate(90 ' + rot + ',0)';
+            });
+    }
+
     render() {
         this.drawHeatmap(2);
         this.drawDendrogram();
+        this.writeVertNames();
     }
 }
 
