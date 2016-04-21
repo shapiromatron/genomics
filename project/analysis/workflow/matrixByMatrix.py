@@ -228,7 +228,6 @@ class MatrixByMatrix():
         for entry in self.vector_matrix:
             for i, val in enumerate(entry):
                 entry[i] = '%.2f' % round(val, 2)
-        print(self.vector_columns)
         # Return an output dict of the analysis results
         return dict(
             bin_parameters={
@@ -251,7 +250,7 @@ class MatrixByMatrix():
             sort_vector=getattr(self, 'sort_vector', None),
             feature_clusters=self.kmeans_results,
             feature_vectors=self.vector_matrix,
-            feature_columns=self.vector_columns,
+            # feature_columns=self.vector_columns,
         )
 
     def writeJson(self, fn):
