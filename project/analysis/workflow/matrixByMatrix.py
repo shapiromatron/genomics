@@ -250,7 +250,7 @@ class MatrixByMatrix():
             sort_vector=getattr(self, 'sort_vector', None),
             feature_clusters=self.kmeans_results,
             feature_vectors=self.vector_matrix,
-            # feature_columns=self.vector_columns,
+            feature_columns=self.vector_columns,
         )
 
     def writeJson(self, fn):
