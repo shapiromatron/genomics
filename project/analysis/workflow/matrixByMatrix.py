@@ -330,6 +330,14 @@ class MatrixByMatrix():
                 'labels': labels.tolist()
                 }
 
+    def normalizeFeatureMatrix(self):
+        arr_max = numpy.amax(self.vector_matrix, axis=0)
+        arr_min = numpy.amin(self.vector_matrix, axis=0)
+        for i, vector in enumerate(self.vector_matrix):
+            for j, val in enumerate(vector):
+                self.vector_matrix[i][j] = \
+                    (val - arr_min[j])/(arr_max[j] - arr_min[j])
+
     def execute(self):
         self.readMatrixFiles()
         self.createSortOrders()
@@ -339,6 +347,7 @@ class MatrixByMatrix():
 
         self.createFeatureMatrix()
         self.performFeatureClustering()
+        self.normalizeFeatureMatrix()
 
 @click.command()
 @click.argument('matrix_list_fn', type=str)
