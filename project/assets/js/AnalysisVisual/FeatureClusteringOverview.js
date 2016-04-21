@@ -87,8 +87,6 @@ class FeatureClusteringOverview{
             entry_count += k_values[cluster].length;
         }
 
-        console.log(cluster_sizes);
-
         var svg = d3.select(heatmap_clusters.get(0))
             .append('svg')
             .attr('height', heatmap_clusters.height())
@@ -104,9 +102,25 @@ class FeatureClusteringOverview{
             .attr('width', heatmap_clusters.width())
             .attr('height', function(d) { return (d.entry/total_entries)*heatmap_clusters.height(); })
             .style('fill', function(d, i) { return cluster_colors[i]; })
+            .on('mouseover', function (d, i) {
+                d3.select(this)
+                    .style('stroke', 'black')
+                    .style('stroke-width', '1');
 
-        console.log(total_entries);
-        console.log(entry_count);
+                var content = ('Cluster ' + (i+1) + '<br/>' + d.entry + ' entries<br/>');
+
+                $(this).tooltip({
+                    container: 'body',
+                    title: content,
+                    html: true,
+                    animation: false,
+                }).tooltip('show');
+
+            })
+            .on('mouseout', function () {
+                d3.select(this)
+                    .style('stroke', 'none');
+            });
     }
 
     render() {
