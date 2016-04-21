@@ -228,6 +228,7 @@ class MatrixByMatrix():
         for entry in self.vector_matrix:
             for i, val in enumerate(entry):
                 entry[i] = '%.2f' % round(val, 2)
+        print(self.vector_columns)
         # Return an output dict of the analysis results
         return dict(
             bin_parameters={
@@ -249,7 +250,8 @@ class MatrixByMatrix():
             cluster_medoids=self.cluster_medoids,
             sort_vector=getattr(self, 'sort_vector', None),
             feature_clusters=self.kmeans_results,
-            feature_vectors=self.vector_matrix
+            feature_vectors=self.vector_matrix,
+            feature_columns=self.vector_columns,
         )
 
     def writeJson(self, fn):
@@ -284,18 +286,20 @@ class MatrixByMatrix():
         self.vector_matrix = None
         headers = None
         row_names = []
+        self.vector_columns = []
 
-        for entry in self.matrix_list:
-            matrix_fn = entry[2]
+        for matrix in self.matrix_list:
+            matrix_fn = matrix[2]
+            self.vector_columns.append(matrix[1])
             with open(matrix_fn) as f:
-                # DEAL WITH HEADERS
-                # IF EMPTY, POPULATE HEADERS
+                # DEAL WITH headersS
+                # IF EMPTY, POPULATE headersS
                 if not headers:
                     headers = next(f).strip().split()
                 # ELSE, CHECK IF CONSISTENT
                 else:
                     if headers != next(f).strip().split():
-                        raise ValueError('Headers not consistent across \
+                        raise ValueError('headers not consistent across \
                             matrices')
 
                 # POPULATE TEMPORARY MATRIX
