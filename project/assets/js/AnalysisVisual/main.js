@@ -3,6 +3,7 @@ import $ from 'jquery';
 
 import AnalysisOverview from './AnalysisOverview';
 import IndividualOverview from './IndividualOverview';
+import FeatureClusteringOverview from './FeatureClusteringOverview';
 
 
 let startup = function(){
@@ -15,7 +16,10 @@ let startup = function(){
         $.get(window.plotURL, function(data){
             // create instances for visualization
             let overview = new AnalysisOverview($('#visual_panel_1'), data),
-                individual_overview = new IndividualOverview($('#visual_panel_2'), data);
+                individual_overview = new IndividualOverview($('#visual_panel_2'), data),
+                feature_clust_overview = new FeatureClusteringOverview($('#visual_panel_1'), data);
+                //feature_clust_individual = new IndividualFeatureClusteringOverview($('#visual_panel_2'), data);
+
             // add buttons for visualization selection
             $('<button>Data set clustering</button>')
                 .attr({
@@ -53,6 +57,9 @@ let startup = function(){
                     'class': 'btn btn-default'
                 });
 
+                $('#visual_panel_1').empty();
+                $('#visual_panel_2').empty();
+
                 overview.render();
                 individual_overview.render();
             });
@@ -64,6 +71,11 @@ let startup = function(){
                 $('#data_clust_button').attr({
                     'class': 'btn btn-default'
                 });
+
+                $('#visual_panel_1').empty();
+                $('#visual_panel_2').empty();
+
+                feature_clust_overview.render();
             });
 
             overview.render();

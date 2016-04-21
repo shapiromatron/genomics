@@ -428,7 +428,9 @@ class Analysis(GenomicBinSettings):
             'correlation_matrix': output['correlation_matrix'],
             'matrix_ids': output['matrix_ids'],
             'matrix_names': output['matrix_names'],
-            'cluster_medoids': output['cluster_medoids']
+            'cluster_medoids': output['cluster_medoids'],
+            'feature_clusters': output['feature_clusters'],
+            'feature_vectors': output['feature_vectors'],
         }
 
     def get_ks(self, id_):
