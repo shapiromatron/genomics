@@ -63,6 +63,50 @@ class FeatureClusteringOverview{
                 row_count += 1;
             }
         }
+
+        // remove existing cluster bars
+        this.el.find('#heatmap_clusters').remove();
+
+        // add cluster bars
+        var heatmap_clusters = $('<div id="heatmap_clusters">')
+            .css({
+                'height': '80%',
+                'width': '3%',
+                'position': 'absolute',
+                'left': '36%',
+                'top': '20%',
+            }).appendTo(this.el);
+
+        var cluster_colors = ['red','blue'];
+        var cluster_sizes = [];
+        var total_entries = this.feature_clusters[k]['labels'].length;
+        var entry_count = 0;
+
+        for (var cluster = 0; cluster < k_values.length; cluster++) {
+            cluster_sizes.push({'entry':k_values[cluster].length, 'cume':entry_count});
+            entry_count += k_values[cluster].length;
+        }
+
+        console.log(cluster_sizes);
+
+        var svg = d3.select(heatmap_clusters.get(0))
+            .append('svg')
+            .attr('height', heatmap_clusters.height())
+            .attr('width', heatmap_clusters.width());
+
+        svg.append('g')
+            .selectAll('rect')
+            .data(cluster_sizes)
+            .enter()
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', function(d) { return (d.cume/total_entries)*heatmap_clusters.height(); })
+            .attr('width', heatmap_clusters.width())
+            .attr('height', function(d) { return (d.entry/total_entries)*heatmap_clusters.height(); })
+            .style('fill', function(d, i) { return cluster_colors[i]; })
+
+        console.log(total_entries);
+        console.log(entry_count);
     }
 
     render() {
