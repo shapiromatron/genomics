@@ -12,6 +12,7 @@ class AnalysisOverview{
         this.correlation_matrix = data['correlation_matrix'];
         this.matrix_names = data['matrix_names'];
         this.cluster_medoids = data['cluster_medoids'];
+        this.matrix_ids = data['matrix_ids'];
     }
 
     drawHeatmap() {
@@ -36,7 +37,9 @@ class AnalysisOverview{
             cell_height = height/row_number,
             cell_width = width/col_number,
             cluster_members = this.cluster_members,
-            cluster_medoids = this.cluster_medoids;
+            cluster_medoids = this.cluster_medoids,
+            matrix_names = this.matrix_names,
+            matrix_ids = this.matrix_ids;
 
         var colorScale = d3.scale.linear()
             .domain([-1, 0, 1])
@@ -72,8 +75,12 @@ class AnalysisOverview{
                         '(' + cluster_members[i].length + ') ' + cluster_medoids[i],
                     clust_2 = (cluster_members[j].length === 1) ?
                         cluster_members[j][0] :
-                        '(' + cluster_members[j].length + ') ' + cluster_medoids[j],
-                    content = (clust_1 + '<br/>' + clust_2 + '<br/>' + d.toFixed(2));
+                        '(' + cluster_members[j].length + ') ' + cluster_medoids[j];
+
+                clust_1 = matrix_names[matrix_ids.indexOf(clust_1)]
+                clust_2 = matrix_names[matrix_ids.indexOf(clust_2)]
+
+                var content = (clust_1 + '<br/>' + clust_2 + '<br/>' + d.toFixed(2));
 
                 $(this).tooltip({
                     container: 'body',

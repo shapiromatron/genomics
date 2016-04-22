@@ -599,8 +599,17 @@ class Analysis(GenomicBinSettings):
             'correlation_matrix': output['correlation_matrix'],
             'matrix_ids': output['matrix_ids'],
             'matrix_names': output['matrix_names'],
-            'cluster_medoids': output['cluster_medoids']
+            'cluster_medoids': output['cluster_medoids'],
+            'feature_clusters': output['feature_clusters'],
+            'feature_vectors': output['feature_vectors'],
+            'feature_columns': output['feature_columns'],
         }
+
+    def get_ks(self, id_):
+        if not self.output:
+            return False
+        output = self.output_json
+        return {'p-value': str(id_) + ': 0.05'}
 
     def get_sort_vector(self, id_):
         if not self.output:

@@ -15,6 +15,7 @@
 
 
 {% block mid_content %}
+<div id='analysis_selection_panel'></div>
 <div id='visual_panel_1'></div>
 <div id='visual_panel_2'></div>
 <div class="modal fade" id="flcModal" tabindex="-1" role="dialog">
@@ -35,7 +36,8 @@
 <script id="config" type="text/json" charset="utf-8">
     {
         "sortVectorRoot": "{% url 'analysis:api:analysis-sort-vector' object.id %}",
-        "plotURL": "{% url 'analysis:api:analysis-plot' object.id %}"
+        "plotURL": "{% url 'analysis:api:analysis-plot' object.id %}",
+        "ksURL": "{% url 'analysis:api:analysis-ks' object.id %}"
     }
 </script>
 {% render_bundle 'main' %}

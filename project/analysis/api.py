@@ -114,6 +114,17 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
     pagination_class = NoPagination
 
     @detail_route(methods=['get'])
+    def ks(self, request, pk=None):
+        try:
+            sort_vector_id = int(self.request.GET.get('id', -1))
+        except:
+            sort_vector_id = -1
+        if sort_vector_id == -1:
+            raise NotAcceptable("Sort vector `id` parameter required")
+        an = get_object_or_404(models.Analysis, pk=int(pk))
+        return Response(an.get_ks(sort_vector_id))
+
+    @detail_route(methods=['get'])
     def plot(self, request, pk=None):
         an = get_object_or_404(models.Analysis, pk=int(pk))
         return Response(an.get_summary_plot())
@@ -126,7 +137,7 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
             sort_vector_id = -1
         if sort_vector_id == -1:
             raise NotAcceptable("Sort vector `id` parameter required")
-        an = get_object_or_404(models.Analysis, pk=int(pk))
+        an = get_object_or_404(models.Analysis, pk=int(pk))  # todo: check permissions
         return Response(an.get_sort_vector(sort_vector_id))
 
     def get_serializer_class(self):
