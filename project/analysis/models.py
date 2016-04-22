@@ -24,6 +24,7 @@ from .workflow.matrixByMatrix import MatrixByMatrix
 
 
 encode_store = ReadOnlyFileSystemStorage.create_store(settings.ENCODE_PATH)
+userdata_store = ReadOnlyFileSystemStorage.create_store(settings.USERDATA_PATH)
 
 
 class Dataset(models.Model):
@@ -91,8 +92,10 @@ class DatasetDownload(models.Model):
         null=True,
         related_name='%(class)s',)
     url = models.URLField()
-    filename = models.CharField(
-        max_length=100)
+    data = models.FileField(
+        blank=True,
+        max_length=256,
+        storage=userdata_store)
     filesize = models.FloatField(
         null=True)
     md5 = models.CharField(
@@ -122,12 +125,11 @@ class DatasetDownload(models.Model):
 
     @property
     def basename(self):
-        return os.path.basename(self.filename)
+        return os.path.basename(self.data.path)
 
     def set_filename(self):
         basename, ext = os.path.splitext(os.path.basename(self.url))
         path = self.owner.path
-
         fn = os.path.join(path, "{}{}".format(basename, ext))
         i = 1
         while os.path.exists(fn):
@@ -135,19 +137,19 @@ class DatasetDownload(models.Model):
             i += 1
 
         # set filename to object
-        self.filename = fn
+        self.data.name = fn[len(settings.USERDATA_PATH)+1:]
 
         # write a temporary file prevent-overwriting file
         with open(fn, 'w') as f:
             f.write('temporary')
 
     def save(self, *args, **kwargs):
-        if not self.filename:
+        if not self.data.name:
             self.set_filename()
         super().save(*args, **kwargs)
 
     def download(self):
-        fn = self.filename
+        fn = self.data.path
         self.reset()
         try:
             r = requests.get(self.url, stream=True)
@@ -167,7 +169,7 @@ class DatasetDownload(models.Model):
 
     def get_md5(self):
         # equivalent to "md5 -q $FN"
-        fn = self.filename
+        fn = self.data.path
         hasher = hashlib.md5()
         with open(fn, "rb") as f:
             for block in iter(lambda: f.read(self.CHUNK), b''):
@@ -181,12 +183,10 @@ class DatasetDownload(models.Model):
         self.end_time = None
         self.filesize = None
         self.md5 = ''
-        self.save()
 
     def delete_file(self):
-        fn = self.filename
-        if os.path.exists(fn):
-            os.remove(fn)
+        if self.data and os.path.exists(self.data.path):
+            os.remove(self.data.path)
 
 
 class GenomicDataset(Dataset):
