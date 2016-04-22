@@ -204,7 +204,7 @@ class GenomicDataset(Dataset):
 
     @property
     def is_stranded(self):
-        return self.data_ambiguous.name == ''
+        raise NotImplementedError('Abstract method')
 
 
 class UserDataset(GenomicDataset):
@@ -247,6 +247,10 @@ class UserDataset(GenomicDataset):
         null=True)
     expiration_date = models.DateTimeField(
         null=True)
+
+    @property
+    def is_stranded(self):
+        return self.plus is not None
 
     def get_absolute_url(self):
         return reverse('analysis:user_dataset', args=[self.pk, ])
@@ -298,6 +302,10 @@ class EncodeDataset(GenomicDataset):
         blank=True,
         db_index=True)
     extra_content = JSONField(default=dict)
+
+    @property
+    def is_stranded(self):
+        return self.data_ambiguous.name == ''
 
     @classmethod
     def get_field_options(cls):
