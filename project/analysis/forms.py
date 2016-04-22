@@ -82,32 +82,9 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
 class DatasetDownloadForm(BaseFormMixin, forms.ModelForm):
     CREATE_LEGEND = 'Upload a new dataset'
 
-    files_template = """
-        <div class='row'>
-            <div class='col-md-10 col-md-offset-2'
-                <h3>Files you've already uploaded (beware of name conflicts): </h3>
-                <ul id='filesUl'>
-                </ul>
-            </div>
-        </div>
-    """
-
     class Meta:
         model = models.DatasetDownload
-        fields = ('url', 'filename')
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.layout.insert(
-            len(self.helper.layout)-1,
-            cfl.HTML(self.files_template)
-        )
-
-    def clean_filename(self):
-        fn = self.cleaned_data['filename']
-        if fn + '.bigWig' in self.instance.owner.files:
-            raise forms.ValidationError("File already exists!")
-        return fn
+        fields = ('url', )
 
 
 class FeatureListForm(BaseFormMixin, forms.ModelForm):

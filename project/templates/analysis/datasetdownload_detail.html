@@ -14,7 +14,7 @@
 {% block mid_content %}
 
 <h2>
-    <span>{{object.get_filename}}</span>
+    <span>{{object.basename}}</span>
     <div class='dropdown pull-right'>
         <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
         Actions <span class="caret"></span>
@@ -30,7 +30,7 @@
     <tbody>
         <tr>
             <th style='width: 15%'>Filename</th>
-            <td style='width: 85%'>{{object.get_filename}}</td>
+            <td style='width: 85%'>{{object.basename}}</td>
         </tr>
         <tr>
             <th>Download URL</th>

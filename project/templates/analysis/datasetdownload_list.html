@@ -27,7 +27,7 @@
         <tbody>
         {% for object in object_list %}
             <tr>
-                <td><a href="{{object.get_absolute_url}}">{{object.get_filename}}</a></td>
+                <td><a href="{{object.get_absolute_url}}">{{object.basename}}</a></td>
                 <td>{{object.get_status_code_display}} {{object.status}}</td>
                 <td>{{object.start_time}}</td>
                 <td>{{object.end_time}}</td>

@@ -92,7 +92,6 @@ class DatasetDownload(models.Model):
         related_name='%(class)s',)
     url = models.URLField()
     filename = models.CharField(
-        help_text='Filename (no extension)',
         max_length=100)
     filesize = models.FloatField(
         null=True)
@@ -121,14 +120,34 @@ class DatasetDownload(models.Model):
     def get_form_cancel_url(self):
         return reverse('analysis:dataset_download_list')
 
-    def get_full_path(self):
-        return os.path.join(self.owner.path, self.filename + '.bigWig')
+    @property
+    def basename(self):
+        return os.path.basename(self.filename)
 
-    def get_filename(self):
-        return self.get_full_path().split(self.owner.path + '/')[1]
+    def set_filename(self):
+        basename, ext = os.path.splitext(os.path.basename(self.url))
+        path = self.owner.path
+
+        fn = os.path.join(path, "{}{}".format(basename, ext))
+        i = 1
+        while os.path.exists(fn):
+            fn = os.path.join(path, "{}-{}{}".format(basename, i, ext))
+            i += 1
+
+        # set filename to object
+        self.filename = fn
+
+        # write a temporary file prevent-overwriting file
+        with open(fn, 'w') as f:
+            f.write('temporary')
+
+    def save(self, *args, **kwargs):
+        if not self.filename:
+            self.set_filename()
+        super().save(*args, **kwargs)
 
     def download(self):
-        fn = self.get_full_path()
+        fn = self.filename
         self.reset()
         try:
             r = requests.get(self.url, stream=True)
@@ -148,7 +167,7 @@ class DatasetDownload(models.Model):
 
     def get_md5(self):
         # equivalent to "md5 -q $FN"
-        fn = self.get_full_path()
+        fn = self.filename
         hasher = hashlib.md5()
         with open(fn, "rb") as f:
             for block in iter(lambda: f.read(self.CHUNK), b''):
@@ -165,7 +184,7 @@ class DatasetDownload(models.Model):
         self.save()
 
     def delete_file(self):
-        fn = self.get_full_path()
+        fn = self.filename
         if os.path.exists(fn):
             os.remove(fn)
 
