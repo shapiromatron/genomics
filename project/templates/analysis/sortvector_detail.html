@@ -24,6 +24,14 @@
             <td>{{object.public|fabool}}</td>
         </tr>
         <tr>
+            <th>Feature list</th>
+            <td><a href="{{object.feature_list.get_absolute_url}}">{{object}}</a></td>
+        </tr>
+        <tr>
+            <th>File</th>
+            <td><a href="{{object.vector.url}}">Download</a></td>
+        </tr>
+        <tr>
             <th>Validated</th>
             <td>{{object.validated|fabool}}</td>
         </tr>
