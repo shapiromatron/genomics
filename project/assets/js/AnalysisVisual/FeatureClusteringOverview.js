@@ -52,7 +52,7 @@ class FeatureClusteringOverview{
                 k_values[label][k_values[label].length-1].push(this.feature_vectors[i][column_order[j]]);
             }
         }
-        console.log(k_values);
+
         // draw heatmap
         var row_number = this.feature_clusters[k]['labels'].length,
             col_number = k_values[0][0].length,
@@ -79,6 +79,58 @@ class FeatureClusteringOverview{
                 row_count += 1;
             }
         }
+
+        // add column tooltips
+        this.el.find('#heatmap_col_tooltips').remove();
+
+        var heatmap_col_tooltips = $('<div id="heatmap_col_tooltips">')
+            .css({
+                'height': '80%',
+                'width': '60%',
+                'position': 'absolute',
+                'left': '40%',
+                'top': '20%',
+            }).appendTo(this.el);
+
+        var height = heatmap_col_tooltips.height(),
+            width = heatmap_col_tooltips.width(),
+            col_number = this.feature_columns.length,
+            cell_width = width/col_number;
+
+        var svg = d3.select(heatmap_col_tooltips.get(0))
+            .append('svg')
+            .attr('height', height)
+            .attr('width', width);
+
+        svg.append('g')
+            .selectAll('rect')
+            .data(this.feature_columns)
+            .enter()
+            .append('rect')
+            .text( function(d) { return d; } )
+            .attr('x', function(d,i,j) { return (i * cell_width); })
+            .attr('y', 0)
+            .attr('width', function(d) { return cell_width; })
+            .attr('height', height)
+            .style('fill', 'transparent')
+            .on('mouseover', function (d, i, j) {
+                d3.select(this)
+                    .style('stroke', 'black')
+                    .style('stroke-width', '1');
+
+                $(this).tooltip({
+                    container: 'body',
+                    title: d,
+                    html: true,
+                    animation: false,
+                }).tooltip('show');
+            })
+            .on('mouseout', function () {
+                d3.select(this)
+                    .style('stroke', 'none');
+            });
+
+        $('[data-toggle="tooltip"]').tooltip();
 
         // remove existing cluster bars
         this.el.find('#heatmap_clusters').remove();
