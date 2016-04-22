@@ -25,10 +25,6 @@
             <td>{{object.public|fabool}}</td>
         </tr>
         <tr>
-            <th>Data download(s) complete</th>
-            <td>{{object.is_downloaded|fabool}}</td>
-        </tr>
-        <tr>
             <th>Validated</th>
             <td>{{object.validated|fabool}}</td>
         </tr>
@@ -45,6 +41,10 @@
             <td>{{object.is_stranded|fabool}}</td>
         </tr>
         <tr>
+            <th>Data download(s) complete</th>
+            <td>{{object.is_downloaded|fabool}}</td>
+        </tr>
+        <tr>
             <th>Date created</th>
             <td>{{object.created}}</td>
         </tr>
@@ -52,6 +52,21 @@
             <th>Date updated</th>
             <td>{{object.last_updated}}</td>
         </tr>
+        {% if object.is_stranded %}
+        <tr>
+            <th>Plus-strand data file download details</th>
+            <td>{% include 'analysis/_datasetdownload_table.html' with object=object.plus %}</td>
+        </tr>
+        <tr>
+            <th>Minus-strand data file download details</th>
+            <td>{% include 'analysis/_datasetdownload_table.html' with object=object.minus %}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <th>Data file download details</th>
+            <td>{% include 'analysis/_datasetdownload_table.html' with object=object.ambiguous %}</td>
+        </tr>
+        {% endif %}
     </tbody>
 </table>
 
