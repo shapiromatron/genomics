@@ -9,8 +9,10 @@ class FeatureClusteringOverview{
         this.matrix_names = data['matrix_names'];
         this.feature_clusters = data['feature_clusters'];
         this.feature_vectors = data['feature_vectors'];
+        this.feature_columns = data['feature_columns'];
         this.dendrogram = data['dendrogram'];
         this.matrix_names = data['matrix_names'];
+        this.matrix_ids = data['matrix_ids'];
         this.cluster_medoids = data['cluster_medoids'];
         this.cluster_members = data['cluster_members'];
     }
@@ -22,25 +24,35 @@ class FeatureClusteringOverview{
         // create heatmap
         var heatmap = $('<canvas id="heatmap"></canvas>')
             .prop({
-                'height': 0.60 * this.el.height(),
+                'height': 0.80 * this.el.height(),
                 'width': 0.60 * this.el.width(),
             })
             .css({
                 'position': 'absolute',
                 'left': '40%',
-                'top': '40%',
+                'top': '20%',
             })
             .appendTo(this.el);
 
         // get values to draw heatmap
+        var column_order = [];
+        for(var i=0; i<this.cluster_members.length; i++){
+            column_order.push(this.matrix_ids.indexOf(this.cluster_members[i][0]))
+        }
+
         var k_values = [];
         for(var i=0; i<k; i++){
             k_values.push([]);
         }
         for(var i=0; i<this.feature_clusters[k]['labels'].length; i++){
             var label = this.feature_clusters[k]['labels'][i];
-            k_values[label].push(this.feature_vectors[i]);
+            // k_values[label].push(this.feature_vectors[i]);
+            k_values[label].push([])
+            for(var j=0; j<column_order.length; j++){
+                k_values[label][k_values[label].length-1].push(this.feature_vectors[i][column_order[j]]);
+            }
         }
+        console.log(k_values);
         // draw heatmap
         var row_number = this.feature_clusters[k]['labels'].length,
             col_number = k_values[0][0].length,
@@ -74,11 +86,11 @@ class FeatureClusteringOverview{
         // add cluster bars
         var heatmap_clusters = $('<div id="heatmap_clusters">')
             .css({
-                'height': '60%',
+                'height': '80%',
                 'width': '3%',
                 'position': 'absolute',
                 'left': '36%',
-                'top': '40%',
+                'top': '20%',
             }).appendTo(this.el);
 
         var cluster_colors = ['red','blue'];
@@ -136,7 +148,7 @@ class FeatureClusteringOverview{
                 'left': '40%',
                 'top': '0%',
                 'overflow': 'visible',
-                'height': '20%',
+                'height': '10%',
                 'width': '60%',
             }).appendTo(this.el);
 
@@ -190,9 +202,9 @@ class FeatureClusteringOverview{
             .css({
                 'position': 'absolute',
                 'left': '40%',
-                'top': '21%',
+                'top': '11%',
                 'overflow': 'hidden',
-                'height': '18%',
+                'height': '8%',
                 'width': '60%',
             }).appendTo(this.el);
 
