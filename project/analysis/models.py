@@ -1,5 +1,6 @@
 import json
 import hashlib
+import logging
 import os
 import uuid
 import io
@@ -22,6 +23,8 @@ from .import tasks
 from .workflow.matrix import BedMatrix
 from .workflow.matrixByMatrix import MatrixByMatrix
 
+
+logger = logging.getLogger(__name__)
 
 encode_store = ReadOnlyFileSystemStorage.create_store(settings.ENCODE_PATH)
 userdata_store = ReadOnlyFileSystemStorage.create_store(settings.USERDATA_PATH)
@@ -130,6 +133,8 @@ class DatasetDownload(models.Model):
             fn = os.path.join(path, "{}-{}{}".format(basename, i, ext))
             i += 1
 
+        logger.info('Setting filename to {}'.format(fn))
+
         # set filename to object
         self.data.name = fn[len(settings.USERDATA_PATH)+1:]
 
@@ -186,6 +191,7 @@ class DatasetDownload(models.Model):
 
     def delete_file(self):
         if self.data and os.path.exists(self.data.path):
+            logger.info('Deleting {}'.format(self.data.path))
             os.remove(self.data.path)
 
 

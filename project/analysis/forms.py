@@ -128,25 +128,24 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
             if cleaned_data.get('url_ambiguous') == '':
                 self.add_error('url_ambiguous', 'This field is required.')
 
+    def add_data_download(self, url, fldName):
+        fld = getattr(self.instance, fldName, None)
+        if (url and (
+                (fld is None) or
+                (fld.url != url))):
+            obj = models.DatasetDownload.objects.create(
+                owner=self.instance.owner,
+                url=url)
+            setattr(self.instance, fldName, obj)
+
     def save(self, commit=True):
         if commit:
-            if self.cleaned_data['url_ambiguous']:
-                obj = models.DatasetDownload.objects.create(
-                    owner=self.instance.owner,
-                    url=self.cleaned_data['url_ambiguous'])
-                self.instance.data_ambiguous = obj
-
-            if self.cleaned_data['url_plus']:
-                obj = models.DatasetDownload.objects.create(
-                    owner=self.instance.owner,
-                    url=self.cleaned_data['url_plus'])
-                self.instance.data_plus = obj
-
-            if self.cleaned_data['url_minus']:
-                obj = models.DatasetDownload.objects.create(
-                    owner=self.instance.owner,
-                    url=self.cleaned_data['url_minus'])
-                self.instance.data_minus = obj
+            self.add_data_download(
+                self.cleaned_data.get('url_ambiguous'), 'ambiguous')
+            self.add_data_download(
+                self.cleaned_data.get('url_plus'), 'plus')
+            self.add_data_download(
+                self.cleaned_data.get('url_minus'), 'minus')
 
         return super().save(commit=commit)
 
