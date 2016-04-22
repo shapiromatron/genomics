@@ -1,10 +1,10 @@
-import json
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import HttpResponse
+from django.shortcuts import HttpResponse, get_object_or_404
 from django.core.exceptions import PermissionDenied
-from django.views.generic import TemplateView, CreateView, UpdateView, DetailView, DeleteView, ListView
+from django.views.generic import TemplateView, CreateView, UpdateView, \
+        DetailView, DeleteView, ListView
 
 from utils.views import OwnerOrStaff, AddUserToFormMixin
 from . import models, forms, tasks
@@ -74,8 +74,18 @@ class UserDatasetDelete(OwnerOrStaff, DeleteView):
 
 
 # User dataset CRUD
-class DatasetDownloadDetail(OwnerOrStaff, DetailView):
-    model = models.DatasetDownload
+class DatasetDownloadRetry(OwnerOrStaff, DetailView):
+    model = models.UserDataset
+
+    def render_to_response(self, context, **response_kwargs):
+        # try to download-dataset again, then redirect to UserDataset detail
+        dd = get_object_or_404(
+            models.DatasetDownload,
+            id=int(self.kwargs['dd_pk']),
+            owner=self.request.user
+        )
+        tasks.download_dataset.delay(dd.id)
+        return HttpResponseRedirect(self.object.get_absolute_url())
 
 
 # Feature list CRUD

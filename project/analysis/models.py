@@ -117,8 +117,9 @@ class DatasetDownload(models.Model):
         blank=True,
         null=True)
 
-    def get_absolute_url(self):
-        return reverse('analysis:dataset_download', args=[self.pk, ])
+    def get_retry_url(self, parent):
+        return reverse('analysis:dataset_download_retry',
+                       args=[parent.id, self.id])
 
     @property
     def basename(self):
@@ -152,6 +153,9 @@ class DatasetDownload(models.Model):
         # ensure URL is valid and doesn't raise a 400/500 error
         resp = requests.head(url)
         return resp.ok, "{}: {}".format(resp.status_code, resp.reason)
+
+    def show_download_retry(self):
+        return self.status_code == self.FINISHED_ERROR
 
     def download(self):
         fn = self.data.path

@@ -55,16 +55,16 @@
         {% if object.is_stranded %}
         <tr>
             <th>Plus-strand data file download details</th>
-            <td>{% include 'analysis/_datasetdownload_table.html' with object=object.plus %}</td>
+            <td>{% include 'analysis/_datasetdownload_table.html' with parent=object object=object.plus %}</td>
         </tr>
         <tr>
             <th>Minus-strand data file download details</th>
-            <td>{% include 'analysis/_datasetdownload_table.html' with object=object.minus %}</td>
+            <td>{% include 'analysis/_datasetdownload_table.html' with parent=object object=object.minus %}</td>
         </tr>
         {% else %}
         <tr>
             <th>Data file download details</th>
-            <td>{% include 'analysis/_datasetdownload_table.html' with object=object.ambiguous %}</td>
+            <td>{% include 'analysis/_datasetdownload_table.html' with parent=object object=object.ambiguous %}</td>
         </tr>
         {% endif %}
     </tbody>
