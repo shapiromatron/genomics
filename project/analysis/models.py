@@ -1,7 +1,10 @@
 import json
+import hashlib
+import logging
 import os
 import uuid
 import io
+import requests
 import zipfile
 import itertools
 
@@ -11,6 +14,7 @@ from django.core.cache import cache
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.urlresolvers import reverse
 from django.contrib.postgres.fields import JSONField
+from django.utils.timezone import now
 
 from utils.models import ReadOnlyFileSystemStorage, get_random_filename
 
@@ -20,7 +24,10 @@ from .workflow.matrix import BedMatrix
 from .workflow.matrixByMatrix import MatrixByMatrix
 
 
+logger = logging.getLogger(__name__)
+
 encode_store = ReadOnlyFileSystemStorage.create_store(settings.ENCODE_PATH)
+userdata_store = ReadOnlyFileSystemStorage.create_store(settings.USERDATA_PATH)
 
 
 class Dataset(models.Model):
@@ -70,6 +77,128 @@ GENOME_ASSEMBLY_CHOICES = (
 )
 
 
+class DatasetDownload(models.Model):
+    NOT_STARTED = 0
+    STARTED = 1
+    FINISHED_ERROR = 2
+    FINISHED_SUCCESS = 3
+    STATUS_CHOICES = (
+        (NOT_STARTED, 'not-started'),
+        (STARTED, 'started'),
+        (FINISHED_ERROR, 'finished with errors'),
+        (FINISHED_SUCCESS, 'successfully completed'),
+    )
+    CHUNK = 1024 * 1024
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        related_name='%(class)s',)
+    url = models.URLField()
+    data = models.FileField(
+        blank=True,
+        max_length=256,
+        storage=userdata_store)
+    filesize = models.FloatField(
+        null=True)
+    md5 = models.CharField(
+        max_length=64,
+        null=True)
+    status_code = models.PositiveSmallIntegerField(
+        default=NOT_STARTED,
+        choices=STATUS_CHOICES)
+    status = models.TextField(
+        blank=True,
+        null=True)
+    start_time = models.DateTimeField(
+        blank=True,
+        null=True)
+    end_time = models.DateTimeField(
+        blank=True,
+        null=True)
+
+    def get_retry_url(self, parent):
+        return reverse('analysis:dataset_download_retry',
+                       args=[parent.id, self.id])
+
+    @property
+    def basename(self):
+        return os.path.basename(self.data.path)
+
+    def set_filename(self):
+        basename, ext = os.path.splitext(os.path.basename(self.url))
+        path = self.owner.path
+        fn = os.path.join(path, "{}{}".format(basename, ext))
+        i = 1
+        while os.path.exists(fn):
+            fn = os.path.join(path, "{}-{}{}".format(basename, i, ext))
+            i += 1
+
+        logger.info('Setting filename to {}'.format(fn))
+
+        # set filename to object
+        self.data.name = fn[len(settings.USERDATA_PATH)+1:]
+
+        # write a temporary file prevent-overwriting file
+        with open(fn, 'w') as f:
+            f.write('temporary')
+
+    def save(self, *args, **kwargs):
+        if not self.data.name:
+            self.set_filename()
+        super().save(*args, **kwargs)
+
+    @staticmethod
+    def check_valid_url(url):
+        # ensure URL is valid and doesn't raise a 400/500 error
+        resp = requests.head(url)
+        return resp.ok, "{}: {}".format(resp.status_code, resp.reason)
+
+    def show_download_retry(self):
+        return self.status_code == self.FINISHED_ERROR
+
+    def download(self):
+        fn = self.data.path
+        self.reset()
+        try:
+            r = requests.get(self.url, stream=True)
+            with open(fn, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=self.CHUNK):
+                    if chunk:  # filter out keep-alive new chunks
+                        f.write(chunk)
+            self.end_time = now()
+            self.status_code = self.FINISHED_SUCCESS
+            self.md5 = self.get_md5()
+            self.filesize = os.path.getsize(fn)
+        except Exception as e:
+            self.start_time = None
+            self.status_code = self.FINISHED_ERROR
+            self.status = str(e)
+        self.save()
+
+    def get_md5(self):
+        # equivalent to "md5 -q $FN"
+        fn = self.data.path
+        hasher = hashlib.md5()
+        with open(fn, "rb") as f:
+            for block in iter(lambda: f.read(self.CHUNK), b''):
+                hasher.update(block)
+        return hasher.hexdigest()
+
+    def reset(self):
+        self.status_code = self.STARTED
+        self.status = ''
+        self.start_time = now()
+        self.end_time = None
+        self.filesize = None
+        self.md5 = ''
+
+    def delete_file(self):
+        if self.data and os.path.exists(self.data.path):
+            logger.info('Deleting {}'.format(self.data.path))
+            os.remove(self.data.path)
+
+
 class GenomicDataset(Dataset):
     genome_assembly = models.PositiveSmallIntegerField(
         db_index=True,
@@ -85,24 +214,62 @@ class GenomicDataset(Dataset):
 
     @property
     def is_stranded(self):
-        return self.data_ambiguous.name == ''
+        raise NotImplementedError('Abstract method')
 
 
 class UserDataset(GenomicDataset):
-    data_ambiguous = models.FileField(
-        blank=True,
-        max_length=256)
-    data_plus = models.FileField(
-        blank=True,
-        max_length=256)
-    data_minus = models.FileField(
-        blank=True,
-        max_length=256)
+    DATA_TYPES = (
+        ('Cage',        'Cage'),
+        ('ChiaPet',     'ChiaPet'),
+        ('ChipSeq',     'ChipSeq'),
+        ('DnaseDgf',    'DnaseDgf'),
+        ('DnaseSeq',    'DnaseSeq'),
+        ('FaireSeq',    'FaireSeq'),
+        ('Mapability',  'Mapability'),
+        ('Nucleosome',  'Nucleosome'),
+        ('Orchid',      'Orchid'),
+        ('RepliChip',   'RepliChip'),
+        ('RepliSeq',    'RepliSeq'),
+        ('RipSeq',      'RipSeq'),
+        ('RnaPet',      'RnaPet'),
+        ('RnaSeq',      'RnaSeq'),
+        ('SmartSeq',    'SmartSeq'),
+        ('Other',       'Other (describe in "description" field)'),
+    )
+
+    data_type = models.CharField(
+        max_length=16,
+        choices=DATA_TYPES)
+    ambiguous = models.ForeignKey(
+        DatasetDownload,
+        null=True,
+        related_name='ambiguous')
+    plus = models.ForeignKey(
+        DatasetDownload,
+        null=True,
+        related_name='plus')
+    minus = models.ForeignKey(
+        DatasetDownload,
+        null=True,
+        related_name='minus')
     url = models.URLField(
         max_length=256,
         null=True)
     expiration_date = models.DateTimeField(
         null=True)
+
+    @property
+    def is_stranded(self):
+        return self.plus is not None
+
+    @property
+    def is_downloaded(self):
+        success_code = DatasetDownload.FINISHED_SUCCESS
+        if self.is_stranded:
+            return self.plus.status_code == success_code and \
+                   self.minus.status_code == success_code
+        else:
+            return self.ambiguous.status_code == success_code
 
     def get_absolute_url(self):
         return reverse('analysis:user_dataset', args=[self.pk, ])
@@ -155,6 +322,10 @@ class EncodeDataset(GenomicDataset):
         db_index=True)
     extra_content = JSONField(default=dict)
 
+    @property
+    def is_stranded(self):
+        return self.data_ambiguous.name == ''
+
     @classmethod
     def get_field_options(cls):
         dicts = {}
@@ -194,8 +365,8 @@ class FeatureList(Dataset):
 class SortVector(Dataset):
     feature_list = models.ForeignKey(
         FeatureList)
-    text = models.TextField(
-        blank=True)
+    vector = models.FileField(
+        max_length=256)
 
     def get_absolute_url(self):
         return reverse('analysis:sort_vector', args=[self.pk, ])
@@ -386,7 +557,7 @@ class Analysis(GenomicBinSettings):
 
         sv = None
         if self.sort_vector:
-            sv = self.sort_vector.text   # todo - use file?
+            sv = self.sort_vector.vector.path
 
         mm = MatrixByMatrix(
             matrix_list=matrix_list,
@@ -456,7 +627,7 @@ class Analysis(GenomicBinSettings):
 
             # write sort vector
             if self.sort_vector:
-                z.writestr('sort_vector.txt', self.sort_vector.text.encode('utf-8'))
+                z.write(self.sort_vector.vector.path, arcname='sort_vector.txt')
 
             # write output JSON
             if self.output:

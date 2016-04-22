@@ -16,5 +16,35 @@
 
 
 {% block mid_content %}
-    {% crispy form %}
+    <div id='userDatasetForm' style='display: none'>
+        {% crispy form %}
+    </div>
 {% endblock %}
+
+
+{% block extra_js %}
+<script type="text/javascript">
+
+var setRequiredFields = function(){
+        $('#id_stranded').change(function(e){
+            if ($(e.target).prop('checked')){
+                $('#div_id_url_ambiguous').hide();
+                $('#div_id_url_plus').show();
+                $('#div_id_url_minus').show();
+            } else {
+                $('#div_id_url_ambiguous').show();
+                $('#div_id_url_plus').hide();
+                $('#div_id_url_minus').hide();
+            }
+        }).trigger('change');
+    },
+    showForm = function(){
+        $('#userDatasetForm').fadeIn();
+    };
+
+$(document).ready(function(){
+    setRequiredFields();
+    showForm();
+});
+</script>
+{% endblock extra_js %}

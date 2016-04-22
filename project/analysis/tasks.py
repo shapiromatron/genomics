@@ -4,7 +4,9 @@ from celery.decorators import task
 from celery import group, chain
 from django.apps import apps
 from django.utils import timezone
-from django.core.cache import cache
+
+import requests
+
 
 logger = get_task_logger(__name__)
 
@@ -77,3 +79,9 @@ def execute_matrix_combination(analysis_id):
     analysis.end_time = timezone.now()
     analysis.save()
     analysis.increment_execution_status()
+
+
+@task()
+def download_dataset(id_):
+    dd = apps.get_model('analysis', 'DatasetDownload').objects.get(id=id_)
+    dd.download()

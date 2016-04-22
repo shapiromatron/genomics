@@ -12,6 +12,8 @@ class MyConfig(AppConfig):
 
     def ready(self):
 
+        from . import signals  # noqa
+
         # make sure download paths exist
         paths = [
             os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'fcm')),
@@ -23,8 +25,18 @@ class MyConfig(AppConfig):
 
         # download UCSC tools if needed
         tools = [
-            os.path.abspath(os.path.join(settings.PROJECT_PATH, 'analysis', 'workflow', 'bigWigAverageOverBed')),
-            os.path.abspath(os.path.join(settings.PROJECT_PATH, 'analysis', 'workflow', 'validateFiles')),
+            os.path.abspath(os.path.join(
+                settings.PROJECT_PATH,
+                'analysis',
+                'workflow',
+                'bigWigAverageOverBed'
+            )),
+            os.path.abspath(os.path.join(
+                settings.PROJECT_PATH,
+                'analysis',
+                'workflow',
+                'validateFiles'
+            )),
         ]
         for tool in tools:
             if not os.path.exists(tool):

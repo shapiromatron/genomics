@@ -1,0 +1,47 @@
+{% load filesize %}
+{% load call_args %}
+
+<table class='table table-condensed'>
+    <tbody>
+        <tr>
+            <th style='width: 15%'>Filename</th>
+            <td style='width: 85%'>{{object.basename}}</td>
+        </tr>
+        <tr>
+            <th>Download URL</th>
+            <td>
+                <a href="{{object.url}}">{{object.url}}</a>
+            </td>
+        </tr>
+        <tr>
+            <th>Download status</th>
+            <td>
+                {{object.get_status_code_display}}
+                {% if object.show_download_retry %}
+                <a class="btn btn-sm btn-warning"
+                   href="{{ object|args:parent|call:"get_retry_url" }}">Retry download</a>
+                {% endif %}
+                {% if object.status %}
+                    <br><br>
+                    <pre>{{object.status}}</pre>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Filesize</th>
+            <td>{{object.filesize|filesize}}</td>
+        </tr>
+        <tr>
+            <th>MD5</th>
+            <td>{{object.md5}}</td>
+        </tr>
+        <tr>
+            <th>Upload start time</th>
+            <td>{{object.start_time}}</td>
+        </tr>
+        <tr>
+            <th>Upload end time</th>
+            <td>{{object.end_time}}</td>
+        </tr>
+    </tbody>
+</table>
