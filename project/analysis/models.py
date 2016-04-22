@@ -117,12 +117,6 @@ class DatasetDownload(models.Model):
     def get_absolute_url(self):
         return reverse('analysis:dataset_download', args=[self.pk, ])
 
-    def get_delete_url(self):
-        return reverse('analysis:dataset_download_delete', args=[self.pk, ])
-
-    def get_form_cancel_url(self):
-        return reverse('analysis:dataset_download_list')
-
     @property
     def basename(self):
         return os.path.basename(self.data.path)

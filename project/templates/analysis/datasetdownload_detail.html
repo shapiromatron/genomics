@@ -13,18 +13,7 @@
 
 {% block mid_content %}
 
-<h2>
-    <span>{{object.basename}}</span>
-    <div class='dropdown pull-right'>
-        <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
-        Actions <span class="caret"></span>
-        </button>
-        <ul class='dropdown-menu'>
-            <li><a href='{{object.get_delete_url}}'>Delete</a></li>
-        </ul>
-    </div>
-</h2>
-
+<h2>{{object.basename}}</h2>
 
 <table class='table table-condensed'>
     <tbody>

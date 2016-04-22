@@ -73,7 +73,8 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
     class Meta:
         model = models.UserDataset
         fields = (
-            'name', 'description', 'genome_assembly', 'stranded',
+            'name', 'description', 'data_type',
+            'genome_assembly', 'stranded',
             'url_ambiguous', 'url_plus', 'url_minus',
         )
 
@@ -134,14 +135,6 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
                 self.instance.data_minus = obj
 
         return super().save(commit=commit)
-
-
-class DatasetDownloadForm(BaseFormMixin, forms.ModelForm):
-    CREATE_LEGEND = 'Upload a new dataset'
-
-    class Meta:
-        model = models.DatasetDownload
-        fields = ('url', )
 
 
 class FeatureListForm(BaseFormMixin, forms.ModelForm):

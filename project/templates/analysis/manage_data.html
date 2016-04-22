@@ -26,15 +26,8 @@
 
     <div class="col-sm-6">
         <h2>User datasets
-            <div class='dropdown pull-right'>
-                <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
-                Actions <span class="caret"></span>
-                </button>
-                <ul class='dropdown-menu'>
-                    <li><a href='{% url 'analysis:user_dataset_create' %}'>Create new</a></li>
-                    <li><a href='{% url 'analysis:dataset_download_list' %}'>Uploaded datasets</a></li>
-                </ul>
-            </div>
+            <a href="{% url 'analysis:user_dataset_create' %}"
+               class='btn btn-primary pull-right'>Create new</a>
         </h2>
         {% include 'analysis/manage_data_table.html' with object_list=user_datasets %}
     </div>

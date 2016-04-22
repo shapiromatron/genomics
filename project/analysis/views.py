@@ -74,26 +74,8 @@ class UserDatasetDelete(OwnerOrStaff, DeleteView):
 
 
 # User dataset CRUD
-class DatasetDownloadList(LoginRequiredMixin, ListView):
-    model = models.DatasetDownload
-
-    def get_queryset(self):
-        return self.model.objects.filter(owner=self.request.user)
-
-
 class DatasetDownloadDetail(OwnerOrStaff, DetailView):
     model = models.DatasetDownload
-
-
-class DatasetDownloadCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
-    model = models.DatasetDownload
-    form_class = forms.DatasetDownloadForm
-    success_url = reverse_lazy('analysis:dataset_download_list')
-
-
-class DatasetDownloadDelete(OwnerOrStaff, DeleteView):
-    model = models.DatasetDownload
-    success_url = reverse_lazy('analysis:dataset_download_list')
 
 
 # Feature list CRUD
