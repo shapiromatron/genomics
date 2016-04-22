@@ -1,7 +1,6 @@
 import itertools
 import json
 from django import forms
-import crispy_forms.layout as cfl
 
 from utils.forms import BaseFormHelper
 
@@ -54,7 +53,20 @@ class BaseFormMixin(object):
 
 class UserDatasetForm(BaseFormMixin, forms.ModelForm):
     CREATE_LEGEND = 'Create user dataset'
+    URL_HELP = 'URL for downloading user-dataset, must be publicly available without authentication.'  # noqa
 
+    url_ambiguous = forms.URLField(
+        required=False,
+        label='URL (strands unspecified)',
+        help_text=URL_HELP)
+    url_plus = forms.URLField(
+        required=False,
+        label='URL (plus-strand)',
+        help_text=URL_HELP)
+    url_minus = forms.URLField(
+        required=False,
+        label='URL (minus-strand)',
+        help_text=URL_HELP)
     stranded = forms.BooleanField(
         required=False)
 
@@ -64,6 +76,29 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
             'name', 'description', 'genome_assembly', 'stranded',
             'url_ambiguous', 'url_plus', 'url_minus',
         )
+
+    def check_url_validity(self, url):
+        is_ok, status = models.DatasetDownload.check_valid_url(url)
+        if not is_ok:
+            raise forms.ValidationError(status)
+
+    def clean_url_ambiguous(self):
+        url = self.cleaned_data['url_ambiguous']
+        if url:
+            self.check_url_validity(url)
+        return url
+
+    def clean_url_plus(self):
+        url = self.cleaned_data['url_plus']
+        if url:
+            self.check_url_validity(url)
+        return url
+
+    def clean_url_minus(self):
+        url = self.cleaned_data['url_minus']
+        if url:
+            self.check_url_validity(url)
+        return url
 
     def clean(self):
         cleaned_data = super().clean()
@@ -77,6 +112,28 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
         else:
             if cleaned_data.get('url_ambiguous') == '':
                 self.add_error('url_ambiguous', 'This field is required.')
+
+    def save(self, commit=True):
+        if commit:
+            if self.cleaned_data['url_ambiguous']:
+                obj = models.DatasetDownload.objects.create(
+                    owner=self.instance.owner,
+                    url=self.cleaned_data['url_ambiguous'])
+                self.instance.data_ambiguous = obj
+
+            if self.cleaned_data['url_plus']:
+                obj = models.DatasetDownload.objects.create(
+                    owner=self.instance.owner,
+                    url=self.cleaned_data['url_plus'])
+                self.instance.data_plus = obj
+
+            if self.cleaned_data['url_minus']:
+                obj = models.DatasetDownload.objects.create(
+                    owner=self.instance.owner,
+                    url=self.cleaned_data['url_minus'])
+                self.instance.data_minus = obj
+
+        return super().save(commit=commit)
 
 
 class DatasetDownloadForm(BaseFormMixin, forms.ModelForm):
