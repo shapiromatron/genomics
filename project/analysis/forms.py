@@ -78,6 +78,20 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
             'url_ambiguous', 'url_plus', 'url_minus',
         )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.id:
+            self.fields['stranded'].initial = self.instance.is_stranded
+            self.fields['url_ambiguous'].initial = '' \
+                if self.instance.ambiguous is None \
+                else self.instance.ambiguous.url
+            self.fields['url_plus'].initial = '' \
+                if self.instance.plus is None \
+                else self.instance.plus.url
+            self.fields['url_minus'].initial = '' \
+                if self.instance.minus is None \
+                else self.instance.minus.url
+
     def check_url_validity(self, url):
         is_ok, status = models.DatasetDownload.check_valid_url(url)
         if not is_ok:
