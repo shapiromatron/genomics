@@ -258,6 +258,15 @@ class UserDataset(GenomicDataset):
     def is_stranded(self):
         return self.plus is not None
 
+    @property
+    def is_downloaded(self):
+        success_code = DatasetDownload.FINISHED_SUCCESS
+        if self.is_stranded:
+            return self.plus.status_code == success_code and \
+                   self.minus.status_code == success_code
+        else:
+            return self.ambiguous.status_code == success_code
+
     def get_absolute_url(self):
         return reverse('analysis:user_dataset', args=[self.pk, ])
 

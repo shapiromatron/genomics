@@ -17,12 +17,16 @@
 <table class='table table-condensed'>
     <tbody>
         <tr>
-            <th style='width: 15%'>Description</th>
-            <td style='width: 85%'>{{object.description}}</td>
+            <th style='width: 25%'>Description</th>
+            <td style='width: 75%'>{{object.description}}</td>
         </tr>
         <tr>
             <th>Public</th>
             <td>{{object.public|fabool}}</td>
+        </tr>
+        <tr>
+            <th>Data download(s) complete</th>
+            <td>{{object.is_downloaded|fabool}}</td>
         </tr>
         <tr>
             <th>Validated</th>
