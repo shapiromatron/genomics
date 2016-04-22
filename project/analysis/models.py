@@ -208,7 +208,28 @@ class GenomicDataset(Dataset):
 
 
 class UserDataset(GenomicDataset):
+    DATA_TYPES = (
+        ('Cage',        'Cage'),
+        ('ChiaPet',     'ChiaPet'),
+        ('ChipSeq',     'ChipSeq'),
+        ('DnaseDgf',    'DnaseDgf'),
+        ('DnaseSeq',    'DnaseSeq'),
+        ('FaireSeq',    'FaireSeq'),
+        ('Mapability',  'Mapability'),
+        ('Nucleosome',  'Nucleosome'),
+        ('Orchid',      'Orchid'),
+        ('RepliChip',   'RepliChip'),
+        ('RepliSeq',    'RepliSeq'),
+        ('RipSeq',      'RipSeq'),
+        ('RnaPet',      'RnaPet'),
+        ('RnaSeq',      'RnaSeq'),
+        ('SmartSeq',    'SmartSeq'),
+        ('Other',       'Other (describe in "description" field)'),
+    )
 
+    data_type = models.CharField(
+        max_length=16,
+        choices=DATA_TYPES)
     ambiguous = models.ForeignKey(
         DatasetDownload,
         null=True,
