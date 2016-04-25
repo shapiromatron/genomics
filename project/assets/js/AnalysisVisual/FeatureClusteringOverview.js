@@ -15,9 +15,24 @@ class FeatureClusteringOverview{
         this.matrix_ids = data['matrix_ids'];
         this.cluster_medoids = data['cluster_medoids'];
         this.cluster_members = data['cluster_members'];
+
+        this.colors = [
+            '#a50026',
+            '#e0f3f8',
+            '#d73027',
+            '#abd9e9',
+            '#f46d43',
+            '#74add1',
+            '#fdae61',
+            '#4575b4',
+            '#fee090',
+            '#313695',
+        ];
     }
 
     drawHeatmap(k) {
+        var colors = this.colors;
+
         // remove existing heatmap
         this.el.find('#heatmap').remove();
 
@@ -62,7 +77,7 @@ class FeatureClusteringOverview{
 
         var colorScale = d3.scale.linear()
             .domain([0, 1])
-            .range(['white', 'red']);
+            .range(['white', colors[0]]);
 
         var scale_x = width/col_number,
             scale_y = height/row_number;
@@ -145,7 +160,7 @@ class FeatureClusteringOverview{
                 'top': '20%',
             }).appendTo(this.el);
 
-        var cluster_colors = ['red','blue'];
+        var colors = this.colors;
         var cluster_sizes = [];
         var total_entries = this.feature_clusters[k]['labels'].length;
         var entry_count = 0;
@@ -169,7 +184,7 @@ class FeatureClusteringOverview{
             .attr('y', function(d) { return (d.cume/total_entries)*heatmap_clusters.height(); })
             .attr('width', heatmap_clusters.width())
             .attr('height', function(d) { return (d.entry/total_entries)*heatmap_clusters.height(); })
-            .style('fill', function(d, i) { return cluster_colors[i]; })
+            .style('fill', function(d, i) { return colors[i]; })
             .on('mouseover', function (d, i) {
                 d3.select(this)
                     .style('stroke', 'black')
@@ -293,8 +308,59 @@ class FeatureClusteringOverview{
             });
     }
 
+    makeClusterSelect() {
+        function addOptions(el, option_array) {
+            var select = el.find('#select_list');
+
+            select.empty();
+
+            d3.select(select.get(0))
+                .selectAll('option')
+                .data(d3.keys(option_array))
+                .enter()
+                .append('option')
+                .text(function(d) {return d;})
+                .attr('value', function(d) {return d;});
+        }
+
+        //Add text
+        this.el.find('#select_prompt').remove();
+        var select_list = $('<div id="select_prompt">Select k-value:</div>')
+            .css({
+                //'height': '8%',
+                'width': '20%',
+                'font-size': '12px',
+                'position': 'absolute',
+                'top': '20%',
+                'left': '0%',
+            })
+            .appendTo(this.el);
+
+        //Remove heatmap div if there; append heatmap div
+        this.el.find('#select_list').remove();
+        var self = this;
+        var select_list = $('<select id="select_list"></select>')
+            .css({
+                //'height': '8%',
+                'width': '6%',
+                'font-size': '12px',
+                'position': 'absolute',
+                'top': '20%',
+                'left': '24%',
+            })
+            .change(function() {
+                self.drawHeatmap(this.value);
+            })
+            .appendTo(this.el);
+
+        addOptions(this.el, this.feature_clusters);
+        select_list[0].selectedIndex = 0;
+    }
+
     render() {
         this.drawHeatmap(2);
+
+        this.makeClusterSelect();
         this.drawDendrogram();
         this.writeVertNames();
     }
