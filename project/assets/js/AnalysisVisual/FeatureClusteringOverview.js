@@ -345,15 +345,16 @@ class FeatureClusteringOverview{
             .css({
                 'height': '8%',
                 'width': '6%',
-                //'font-size': '12px',
+                // 'font-size': '12px',
                 'position': 'absolute',
                 'top': '20%',
                 'left': '24%',
             })
             .change(function() {
-                console.log(this.value);
+                // console.log(this.value);
                 self.drawHeatmap(this.value);
                 self.drawClusterSelect(this.value);
+                self.drawFeatureSelect(null, null);
             })
             .appendTo(this.el);
 
@@ -472,6 +473,7 @@ class FeatureClusteringOverview{
         var el = this.el;
         //Add text
         this.el.find('#feature_prompt').remove();
+        this.el.find('#pointer').remove();
         var select_list = $('<div id="feature_prompt">Select feature:</div>')
             .css({
                 'height': '8%',
