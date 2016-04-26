@@ -156,9 +156,9 @@ class FeatureClusteringOverview{
         var heatmap_clusters = $('<div id="heatmap_clusters">')
             .css({
                 'height': '80%',
-                'width': '3%',
+                'width': '2%',
                 'position': 'absolute',
-                'left': '36%',
+                'left': '37%',
                 'top': '20%',
             }).appendTo(this.el);
 
@@ -418,7 +418,58 @@ class FeatureClusteringOverview{
                 .attr('value', function(d) {return d;});
         }
 
-        var features = this.feature_clusters[k];
+        function drawPointer(feature, k) {
+            function getIndex(feature) {
+                var feature_index = 0;
+                for (var i in feature_cluster_members[k]) {
+                    for (var j in feature_cluster_members[k][i]) {
+                        if (feature == feature_cluster_members[k][i][j]) {
+                            return feature_index;
+                        }
+                        feature_index += 1;
+                    }
+                }
+            }
+            var total_feature_num = feature_names.length;
+            var feature_index = getIndex(feature);
+            var total_height = 0.8 * el.height();
+            var pointer_height = (feature_index/total_feature_num)*total_height + 0.2 * el.height();
+
+            var offset = {
+                'top': 0.01 * el.height(),
+                'left': 0.02 * el.width(),
+            };
+
+
+            var point_1 = (0) + ',' + (pointer_height - offset.top),
+                point_2 = (offset.left) + ',' + (pointer_height),
+                point_3 = (0) + ',' + (pointer_height + offset.top);
+            var points = point_1 + ' ' + point_2 + ' ' + point_3;
+
+            el.find('#pointer').remove();
+            var pointer = $('<div id="pointer">')
+                .css({
+                    'position': 'absolute',
+                    'left': '35%',
+                    'top': '0%',
+                    'overflow': 'visible',
+                    'height': '110%',
+                    'width': offset.left,
+                }).appendTo(el);
+            d3.select(pointer.get(0))
+                .append('svg')
+                .attr('height', pointer.height())
+                .attr('width', pointer.width())
+                .append('polygon')
+                .attr('points', points)
+                .style('fill', 'black')
+                .style('position', 'absolute');
+        }
+
+        var features = [];
+        var feature_names = this.feature_names;
+        var feature_cluster_members = this.feature_cluster_members;
+        var el = this.el;
         //Add text
         this.el.find('#feature_prompt').remove();
         var select_list = $('<div id="feature_prompt">Select feature:</div>')
@@ -448,7 +499,7 @@ class FeatureClusteringOverview{
                 'left': '0%',
             })
             .change(function() {
-                console.log(this.value);
+                drawPointer(this.value, k);
             })
             .appendTo(this.el);
 
