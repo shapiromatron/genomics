@@ -251,6 +251,8 @@ class MatrixByMatrix():
             feature_clusters=self.kmeans_results,
             feature_vectors=self.vector_matrix,
             feature_columns=self.vector_columns,
+            feature_names=self.feature_names,
+            feature_cluster_members=self.feature_cluster_members,
         )
 
     def writeJson(self, fn):
@@ -284,7 +286,7 @@ class MatrixByMatrix():
     def createFeatureMatrix(self):
         self.vector_matrix = None
         headers = None
-        row_names = []
+        self.feature_names = []
         self.vector_columns = []
 
         for matrix in self.matrix_list:
@@ -312,13 +314,13 @@ class MatrixByMatrix():
                     for i, entry in enumerate(matrix_temp):
                         row_name = entry[0]
                         row_values = numpy.array(entry[1:]).astype(float)
-                        row_names.append(row_name)
+                        self.feature_names.append(row_name)
                         self.vector_matrix.append([numpy.sum(row_values)])
                 else:
                     for i, entry in enumerate(matrix_temp):
                         row_name = entry[0]
                         row_values = numpy.array(entry[1:]).astype(float)
-                        if row_name != row_names[i]:
+                        if row_name != self.feature_names[i]:
                             raise ValueError('Row names do not match across \
                                 matrices')
                         self.vector_matrix[i].append(numpy.sum(row_values))
@@ -341,6 +343,17 @@ class MatrixByMatrix():
                 self.vector_matrix[i][j] = \
                     (val - arr_min[j])/(arr_max[j] - arr_min[j])
 
+    def getClusterMembers(self):
+        self.feature_cluster_members = dict()
+        for k in self.kmeans_results:
+            self.feature_cluster_members[k] = dict()
+            for i in range(1, k+1):
+                self.feature_cluster_members[k][i] = []
+            for i, cluster in enumerate(self.kmeans_results[k]['labels']):
+                self.feature_cluster_members[k][int(cluster)+1].append(
+                    self.feature_names[i])
+        print(self.feature_cluster_members)
+
     def execute(self):
         self.readMatrixFiles()
         self.createSortOrders()
@@ -351,6 +364,7 @@ class MatrixByMatrix():
         self.createFeatureMatrix()
         self.performFeatureClustering()
         self.normalizeFeatureMatrix()
+        self.getClusterMembers()
 
 @click.command()
 @click.argument('matrix_list_fn', type=str)
