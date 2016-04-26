@@ -352,7 +352,6 @@ class MatrixByMatrix():
             for i, cluster in enumerate(self.kmeans_results[k]['labels']):
                 self.feature_cluster_members[k][int(cluster)+1].append(
                     self.feature_names[i])
-        print(self.feature_cluster_members)
 
     def execute(self):
         self.readMatrixFiles()
