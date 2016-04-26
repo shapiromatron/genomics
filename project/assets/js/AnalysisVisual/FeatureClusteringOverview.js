@@ -15,6 +15,8 @@ class FeatureClusteringOverview{
         this.matrix_ids = data['matrix_ids'];
         this.cluster_medoids = data['cluster_medoids'];
         this.cluster_members = data['cluster_members'];
+        this.feature_names = data['feature_names'];
+        this.feature_cluster_members = data['feature_cluster_members'];
 
         this.colors = [
             '#a50026',
@@ -308,9 +310,9 @@ class FeatureClusteringOverview{
             });
     }
 
-    makeClusterSelect() {
+    makeKSelect() {
         function addOptions(el, option_array) {
-            var select = el.find('#select_list');
+            var select = el.find('#select_k');
 
             select.empty();
 
@@ -324,12 +326,12 @@ class FeatureClusteringOverview{
         }
 
         //Add text
-        this.el.find('#select_prompt').remove();
-        var select_list = $('<div id="select_prompt">Select k-value:</div>')
+        this.el.find('#k_prompt').remove();
+        var select_list = $('<div id="k_prompt">Select k-value:</div>')
             .css({
-                //'height': '8%',
+                'height': '8%',
                 'width': '20%',
-                'font-size': '12px',
+                //'font-size': '12px',
                 'position': 'absolute',
                 'top': '20%',
                 'left': '0%',
@@ -337,19 +339,21 @@ class FeatureClusteringOverview{
             .appendTo(this.el);
 
         //Remove heatmap div if there; append heatmap div
-        this.el.find('#select_list').remove();
+        this.el.find('#select_k').remove();
         var self = this;
-        var select_list = $('<select id="select_list"></select>')
+        var select_list = $('<select id="select_k"></select>')
             .css({
-                //'height': '8%',
+                'height': '8%',
                 'width': '6%',
-                'font-size': '12px',
+                //'font-size': '12px',
                 'position': 'absolute',
                 'top': '20%',
                 'left': '24%',
             })
             .change(function() {
+                console.log(this.value);
                 self.drawHeatmap(this.value);
+                self.drawClusterSelect(this.value);
             })
             .appendTo(this.el);
 
@@ -357,10 +361,142 @@ class FeatureClusteringOverview{
         select_list[0].selectedIndex = 0;
     }
 
+    drawClusterSelect(k) {
+
+        //Add text
+        this.el.find('#cluster_prompt').remove();
+        var select_list = $('<div id="cluster_prompt">Select cluster:</div>')
+            .css({
+                'height': '8%',
+                'width': '20%',
+                //'font-size': '12px',
+                'position': 'absolute',
+                'top': '30%',
+                'left': '0%',
+            })
+            .appendTo(this.el);
+
+        this.el.find('#select_cluster').remove();
+        var self = this;
+        var select_list = $('<select id="select_cluster"></select>')
+            .css({
+                'height': '8%',
+                'width': '6%',
+                //'font-size': '12px',
+                'position': 'absolute',
+                'top': '30%',
+                'left': '24%',
+            })
+            .change(function() {
+                self.drawFeatureSelect(k, this.value);
+            })
+            .appendTo(this.el);
+
+        var cluster_range = d3.range(k);
+        for (var i=0; i<cluster_range.length; i++) {
+            cluster_range[i] += 1;
+        }
+        cluster_range.unshift('--');
+        d3.select(select_list.get(0))
+            .selectAll('option')
+            .data(cluster_range)
+            .enter()
+            .append('option')
+            .text(function(d) {return d;})
+            .attr('value', function(d) {return d;});
+    }
+
+    drawFeatureSelect(k,cluster) {
+        function addOptions(select, option_array) {
+            select.empty();
+            d3.select(select.get(0))
+                .selectAll('option')
+                .data(option_array)
+                .enter()
+                .append('option')
+                .text(function(d) {return d;})
+                .attr('value', function(d) {return d;});
+        }
+
+        var features = this.feature_clusters[k];
+        //Add text
+        this.el.find('#feature_prompt').remove();
+        var select_list = $('<div id="feature_prompt">Select feature:</div>')
+            .css({
+                'height': '8%',
+                'width': '20%',
+                //'font-size': '12px',
+                'position': 'absolute',
+                'top': '40%',
+                'left': '0%',
+            })
+            .appendTo(this.el);
+
+        this.el.find('#select_feature').remove();
+        var features = [];
+        var self = this;
+        var select_list = $('<select id="select_feature"></select>')
+            .attr({
+                'size': '12',
+            })
+            .css({
+                'height': '40%',
+                'width': '30%',
+                'font-size': '12px',
+                'position': 'absolute',
+                'top': '60%',
+                'left': '0%',
+            })
+            .change(function() {
+                console.log(this.value);
+            })
+            .appendTo(this.el);
+
+        if (k && cluster && cluster != '--') {
+            var features = this.feature_cluster_members[k][cluster];
+            addOptions(select_list, features);
+        }
+
+        this.el.find('#feature_search_field').remove();
+
+        $('<input id="feature_search_field"></input>')
+            .attr({
+                'type': 'text',
+                'id': 'search_field',
+                'placeholder': 'Filter feature list',
+                'outerWidth': '30%',
+                'outerHeight': '8%',
+            }).css({
+                'position': 'absolute',
+                'left': '0%',
+                'top': '50%',
+                'width': '30%',
+                'height': '8%',
+                'overflow': 'scroll',
+            })
+
+            .on('input', function() {
+                var selectable;
+                let value = this.value.toLowerCase();
+                if (value === '') {
+                    selectable = features;
+                } else {
+                    selectable = $.grep(features, function(n) {
+                        return (n.toLowerCase().includes(value));
+                    });
+                }
+                addOptions(select_list, selectable);
+            })
+
+            .appendTo(this.el);
+    }
+
     render() {
         this.drawHeatmap(2);
+        this.drawClusterSelect(2);
+        this.drawFeatureSelect(null, null);
 
-        this.makeClusterSelect();
+        this.makeKSelect();
         this.drawDendrogram();
         this.writeVertNames();
     }
