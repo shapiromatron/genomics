@@ -356,6 +356,7 @@ class FeatureClusteringOverview{
                 self.drawHeatmap(this.value);
                 self.drawClusterSelect(this.value);
                 self.drawFeatureSelect(null, null);
+                self.drawCentroidPlot(this.value, null);
             })
             .appendTo(this.el_1);
 
