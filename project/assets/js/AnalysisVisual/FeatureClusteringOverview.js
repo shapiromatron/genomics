@@ -355,7 +355,7 @@ class FeatureClusteringOverview{
                 // console.log(this.value);
                 self.drawHeatmap(this.value);
                 self.drawClusterSelect(this.value);
-                self.drawFeatureSelect(null, null);
+                self.drawFeatureSelect(this.value, '--');
                 self.drawCentroidPlot(this.value, null);
             })
             .appendTo(this.el_1);
@@ -477,7 +477,7 @@ class FeatureClusteringOverview{
         //Add text
         this.el_1.find('#feature_prompt').remove();
         this.el_1.find('#pointer').remove();
-        var select_list = $('<div id="feature_prompt">Select feature:</div>')
+        var select_list = $('<div id="feature_prompt">Select feature from cluster:</div>')
             .css({
                 'height': '8%',
                 'width': '20%',
@@ -509,10 +509,14 @@ class FeatureClusteringOverview{
             })
             .appendTo(this.el_1);
 
-        if (k && cluster && cluster != '--') {
-            var features = this.feature_cluster_members[k][cluster];
-            addOptions(select_list, features);
+        if (k) {
+            if (cluster == '--') {
+                var features = this.feature_names;
+            } else {
+                var features = this.feature_cluster_members[k][cluster];
+            }
         }
+        addOptions(select_list, features);
 
         this.el_1.find('#feature_search_field').remove();
 
@@ -727,7 +731,7 @@ class FeatureClusteringOverview{
     render() {
         this.drawHeatmap(2);
         this.drawClusterSelect(2);
-        this.drawFeatureSelect(null, null);
+        this.drawFeatureSelect(2, '--');
         this.drawCentroidPlot(2, null);
 
         this.makeKSelect();
