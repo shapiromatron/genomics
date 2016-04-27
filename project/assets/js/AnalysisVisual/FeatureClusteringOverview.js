@@ -52,10 +52,10 @@ class FeatureClusteringOverview{
             .appendTo(this.el);
 
         // get values to draw heatmap
-        var column_order = [];
-        for(var i=0; i<this.cluster_members.length; i++){
-            column_order.push(this.matrix_ids.indexOf(this.cluster_members[i][0]))
-        }
+        // var column_order = [];
+        // for(var i=0; i<this.cluster_members.length; i++){
+        //     column_order.push(this.matrix_ids.indexOf(this.cluster_members[i][0]))
+        // }
 
         var k_values = [];
         for(var i=0; i<k; i++){
@@ -64,10 +64,10 @@ class FeatureClusteringOverview{
         for(var i=0; i<this.feature_clusters[k]['labels'].length; i++){
             var label = this.feature_clusters[k]['labels'][i];
             // k_values[label].push(this.feature_vectors[i]);
-            k_values[label].push([])
-            for(var j=0; j<column_order.length; j++){
-                k_values[label][k_values[label].length-1].push(this.feature_vectors[i][column_order[j]]);
-            }
+            k_values[label].push(this.feature_vectors[i])
+            // for(var j=0; j<column_order.length; j++){
+            //     k_values[label][k_values[label].length-1].push(this.feature_vectors[i][column_order[j]]);
+            // }
         }
 
         // draw heatmap
