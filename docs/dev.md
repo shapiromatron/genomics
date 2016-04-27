@@ -9,6 +9,12 @@ The development instructions here list setup for both the backend (a Python djan
 5. Loading example [ENCODE data](#loading-encode-data)
 6. Running the [development server](#starting-the-development-server)
 
+To begin, clone this repository:
+
+    git clone git@github.com:shapiromatron/genomics.git
+
+The path where this repository is found on your computer will be the project-root path, referred to frequently in the rest of this documentation. 
+
 ## Python webserver setup
 
 Requires the following software before beginning:
@@ -17,11 +23,15 @@ Requires the following software before beginning:
 - PostgreSQL 9.4+
 - Python virtualenv and virtualenvwrapper
 
-Create a new python virtual environment, we'll use the virtual environment name `genomics` throughout the documentation. Next, change paths to the root level of this project. Then, we'll install all python requirements by running the command:
+Create a new python virtual environment, we'll use the virtual environment name `genomics` throughout the documentation. If you you have [virtualenvwrapper](https://pypi.python.org/pypi/virtualenvwrapper/) installed, you can create a new environment using the command below (note that this requires you to specify the path for python 3, which is not the default python with many installations):
+
+    mkvirtualenv genomics --python=/usr/local/bin/python3
+
+Next, change paths to the root-path of this project. Then, we'll install all python requirements by running the command:
 
     pip install -r requirements/dev.txt
-        
-Next, change directories into the `/project` path. Copy default django local-development settings:
+
+Next, change directories into the `/project` path (relative to the root). Copy default django local-development settings:
 
     cp django_project/settings/local.example.py django_project/settings/local.py
 
@@ -85,7 +95,9 @@ To load the encode data:
                 encode/
                     hg19/
             docs/
+            notebooks/
             project/
+            public/
             ...
 
 2. Navigate to the `/project` path, an execute the following command, using the downloaded ENCODE JSON metadata file above:
