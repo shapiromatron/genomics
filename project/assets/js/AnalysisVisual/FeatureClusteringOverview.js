@@ -4,8 +4,9 @@ import d3 from 'd3';
 
 class FeatureClusteringOverview{
 
-    constructor(el, data) {
-        this.el = el;
+    constructor(el_1, el_2, data) {
+        this.el_1 = el_1;
+        this.el_2 = el_2;
         this.matrix_names = data['matrix_names'];
         this.feature_clusters = data['feature_clusters'];
         this.feature_vectors = data['feature_vectors'];
@@ -36,20 +37,20 @@ class FeatureClusteringOverview{
         var colors = this.colors;
 
         // remove existing heatmap
-        this.el.find('#heatmap').remove();
+        this.el_1.find('#heatmap').remove();
 
         // create heatmap
         var heatmap = $('<canvas id="heatmap"></canvas>')
             .prop({
-                'height': 0.80 * this.el.height(),
-                'width': 0.60 * this.el.width(),
+                'height': 0.80 * this.el_1.height(),
+                'width': 0.60 * this.el_1.width(),
             })
             .css({
                 'position': 'absolute',
                 'left': '40%',
                 'top': '20%',
             })
-            .appendTo(this.el);
+            .appendTo(this.el_1);
 
         // get values to draw heatmap
         // var column_order = [];
@@ -98,7 +99,7 @@ class FeatureClusteringOverview{
         }
 
         // add column tooltips
-        this.el.find('#heatmap_col_tooltips').remove();
+        this.el_1.find('#heatmap_col_tooltips').remove();
 
         var heatmap_col_tooltips = $('<div id="heatmap_col_tooltips">')
             .css({
@@ -107,7 +108,7 @@ class FeatureClusteringOverview{
                 'position': 'absolute',
                 'left': '40%',
                 'top': '20%',
-            }).appendTo(this.el);
+            }).appendTo(this.el_1);
 
         var height = heatmap_col_tooltips.height(),
             width = heatmap_col_tooltips.width(),
@@ -150,7 +151,7 @@ class FeatureClusteringOverview{
         $('[data-toggle="tooltip"]').tooltip();
 
         // remove existing cluster bars
-        this.el.find('#heatmap_clusters').remove();
+        this.el_1.find('#heatmap_clusters').remove();
 
         // add cluster bars
         var heatmap_clusters = $('<div id="heatmap_clusters">')
@@ -160,7 +161,7 @@ class FeatureClusteringOverview{
                 'position': 'absolute',
                 'left': '37%',
                 'top': '20%',
-            }).appendTo(this.el);
+            }).appendTo(this.el_1);
 
         var colors = this.colors;
         var cluster_sizes = [];
@@ -209,7 +210,7 @@ class FeatureClusteringOverview{
     }
 
     drawDendrogram() {
-        this.el.find('#dendrogram').remove();
+        this.el_1.find('#dendrogram').remove();
 
         var dendro = $('<div id="dendrogram">')
             .css({
@@ -219,7 +220,7 @@ class FeatureClusteringOverview{
                 'overflow': 'visible',
                 'height': '10%',
                 'width': '60%',
-            }).appendTo(this.el);
+            }).appendTo(this.el_1);
 
         var line_coords = [],
             x_max = parseFloat(Math.max(...[].concat.apply([], this.dendrogram['icoord']))),
@@ -264,7 +265,7 @@ class FeatureClusteringOverview{
 
     writeVertNames() {
         // remove existing
-        this.el.find('#vert_names').remove();
+        this.el_1.find('#vert_names').remove();
 
         // create new
         var vert = $('<div id="vert_names">')
@@ -275,7 +276,7 @@ class FeatureClusteringOverview{
                 'overflow': 'hidden',
                 'height': '8%',
                 'width': '60%',
-            }).appendTo(this.el);
+            }).appendTo(this.el_1);
 
         //Draw SVGs
         var height = vert.height(),
@@ -311,8 +312,8 @@ class FeatureClusteringOverview{
     }
 
     makeKSelect() {
-        function addOptions(el, option_array) {
-            var select = el.find('#select_k');
+        function addOptions(el_1, option_array) {
+            var select = el_1.find('#select_k');
 
             select.empty();
 
@@ -326,7 +327,7 @@ class FeatureClusteringOverview{
         }
 
         //Add text
-        this.el.find('#k_prompt').remove();
+        this.el_1.find('#k_prompt').remove();
         var select_list = $('<div id="k_prompt">Select k-value:</div>')
             .css({
                 'height': '8%',
@@ -336,10 +337,10 @@ class FeatureClusteringOverview{
                 'top': '20%',
                 'left': '0%',
             })
-            .appendTo(this.el);
+            .appendTo(this.el_1);
 
         //Remove heatmap div if there; append heatmap div
-        this.el.find('#select_k').remove();
+        this.el_1.find('#select_k').remove();
         var self = this;
         var select_list = $('<select id="select_k"></select>')
             .css({
@@ -356,16 +357,16 @@ class FeatureClusteringOverview{
                 self.drawClusterSelect(this.value);
                 self.drawFeatureSelect(null, null);
             })
-            .appendTo(this.el);
+            .appendTo(this.el_1);
 
-        addOptions(this.el, this.feature_clusters);
+        addOptions(this.el_1, this.feature_clusters);
         select_list[0].selectedIndex = 0;
     }
 
     drawClusterSelect(k) {
 
         //Add text
-        this.el.find('#cluster_prompt').remove();
+        this.el_1.find('#cluster_prompt').remove();
         var select_list = $('<div id="cluster_prompt">Select cluster:</div>')
             .css({
                 'height': '8%',
@@ -375,9 +376,9 @@ class FeatureClusteringOverview{
                 'top': '30%',
                 'left': '0%',
             })
-            .appendTo(this.el);
+            .appendTo(this.el_1);
 
-        this.el.find('#select_cluster').remove();
+        this.el_1.find('#select_cluster').remove();
         var self = this;
         var select_list = $('<select id="select_cluster"></select>')
             .css({
@@ -391,7 +392,7 @@ class FeatureClusteringOverview{
             .change(function() {
                 self.drawFeatureSelect(k, this.value);
             })
-            .appendTo(this.el);
+            .appendTo(this.el_1);
 
         var cluster_range = d3.range(k);
         for (var i=0; i<cluster_range.length; i++) {
@@ -433,12 +434,12 @@ class FeatureClusteringOverview{
             }
             var total_feature_num = feature_names.length;
             var feature_index = getIndex(feature);
-            var total_height = 0.8 * el.height();
-            var pointer_height = (feature_index/total_feature_num)*total_height + 0.2 * el.height();
+            var total_height = 0.8 * el_1.height();
+            var pointer_height = (feature_index/total_feature_num)*total_height + 0.2 * el_1.height();
 
             var offset = {
-                'top': 0.01 * el.height(),
-                'left': 0.02 * el.width(),
+                'top': 0.01 * el_1.height(),
+                'left': 0.02 * el_1.width(),
             };
 
 
@@ -447,7 +448,7 @@ class FeatureClusteringOverview{
                 point_3 = (0) + ',' + (pointer_height + offset.top);
             var points = point_1 + ' ' + point_2 + ' ' + point_3;
 
-            el.find('#pointer').remove();
+            el_1.find('#pointer').remove();
             var pointer = $('<div id="pointer">')
                 .css({
                     'position': 'absolute',
@@ -456,7 +457,7 @@ class FeatureClusteringOverview{
                     'overflow': 'visible',
                     'height': '110%',
                     'width': offset.left,
-                }).appendTo(el);
+                }).appendTo(el_1);
             d3.select(pointer.get(0))
                 .append('svg')
                 .attr('height', pointer.height())
@@ -470,10 +471,10 @@ class FeatureClusteringOverview{
         var features = [];
         var feature_names = this.feature_names;
         var feature_cluster_members = this.feature_cluster_members;
-        var el = this.el;
+        var el_1 = this.el_1;
         //Add text
-        this.el.find('#feature_prompt').remove();
-        this.el.find('#pointer').remove();
+        this.el_1.find('#feature_prompt').remove();
+        this.el_1.find('#pointer').remove();
         var select_list = $('<div id="feature_prompt">Select feature:</div>')
             .css({
                 'height': '8%',
@@ -483,9 +484,9 @@ class FeatureClusteringOverview{
                 'top': '40%',
                 'left': '0%',
             })
-            .appendTo(this.el);
+            .appendTo(this.el_1);
 
-        this.el.find('#select_feature').remove();
+        this.el_1.find('#select_feature').remove();
         var features = [];
         var self = this;
         var select_list = $('<select id="select_feature"></select>')
@@ -503,14 +504,14 @@ class FeatureClusteringOverview{
             .change(function() {
                 drawPointer(this.value, k);
             })
-            .appendTo(this.el);
+            .appendTo(this.el_1);
 
         if (k && cluster && cluster != '--') {
             var features = this.feature_cluster_members[k][cluster];
             addOptions(select_list, features);
         }
 
-        this.el.find('#feature_search_field').remove();
+        this.el_1.find('#feature_search_field').remove();
 
         $('<input id="feature_search_field"></input>')
             .attr({
@@ -541,13 +542,89 @@ class FeatureClusteringOverview{
                 addOptions(select_list, selectable);
             })
 
-            .appendTo(this.el);
+            .appendTo(this.el_1);
+    }
+
+    drawCentroidPlot(k, feature) {
+        this.el_2.find('#centroid_plot').remove();
+        $('<div id="centroid_plot">')
+            .css({
+                'height': '100%',
+                'width': '70%',
+                'position': 'absolute',
+                'left': '30%',
+                'top': '0%',
+                'overflow': 'scroll',
+            }).appendTo(this.el_2);
+
+        $('<div id="graph">')
+            .css({
+                'height': '100%',
+                'width': '100%',
+                'position': 'absolute',
+                'left': '0%',
+                'top': '0%',
+            }).appendTo(this.el_2.find('#centroid_plot'));
+
+        var offset = {
+            'top': (1/7)*this.el_2.find('#centroid_plot').height(),
+            'bottom': (1/7)*this.el_2.find('#centroid_plot').height(),
+            'left': (1/7)*this.el_2.find('#centroid_plot').width(),
+            'right': 0,
+        };
+
+        var graph = d3.select(this.el_2.find('#graph').get(0)).append('svg')
+            .attr('width', this.el_2.find('#centroid_plot').width())
+            .attr('height', this.el_2.find('#centroid_plot').height())
+            .append('g');
+
+        var feature_columns = this.feature_columns;
+        var y = d3.scale.linear()
+            .domain([0,1])
+            .range([this.el_2.find('#centroid_plot').height() - offset.top - offset.bottom,0]);
+        var x = d3.scale.ordinal()
+            .domain(this.feature_columns)
+            .rangePoints([offset.left,this.el_2.find('#centroid_plot').width() - offset.right], 1);
+        var line = d3.svg.line()
+            .x(function(d,i) {
+                return x(feature_columns[i]);
+            })
+            .y(function(d) {
+                return y(d);
+            });
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient('bottom')
+            .outerTickSize(0)
+            .tickFormat('');
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient('left')
+            .ticks(5);
+
+        graph.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + (this.el_2.find('#centroid_plot').height() - offset.bottom) + ')')
+            .call(xAxis);
+
+        graph.append('g')
+            .attr('class', 'y axis')
+            .attr('transform', 'translate(' + offset.left + ',' + offset.top +')')
+            .call(yAxis);
+
+        graph.append('g')
+            .selectAll('path')
+            .data(this.feature_clusters[k]['centroids'])
+            .enter()
+            .append('path')
+            .attr('d', function(d) {return line(d);});
     }
 
     render() {
         this.drawHeatmap(2);
         this.drawClusterSelect(2);
         this.drawFeatureSelect(null, null);
+        this.drawCentroidPlot(2, null);
 
         this.makeKSelect();
         this.drawDendrogram();
