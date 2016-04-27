@@ -80,7 +80,7 @@ class FeatureClusteringOverview{
 
         var colorScale = d3.scale.linear()
             .domain([0, 1])
-            .range(['white', colors[0]]);
+            .range(['white', 'red']);
 
         var scale_x = width/col_number,
             scale_y = height/row_number;
@@ -636,6 +636,94 @@ class FeatureClusteringOverview{
         }
     }
 
+    drawLegend() {
+        // remove existing
+        this.el_1.find('#legend').remove();
+
+        // create new
+        var legend = $('<div id="legend">')
+            .css({
+                'position': 'absolute',
+                'left': '5%',
+                'top': '8%',
+                'overflow': 'visible',
+                'height': '5%',
+                'width': '20%',
+            }).appendTo(this.el_1);
+
+        var height = legend.height(),
+            width = legend.width();
+
+        var svg = d3.select(legend.get(0))
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .style('overflow', 'visible');
+
+        var gradient = svg
+            .append('linearGradient')
+            .attr('y1', '0')
+            .attr('y2', '0')
+            .attr('x1', '0')
+            .attr('x2', width)
+            .attr('id', 'gradient')
+            .attr('gradientUnits', 'userSpaceOnUse');
+
+        gradient
+            .append('stop')
+            .attr('offset', '0')
+            .attr('stop-color', 'white');
+        //
+        // gradient
+        //     .append('stop')
+        //     .attr('offset', '0.5')
+        //     .attr('stop-color', 'white');
+
+        gradient
+            .append('stop')
+            .attr('offset', '1')
+            .attr('stop-color', 'red');
+
+        svg.append('rect')
+            .attr('width', width)
+            .attr('height', 0.5 * height)
+            .attr('x', '0')
+            .attr('y', 0.5 * height)
+            .attr('fill', 'url(#gradient)')
+            .attr('stroke', 'black')
+            .attr('stroke-width', '1');
+
+        var legend_lines = [
+            {text: 'Minimum', position: 0},
+            {text: 'Maximum', position: width},
+        ];
+
+        svg.append('g')
+            .selectAll('line')
+            .data(legend_lines)
+            .enter()
+            .append('line')
+            .attr('x1', function(d) {return d.position;})
+            .attr('x2', function(d) {return d.position;})
+            .attr('y1', 0.3 * height)
+            .attr('y2', 0.5 * height)
+            .style('stroke', 'black')
+            .style('stroke-width', 1);
+
+        svg.append('g')
+            .selectAll('text')
+            .data(legend_lines)
+            .enter()
+            .append('text')
+            .text(function(d) { return d.text;})
+            .attr('x', function(d) {return d.position;})
+            .attr('y', 0.25*height)
+            .attr('font-family', 'sans-serif')
+            .attr('font-size', '12px')
+            .attr('fill', 'black')
+            .style('text-anchor', 'middle');
+    }
+
     render() {
         this.drawHeatmap(2);
         this.drawClusterSelect(2);
@@ -645,6 +733,7 @@ class FeatureClusteringOverview{
         this.makeKSelect();
         this.drawDendrogram();
         this.writeVertNames();
+        this.drawLegend();
     }
 }
 
