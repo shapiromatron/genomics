@@ -338,8 +338,14 @@ class EncodeDataset(GenomicDataset):
             'phase',
             'localization',
         ]
-        for fld in fields:
-            dicts[fld] = cls.objects.values_list(fld, flat=True).distinct().order_by(fld)
+        for genome, _ in GENOME_ASSEMBLY_CHOICES:
+            dicts[genome] = {}
+            for fld in fields:
+                dicts[genome][fld] = cls.objects\
+                    .filter(genome_assembly=genome)\
+                    .values_list(fld, flat=True)\
+                    .distinct()\
+                    .order_by(fld)
         return dicts
 
 
