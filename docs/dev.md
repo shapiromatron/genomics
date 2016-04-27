@@ -1,8 +1,15 @@
 # Development startup.
 
-The development instructions here list setup for both the backend (a Python django application with a PostgreSQL database), as well as the frontend (a React application with Babel ES6 javascript).
+The development instructions here list setup for both the backend (a Python django application with a PostgreSQL database), as well as the frontend (a React application with Babel ES6 javascript). Note that this is a complex web application, and therefore multiple steps are required: 
 
-## Backend setup
+1. Setting up the [python webserver](#python-webserver-setup) backend
+2. Setting up the [database](#database-setup)
+3. Syncing the [webserver and the database](#webserver-database-sync)
+4. Setting up the [frontend bundling environment](#frontend-javascript-bundling)
+5. Loading example [ENCODE data](#loading-encode-data)
+6. Running the [development server](#starting-the-development-server)
+
+## Python webserver setup
 
 Requires the following software before beginning:
 
@@ -10,142 +17,107 @@ Requires the following software before beginning:
 - PostgreSQL 9.4+
 - Python virtualenv and virtualenvwrapper
 
-Create a new python virtual environment, we'll use `genomics` throughout the
-documentation. Next, change paths to the root level of this project. Then, we'll install
-all python requirements by runing the command:
+Create a new python virtual environment, we'll use the virtual environment name `genomics` throughout the documentation. Next, change paths to the root level of this project. Then, we'll install all python requirements by running the command:
 
-```
-pip install -r requirements/dev.txt
-```
-
+    pip install -r requirements/dev.txt
+        
 Next, change directories into the `/project` path. Copy default django local-development settings:
 
-```
-cp django_project/settings/local.example.py django_project/settings/local.py
-```
+    cp django_project/settings/local.example.py django_project/settings/local.py
 
 Setup commands to start when activating the virtual environment:
 
-```
-echo "export DJANGO_SETTINGS_MODULE=django_project.settings.local" >> $VIRTUAL_ENV/bin/postactivate
-echo "unset DJANGO_SETTINGS_MODULE" >> $VIRTUAL_ENV/bin/postdeactivate
-```
+    echo "export DJANGO_SETTINGS_MODULE=django_project.settings.local" >> $VIRTUAL_ENV/bin/postactivate
+    echo "unset DJANGO_SETTINGS_MODULE" >> $VIRTUAL_ENV/bin/postdeactivate
+
+## Database setup
 
 Next, create a database:
 
-```
-createdb -E UTF-8 genomics
-```
+    createdb -E UTF-8 genomics
+    
+## Webserver database sync
 
 Restart your virtual environment (`deactivate`, then `workon genomics`). Navigate
 to the `/project` path in the repository.
 
-```
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py download_ucsc_tools
-```
+    python manage.py migrate
+    python manage.py createsuperuser
+    python manage.py download_ucsc_tools
 
-### Setting up React and Javascript webpack.
+## Frontend Javascript bundling
 
-Two references I used for setup help:
+Make sure [node.js](https://nodejs.org/en/foundation/) and [npm](https://www.npmjs.com/) are installed, and are accessible in our environment.
+
+Then, change directory  to the `/project` path of our project. Run the following command, which will install all javascript packages for our development environment:
+
+    npm install --save-dev
+
+After loading all frontend dependencies with the command above, we can run a command to watch our javascript location to compile and push updates to the website (detailed below).
+
+*Note*: if you're using sublime text as a text editor, you may want to download the [Babel](https://github.com/babel/babel-sublime) package for updated syntax definitions. Then, with a Javascript file open, change the default syntax highlighting to Babel.
+
+References:
 
 - [Webpack and django](http://owaislone.org/blog/webpack-plus-reactjs-and-django/)
 - [React for beginners](https://reactforbeginners.com/)
 
-First make sure [node.js](https://nodejs.org/en/foundation/) and [npm](https://www.npmjs.com/) are installed, and are accessible in our environment.
 
-Then, change directory  to the `/project` path of our project. Run the following command, which will install all javascript packages for our development environment:
+## Loading ENCODE data
 
-```
-npm install --save-dev
-```
+Input bigWig data are very large and therefore not included in the repository. To load ENCODE data into the development environment, you'll need to have the bigWig files and a JSON file with additional metadata describing these files.
 
-Next, we run this server to hot-reload updates to any new javascript code that we write:
+Example data can be downloaded here:
 
-*Note*: if you're using sublime text as a text editor, you may want to download the [Babel](https://github.com/babel/babel-sublime) package for updated syntax definitions. Then, with a Javascript file open, change the default syntax highlighting to Babel.
+- [ENCODE data subset](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/encode.zip) (:bangbang: 15GB! :bangbang:)
+- [ENCODE data subset JSON metadata](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/load_encode.json) (6 MB)
+- [Example feature-list](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/unt1hr.obsTSS.bed) (0.4 MB)
+- [Example sort-vector](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/wgEncodeBroadHistoneA549CtcfEtoh02Sig.sortVector.txt) (0.2 MB)
+  
+The feature-list and sort-vector are loaded from the the web-interface after the server has been started (see below). 
 
-##Development testing
+To load the encode data:
 
+1. Unzip the encode data subset into a `/data` folder from the root-folder of the application. After unzipping, the file structure should look like this:
+        
+        /
+            data/
+                encode/
+                    hg19/
+            docs/
+            project/
+            ...
 
-Whenever we want to start coding, we'll need to start the django backend application and the javascript frontend hot--reloading application. Execute these commands in separate terminal windows (from the `/project` path of our application):
-```
-workon genomics
-cd /path/to/application/project/
-python manage.py runserver 9000
-node webpack.devserver.js
-```
-
-Navigate to [localhost:9000](http://127.0.0.1:9000/), and start developing!
-
-### IPython/Jupyter notebooks
-
-If interested in the [ipython/jupyter notebooks](http://jupyter.org/) , you can run the notebook server using this command:
-
-```
-workon genomics
-python manage.py shell_plus --notebook
-```
-
-Then, navigate to [localhost:8888](http://127.0.0.1:8888/) to view the notebooks.
-
-### Loading ENCODE data into your environment
-
-Input bigWig data are very large and therefore not included in the repository.
-To load ENCODE data into the development environment, you'll need to have the
-bigWig files and a JSON file with additional metadata describing these files.
-
-Importing data requires three steps:
-
-1. Place the bigWig files in a location where the web-application can find
-    these files. The default path is in `/data/encode` from the root-path of
-    the project (but this can be changed by modifying `ENCODE_PATH` django 
-    the JSON file created in the next step (see below)
-2. Create a JSON metadata file which describes the ENCODE datafiles. The file
-    should be contain a list of ENCODE datasets, each object having a format
-    such as this: 
-
-            {
-                "name": "wgEncodeHaibTfbsHepg2Tcf12Pcr1xRawRep2",
-                "ambig_bigwig": "hg19/wgEncodeHaibTfbs/wgEncodeHaibTfbsHepg2Tcf12Pcr1xRawRep2.bigWig",
-                "minus_bigwig": null,
-                "plus_bigwig": null,
-                "data_type": "ChipSeq",
-                "genome_assembly": "hg19",
-                "treatment": "None",
-                "antibody": "TCF12",
-                "cell_type": "HepG2",
-                "rna_extract": "",
-                "phase": "",
-                "localization": "",
-                "extra_content": {
-                    "geoSampleAccession": "GSM803336",
-                    "ambig_size": "11M",
-                    "project": "wgEncode",
-                    "dccAccession": "wgEncodeEH001544",
-                    "composite": "wgEncodeHaibTfbs",
-                    "ambig_md5sum": "31ec7bea63894895ed2d13beb321127f",
-                    "grant": "Myers",
-                    "dataVersion": "ENCODE Jan 2011 Freeze",
-                    "protocol": "PCR1x",
-                    "dateUnrestricted": 734431.0,
-                    "dateSubmitted": 734158.0,
-                    "controlId": "SL1401",
-                    "type": "bigWig",
-                    "ambig_view": "RawSignal",
-                    "subId": 3026.0,
-                    "ambig_tableName": "wgEncodeHaibTfbsHepg2Tcf12Pcr1xRawRep2",
-                    "setType": "exp",
-                    "lab": "HudsonAlpha",
-                    "labExpId": "SL1167",
-                    "replicate": 2.0
-                }                
-            }
-
-3. Load the JSON metadata into the web application, which will then allow
-    these datasets to be used in the analysis. Use the following management
-    command to attempt import:
+2. Navigate to the `/project` path, an execute the following command, using the downloaded ENCODE JSON metadata file above:
 
         python manage.py load_encode /path/to/load_encode.json
 
 **Caution: This management command will delete all ENCODE objects in the database**
+
+## Starting the development server
+
+Whenever we want to start coding, we'll need to start the django backend application and the javascript frontend hot--reloading application. We need to be sure that we're in the python virtual environment with all our packages installed, and then we change directories to the `/project` path of the genomics application:
+
+    workon genomics
+    cd /path/to/genomics/project/
+
+After running the commands above, start the backend python client in one terminal window:
+
+    python manage.py runserver 9000
+
+After running the commands above, start the javascript bundler in another terminal window:
+
+    node webpack.devserver.js
+
+Navigate to [localhost:9000](http://127.0.0.1:9000/), and start developing!
+
+# Additional optional commands
+
+## IPython/Jupyter notebooks (optional)
+
+If interested in the [ipython/jupyter notebooks](http://jupyter.org/) , you can run the notebook server using this command:
+
+    workon genomics
+    python manage.py shell_plus --notebook
+
+Then, navigate to [localhost:8888](http://127.0.0.1:8888/) to view the notebooks.
