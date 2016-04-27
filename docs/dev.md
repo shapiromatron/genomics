@@ -69,7 +69,7 @@ Input bigWig data are very large and therefore not included in the repository. T
 
 Example data can be downloaded here:
 
-- [ENCODE data subset](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/encode.zip) (:bangbang: 15GB! :bangbang:)
+- [ENCODE data subset](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/encode.zip) (15GB :bangbang:)
 - [ENCODE data subset JSON metadata](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/load_encode.json) (6 MB)
 - [Example feature-list](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/unt1hr.obsTSS.bed) (0.4 MB)
 - [Example sort-vector](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/wgEncodeBroadHistoneA549CtcfEtoh02Sig.sortVector.txt) (0.2 MB)
