@@ -134,6 +134,12 @@ input[type=number] {
   margin-bottom: 0.5em;
 }
 
+/* fix bs3 dropdown headers */
+.dropdown-header {
+  color: #006dcc;
+  font-weight: bold;
+}
+
 /* delete confirmations */
 .deleteConfirmFormDiv {
   border: 2px solid #c9302c;

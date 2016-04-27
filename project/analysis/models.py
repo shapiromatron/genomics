@@ -498,6 +498,9 @@ class Analysis(GenomicBinSettings):
     def get_delete_url(self):
         return reverse('analysis:analysis_delete', args=[self.pk, ])
 
+    def get_zip_url(self):
+        return reverse('analysis:analysis_zip', args=[self.pk, ])
+
     @property
     def user_datasets(self):
         return UserDataset.objects.filter(id__in=self.datasets.values_list('id', flat=True))
