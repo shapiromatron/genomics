@@ -252,7 +252,7 @@ class AnalysisOverview{
         var legend = $('<div id="legend">')
             .css({
                 'position': 'absolute',
-                'left': '10%',
+                'left': '5%',
                 'top': '8%',
                 'overflow': 'visible',
                 'height': '5%',

@@ -4,8 +4,9 @@ import d3 from 'd3';
 
 class FeatureClusteringOverview{
 
-    constructor(el, data) {
-        this.el = el;
+    constructor(el_1, el_2, data) {
+        this.el_1 = el_1;
+        this.el_2 = el_2;
         this.matrix_names = data['matrix_names'];
         this.feature_clusters = data['feature_clusters'];
         this.feature_vectors = data['feature_vectors'];
@@ -15,30 +16,47 @@ class FeatureClusteringOverview{
         this.matrix_ids = data['matrix_ids'];
         this.cluster_medoids = data['cluster_medoids'];
         this.cluster_members = data['cluster_members'];
+        this.feature_names = data['feature_names'];
+        this.feature_cluster_members = data['feature_cluster_members'];
+
+        this.colors = [
+            '#a50026',
+            '#e0f3f8',
+            '#d73027',
+            '#abd9e9',
+            '#f46d43',
+            '#74add1',
+            '#fdae61',
+            '#4575b4',
+            '#fee090',
+            '#313695',
+        ];
     }
 
     drawHeatmap(k) {
+        var colors = this.colors;
+
         // remove existing heatmap
-        this.el.find('#heatmap').remove();
+        this.el_1.find('#heatmap').remove();
 
         // create heatmap
         var heatmap = $('<canvas id="heatmap"></canvas>')
             .prop({
-                'height': 0.80 * this.el.height(),
-                'width': 0.60 * this.el.width(),
+                'height': 0.80 * this.el_1.height(),
+                'width': 0.60 * this.el_1.width(),
             })
             .css({
                 'position': 'absolute',
                 'left': '40%',
                 'top': '20%',
             })
-            .appendTo(this.el);
+            .appendTo(this.el_1);
 
         // get values to draw heatmap
-        var column_order = [];
-        for(var i=0; i<this.cluster_members.length; i++){
-            column_order.push(this.matrix_ids.indexOf(this.cluster_members[i][0]))
-        }
+        // var column_order = [];
+        // for(var i=0; i<this.cluster_members.length; i++){
+        //     column_order.push(this.matrix_ids.indexOf(this.cluster_members[i][0]))
+        // }
 
         var k_values = [];
         for(var i=0; i<k; i++){
@@ -47,10 +65,10 @@ class FeatureClusteringOverview{
         for(var i=0; i<this.feature_clusters[k]['labels'].length; i++){
             var label = this.feature_clusters[k]['labels'][i];
             // k_values[label].push(this.feature_vectors[i]);
-            k_values[label].push([])
-            for(var j=0; j<column_order.length; j++){
-                k_values[label][k_values[label].length-1].push(this.feature_vectors[i][column_order[j]]);
-            }
+            k_values[label].push(this.feature_vectors[i])
+            // for(var j=0; j<column_order.length; j++){
+            //     k_values[label][k_values[label].length-1].push(this.feature_vectors[i][column_order[j]]);
+            // }
         }
 
         // draw heatmap
@@ -81,7 +99,7 @@ class FeatureClusteringOverview{
         }
 
         // add column tooltips
-        this.el.find('#heatmap_col_tooltips').remove();
+        this.el_1.find('#heatmap_col_tooltips').remove();
 
         var heatmap_col_tooltips = $('<div id="heatmap_col_tooltips">')
             .css({
@@ -90,7 +108,7 @@ class FeatureClusteringOverview{
                 'position': 'absolute',
                 'left': '40%',
                 'top': '20%',
-            }).appendTo(this.el);
+            }).appendTo(this.el_1);
 
         var height = heatmap_col_tooltips.height(),
             width = heatmap_col_tooltips.width(),
@@ -133,19 +151,19 @@ class FeatureClusteringOverview{
         $('[data-toggle="tooltip"]').tooltip();
 
         // remove existing cluster bars
-        this.el.find('#heatmap_clusters').remove();
+        this.el_1.find('#heatmap_clusters').remove();
 
         // add cluster bars
         var heatmap_clusters = $('<div id="heatmap_clusters">')
             .css({
                 'height': '80%',
-                'width': '3%',
+                'width': '2%',
                 'position': 'absolute',
-                'left': '36%',
+                'left': '37%',
                 'top': '20%',
-            }).appendTo(this.el);
+            }).appendTo(this.el_1);
 
-        var cluster_colors = ['red','blue'];
+        var colors = this.colors;
         var cluster_sizes = [];
         var total_entries = this.feature_clusters[k]['labels'].length;
         var entry_count = 0;
@@ -169,7 +187,7 @@ class FeatureClusteringOverview{
             .attr('y', function(d) { return (d.cume/total_entries)*heatmap_clusters.height(); })
             .attr('width', heatmap_clusters.width())
             .attr('height', function(d) { return (d.entry/total_entries)*heatmap_clusters.height(); })
-            .style('fill', function(d, i) { return cluster_colors[i]; })
+            .style('fill', function(d, i) { return colors[i]; })
             .on('mouseover', function (d, i) {
                 d3.select(this)
                     .style('stroke', 'black')
@@ -192,7 +210,7 @@ class FeatureClusteringOverview{
     }
 
     drawDendrogram() {
-        this.el.find('#dendrogram').remove();
+        this.el_1.find('#dendrogram').remove();
 
         var dendro = $('<div id="dendrogram">')
             .css({
@@ -202,7 +220,7 @@ class FeatureClusteringOverview{
                 'overflow': 'visible',
                 'height': '10%',
                 'width': '60%',
-            }).appendTo(this.el);
+            }).appendTo(this.el_1);
 
         var line_coords = [],
             x_max = parseFloat(Math.max(...[].concat.apply([], this.dendrogram['icoord']))),
@@ -247,7 +265,7 @@ class FeatureClusteringOverview{
 
     writeVertNames() {
         // remove existing
-        this.el.find('#vert_names').remove();
+        this.el_1.find('#vert_names').remove();
 
         // create new
         var vert = $('<div id="vert_names">')
@@ -258,7 +276,7 @@ class FeatureClusteringOverview{
                 'overflow': 'hidden',
                 'height': '8%',
                 'width': '60%',
-            }).appendTo(this.el);
+            }).appendTo(this.el_1);
 
         //Draw SVGs
         var height = vert.height(),
@@ -293,10 +311,433 @@ class FeatureClusteringOverview{
             });
     }
 
+    makeKSelect() {
+        function addOptions(el_1, option_array) {
+            var select = el_1.find('#select_k');
+
+            select.empty();
+
+            d3.select(select.get(0))
+                .selectAll('option')
+                .data(d3.keys(option_array))
+                .enter()
+                .append('option')
+                .text(function(d) {return d;})
+                .attr('value', function(d) {return d;});
+        }
+
+        //Add text
+        this.el_1.find('#k_prompt').remove();
+        var select_list = $('<div id="k_prompt">Select k-value:</div>')
+            .css({
+                'height': '8%',
+                'width': '20%',
+                //'font-size': '12px',
+                'position': 'absolute',
+                'top': '20%',
+                'left': '0%',
+            })
+            .appendTo(this.el_1);
+
+        //Remove heatmap div if there; append heatmap div
+        this.el_1.find('#select_k').remove();
+        var self = this;
+        var select_list = $('<select id="select_k"></select>')
+            .css({
+                'height': '8%',
+                'width': '6%',
+                // 'font-size': '12px',
+                'position': 'absolute',
+                'top': '20%',
+                'left': '24%',
+            })
+            .change(function() {
+                // console.log(this.value);
+                self.drawHeatmap(this.value);
+                self.drawClusterSelect(this.value);
+                self.drawFeatureSelect(this.value, '--');
+                self.drawCentroidPlot(this.value, null);
+            })
+            .appendTo(this.el_1);
+
+        addOptions(this.el_1, this.feature_clusters);
+        select_list[0].selectedIndex = 0;
+    }
+
+    drawClusterSelect(k) {
+
+        //Add text
+        this.el_1.find('#cluster_prompt').remove();
+        var select_list = $('<div id="cluster_prompt">Select cluster:</div>')
+            .css({
+                'height': '8%',
+                'width': '20%',
+                //'font-size': '12px',
+                'position': 'absolute',
+                'top': '30%',
+                'left': '0%',
+            })
+            .appendTo(this.el_1);
+
+        this.el_1.find('#select_cluster').remove();
+        var self = this;
+        var select_list = $('<select id="select_cluster"></select>')
+            .css({
+                'height': '8%',
+                'width': '6%',
+                //'font-size': '12px',
+                'position': 'absolute',
+                'top': '30%',
+                'left': '24%',
+            })
+            .change(function() {
+                self.drawFeatureSelect(k, this.value);
+                self.drawCentroidPlot(k, null);
+            })
+            .appendTo(this.el_1);
+
+        var cluster_range = d3.range(k);
+        for (var i=0; i<cluster_range.length; i++) {
+            cluster_range[i] += 1;
+        }
+        cluster_range.unshift('--');
+        d3.select(select_list.get(0))
+            .selectAll('option')
+            .data(cluster_range)
+            .enter()
+            .append('option')
+            .text(function(d) {return d;})
+            .attr('value', function(d) {return d;});
+    }
+
+    drawFeatureSelect(k,cluster) {
+        function addOptions(select, option_array) {
+            select.empty();
+            d3.select(select.get(0))
+                .selectAll('option')
+                .data(option_array)
+                .enter()
+                .append('option')
+                .text(function(d) {return d;})
+                .attr('value', function(d) {return d;});
+        }
+
+        function drawPointer(feature, k) {
+            function getIndex(feature) {
+                var feature_index = 0;
+                for (var i in feature_cluster_members[k]) {
+                    for (var j in feature_cluster_members[k][i]) {
+                        if (feature == feature_cluster_members[k][i][j]) {
+                            return feature_index;
+                        }
+                        feature_index += 1;
+                    }
+                }
+            }
+            var total_feature_num = feature_names.length;
+            var feature_index = getIndex(feature);
+            var total_height = 0.8 * el_1.height();
+            var pointer_height = (feature_index/total_feature_num)*total_height + 0.2 * el_1.height();
+
+            var offset = {
+                'top': 0.01 * el_1.height(),
+                'left': 0.02 * el_1.width(),
+            };
+
+
+            var point_1 = (0) + ',' + (pointer_height - offset.top),
+                point_2 = (offset.left) + ',' + (pointer_height),
+                point_3 = (0) + ',' + (pointer_height + offset.top);
+            var points = point_1 + ' ' + point_2 + ' ' + point_3;
+
+            el_1.find('#pointer').remove();
+            var pointer = $('<div id="pointer">')
+                .css({
+                    'position': 'absolute',
+                    'left': '35%',
+                    'top': '0%',
+                    'overflow': 'visible',
+                    'height': '110%',
+                    'width': offset.left,
+                }).appendTo(el_1);
+            d3.select(pointer.get(0))
+                .append('svg')
+                .attr('height', pointer.height())
+                .attr('width', pointer.width())
+                .append('polygon')
+                .attr('points', points)
+                .style('fill', 'black')
+                .style('position', 'absolute');
+        }
+
+        var features = [];
+        var feature_names = this.feature_names;
+        var feature_cluster_members = this.feature_cluster_members;
+        var el_1 = this.el_1;
+        //Add text
+        this.el_1.find('#feature_prompt').remove();
+        this.el_1.find('#pointer').remove();
+        var select_list = $('<div id="feature_prompt">Select feature from cluster:</div>')
+            .css({
+                'height': '8%',
+                'width': '20%',
+                //'font-size': '12px',
+                'position': 'absolute',
+                'top': '40%',
+                'left': '0%',
+            })
+            .appendTo(this.el_1);
+
+        this.el_1.find('#select_feature').remove();
+        var features = [];
+        var self = this;
+        var select_list = $('<select id="select_feature"></select>')
+            .attr({
+                'size': '12',
+            })
+            .css({
+                'height': '40%',
+                'width': '30%',
+                'font-size': '12px',
+                'position': 'absolute',
+                'top': '60%',
+                'left': '0%',
+            })
+            .change(function() {
+                drawPointer(this.value, k);
+                self.drawCentroidPlot(k, this.value);
+            })
+            .appendTo(this.el_1);
+
+        if (k) {
+            if (cluster == '--') {
+                var features = this.feature_names;
+            } else {
+                var features = this.feature_cluster_members[k][cluster];
+            }
+        }
+        addOptions(select_list, features);
+
+        this.el_1.find('#feature_search_field').remove();
+
+        $('<input id="feature_search_field"></input>')
+            .attr({
+                'type': 'text',
+                'id': 'search_field',
+                'placeholder': 'Filter feature list',
+                'outerWidth': '30%',
+                'outerHeight': '8%',
+            }).css({
+                'position': 'absolute',
+                'left': '0%',
+                'top': '50%',
+                'width': '30%',
+                'height': '8%',
+                'overflow': 'scroll',
+            })
+
+            .on('input', function() {
+                var selectable;
+                let value = this.value.toLowerCase();
+                if (value === '') {
+                    selectable = features;
+                } else {
+                    selectable = $.grep(features, function(n) {
+                        return (n.toLowerCase().includes(value));
+                    });
+                }
+                addOptions(select_list, selectable);
+            })
+
+            .appendTo(this.el_1);
+    }
+
+    drawCentroidPlot(k, feature) {
+        this.el_2.find('#centroid_plot').remove();
+        $('<div id="centroid_plot">')
+            .css({
+                'height': '100%',
+                'width': '70%',
+                'position': 'absolute',
+                'left': '30%',
+                'top': '0%',
+                'overflow': 'scroll',
+            }).appendTo(this.el_2);
+
+        $('<div id="graph">')
+            .css({
+                'height': '100%',
+                'width': '100%',
+                'position': 'absolute',
+                'left': '0%',
+                'top': '0%',
+            }).appendTo(this.el_2.find('#centroid_plot'));
+
+        var offset = {
+            'top': (1/7)*this.el_2.find('#centroid_plot').height(),
+            'bottom': (1/7)*this.el_2.find('#centroid_plot').height(),
+            'left': (1/7)*this.el_2.find('#centroid_plot').width(),
+            'right': 0,
+        };
+
+        var graph = d3.select(this.el_2.find('#graph').get(0)).append('svg')
+            .attr('width', this.el_2.find('#centroid_plot').width())
+            .attr('height', this.el_2.find('#centroid_plot').height())
+            .append('g');
+
+        var feature_columns = this.feature_columns;
+        var y = d3.scale.linear()
+            .domain([0,1])
+            .range([this.el_2.find('#centroid_plot').height() - offset.top - offset.bottom,0]);
+        var x = d3.scale.ordinal()
+            .domain(this.feature_columns)
+            .rangePoints([offset.left,this.el_2.find('#centroid_plot').width() - offset.right], 1);
+        var line = d3.svg.line()
+            .x(function(d,i) {
+                return x(feature_columns[i]);
+            })
+            .y(function(d) {
+                return y(d);
+            });
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient('bottom')
+            .outerTickSize(0)
+            .tickFormat('');
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient('left')
+            .ticks(5);
+
+        graph.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + (this.el_2.find('#centroid_plot').height() - offset.bottom) + ')')
+            .call(xAxis);
+
+        graph.append('g')
+            .attr('class', 'y axis')
+            .attr('transform', 'translate(' + offset.left + ',' + offset.top +')')
+            .call(yAxis);
+
+        var colors = this.colors;
+        graph.append('g')
+            .selectAll('path')
+            .data(this.feature_clusters[k]['centroids'])
+            .enter()
+            .append('path')
+            .attr('d', function(d) {return line(d);})
+            .style('stroke', function(d,i) {return colors[i];})
+            .style('fill', 'none')
+            .style('stroke-width', '3');
+
+        if (feature) {
+            var feature_data = this.feature_vectors[this.feature_names.indexOf(feature)];
+            graph.append('path')
+                .attr('d', function(d) {return line(feature_data);})
+                .style('stroke', 'black')
+                .style('fill', 'none')
+                .style('stroke-width', '3');
+        }
+    }
+
+    drawLegend() {
+        // remove existing
+        this.el_1.find('#legend').remove();
+
+        // create new
+        var legend = $('<div id="legend">')
+            .css({
+                'position': 'absolute',
+                'left': '5%',
+                'top': '8%',
+                'overflow': 'visible',
+                'height': '5%',
+                'width': '20%',
+            }).appendTo(this.el_1);
+
+        var height = legend.height(),
+            width = legend.width();
+
+        var svg = d3.select(legend.get(0))
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .style('overflow', 'visible');
+
+        var gradient = svg
+            .append('linearGradient')
+            .attr('y1', '0')
+            .attr('y2', '0')
+            .attr('x1', '0')
+            .attr('x2', width)
+            .attr('id', 'gradient')
+            .attr('gradientUnits', 'userSpaceOnUse');
+
+        gradient
+            .append('stop')
+            .attr('offset', '0')
+            .attr('stop-color', 'white');
+        //
+        // gradient
+        //     .append('stop')
+        //     .attr('offset', '0.5')
+        //     .attr('stop-color', 'white');
+
+        gradient
+            .append('stop')
+            .attr('offset', '1')
+            .attr('stop-color', 'red');
+
+        svg.append('rect')
+            .attr('width', width)
+            .attr('height', 0.5 * height)
+            .attr('x', '0')
+            .attr('y', 0.5 * height)
+            .attr('fill', 'url(#gradient)')
+            .attr('stroke', 'black')
+            .attr('stroke-width', '1');
+
+        var legend_lines = [
+            {text: 'Minimum', position: 0},
+            {text: 'Maximum', position: width},
+        ];
+
+        svg.append('g')
+            .selectAll('line')
+            .data(legend_lines)
+            .enter()
+            .append('line')
+            .attr('x1', function(d) {return d.position;})
+            .attr('x2', function(d) {return d.position;})
+            .attr('y1', 0.3 * height)
+            .attr('y2', 0.5 * height)
+            .style('stroke', 'black')
+            .style('stroke-width', 1);
+
+        svg.append('g')
+            .selectAll('text')
+            .data(legend_lines)
+            .enter()
+            .append('text')
+            .text(function(d) { return d.text;})
+            .attr('x', function(d) {return d.position;})
+            .attr('y', 0.25*height)
+            .attr('font-family', 'sans-serif')
+            .attr('font-size', '12px')
+            .attr('fill', 'black')
+            .style('text-anchor', 'middle');
+    }
+
     render() {
         this.drawHeatmap(2);
+        this.drawClusterSelect(2);
+        this.drawFeatureSelect(2, '--');
+        this.drawCentroidPlot(2, null);
+
+        this.makeKSelect();
         this.drawDendrogram();
         this.writeVertNames();
+        this.drawLegend();
     }
 }
 

@@ -612,6 +612,8 @@ class Analysis(GenomicBinSettings):
             'feature_clusters': output['feature_clusters'],
             'feature_vectors': output['feature_vectors'],
             'feature_columns': output['feature_columns'],
+            'feature_names': output['feature_names'],
+            'feature_cluster_members': output['feature_cluster_members'],
         }
 
     def get_ks(self, id_):
