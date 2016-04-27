@@ -370,6 +370,14 @@ class MatrixByMatrix():
                 self.feature_cluster_members[k][int(cluster)+1].append(
                     self.feature_names[i])
 
+    def reorderFeatureMatrixByDendrogram(self):
+        order = self.dendrogram['leaves']
+        for i, row in enumerate(self.vector_matrix):
+            temp = []
+            for index in order:
+                temp.append(row[index])
+            self.vector_matrix[i] = temp
+
     def execute(self):
         self.readMatrixFiles()
         self.createSortOrders()
@@ -378,6 +386,7 @@ class MatrixByMatrix():
         self.findClusterCorrelationValues()
 
         self.createFeatureMatrix()
+        self.reorderFeatureMatrixByDendrogram()
         self.performFeatureClustering()
         self.normalizeFeatureMatrix()
         self.getClusterMembers()
