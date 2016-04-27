@@ -19,10 +19,6 @@ class Home(TemplateView):
         return super(Home, self).get(request, *args, **kwargs)
 
 
-class DashboardOld(LoginRequiredMixin, TemplateView):
-    template_name = 'analysis/dashboard_old.html'
-
-
 class CeleryTester(Home):
     def get(self, request, *args, **kwargs):
         tasks.debug_task.delay()
