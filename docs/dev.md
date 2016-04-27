@@ -149,9 +149,3 @@ Importing data requires three steps:
         python manage.py load_encode /path/to/load_encode.json
 
 **Caution: This management command will delete all ENCODE objects in the database**
-
-
-### Loading an analysis into development environment.
-
-1. Download a zip file from an analysis you have access to using the URL `/dashboard/analysis/{id}/zip/`, where `{id}` is the numeric ID of the analysis.
-2. Use the [django management command](https://docs.djangoproject.com/en/1.9/howto/custom-management-commands/) `python manage.py load_zip {fn}`, where `{fn}` is the name of the zip file.
