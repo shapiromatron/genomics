@@ -392,6 +392,7 @@ class FeatureClusteringOverview{
             })
             .change(function() {
                 self.drawFeatureSelect(k, this.value);
+                self.drawCentroidPlot(k, null);
             })
             .appendTo(this.el_1);
 
@@ -504,6 +505,7 @@ class FeatureClusteringOverview{
             })
             .change(function() {
                 drawPointer(this.value, k);
+                self.drawCentroidPlot(k, this.value);
             })
             .appendTo(this.el_1);
 
@@ -623,6 +625,15 @@ class FeatureClusteringOverview{
             .style('stroke', function(d,i) {return colors[i];})
             .style('fill', 'none')
             .style('stroke-width', '3');
+
+        if (feature) {
+            var feature_data = this.feature_vectors[this.feature_names.indexOf(feature)];
+            graph.append('path')
+                .attr('d', function(d) {return line(feature_data);})
+                .style('stroke', 'black')
+                .style('fill', 'none')
+                .style('stroke-width', '3');
+        }
     }
 
     render() {
