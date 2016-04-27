@@ -96,17 +96,17 @@ To load the encode data:
 
 ## Starting the development server
 
-Whenever we want to start coding, we'll need to start the django backend application and the javascript frontend hot--reloading application. We need to be sure that we're in the python virtual environment with all our packages installed, and then we change directories to the `/project` path of the genomics application:
+Whenever we want to start coding, we'll need to start the django backend application and the javascript frontend hot--reloading application.
 
+Start the backend python client in one terminal window:
+    
     workon genomics
     cd /path/to/genomics/project/
-
-After running the commands above, start the backend python client in one terminal window:
-
     python manage.py runserver 9000
 
-After running the commands above, start the javascript bundler in another terminal window:
+Start the javascript bundler in another terminal window:
 
+    cd /path/to/genomics/project/
     node webpack.devserver.js
 
 Navigate to [localhost:9000](http://127.0.0.1:9000/), and start developing!
