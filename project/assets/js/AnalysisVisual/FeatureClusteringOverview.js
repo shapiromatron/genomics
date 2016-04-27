@@ -613,12 +613,16 @@ class FeatureClusteringOverview{
             .attr('transform', 'translate(' + offset.left + ',' + offset.top +')')
             .call(yAxis);
 
+        var colors = this.colors;
         graph.append('g')
             .selectAll('path')
             .data(this.feature_clusters[k]['centroids'])
             .enter()
             .append('path')
-            .attr('d', function(d) {return line(d);});
+            .attr('d', function(d) {return line(d);})
+            .style('stroke', function(d,i) {return colors[i];})
+            .style('fill', 'none')
+            .style('stroke-width', '3');
     }
 
     render() {
