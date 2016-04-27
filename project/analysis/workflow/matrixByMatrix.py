@@ -219,12 +219,12 @@ class MatrixByMatrix():
 
     def getOutputDict(self):
         # make values more portable for output JSON
-        for key in self.kmeans_results:
-            for i in range(len(self.kmeans_results[key]['centroids'])):
-                for j, val in enumerate(
-                        self.kmeans_results[key]['centroids'][i]):
-                    self.kmeans_results[key]['centroids'][i][j] = \
-                        '%.2f' % round(val, 2)
+        # for key in self.kmeans_results:
+        #     for i in range(len(self.kmeans_results[key]['centroids'])):
+        #         for j, val in enumerate(
+        #                 self.kmeans_results[key]['centroids'][i]):
+        #             self.kmeans_results[key]['centroids'][i][j] = \
+        #                 '%.2f' % round(val, 2)
         for entry in self.vector_matrix:
             for i, val in enumerate(entry):
                 entry[i] = '%.2f' % round(val, 2)
@@ -326,18 +326,35 @@ class MatrixByMatrix():
                         self.vector_matrix[i].append(numpy.sum(row_values))
 
     def performFeatureClustering(self):
+        def findClosest(entry, list_of_lists):
+            min_value = float('inf')
+            min_index = None
+            for i, _list in enumerate(list_of_lists):
+                sum_of_differences = 0
+                for j, val in enumerate(entry):
+                    sum_of_differences += abs(val - _list[j])
+                if sum_of_differences < min_value:
+                    min_index = i
+                    min_value = sum_of_differences
+            return min_index
+
         self.kmeans_results = dict()
         whitened = whiten(self.vector_matrix)
-        for i in range(2, 11):
-            centroids, labels = kmeans2(whitened, i)
-            self.kmeans_results[i] = {
+        for k in range(2, 11):
+            centroids, labels = kmeans2(whitened, k)
+            self.kmeans_results[k] = {
                 'centroids': centroids.tolist(),
                 'labels': labels.tolist()
                 }
+            for i, centroid in enumerate(self.kmeans_results[k]['centroids']):
+                index = findClosest(centroid, whitened.tolist())
+                self.kmeans_results[k]['centroids'][i] = \
+                    self.vector_matrix[index]
 
     def normalizeFeatureMatrix(self):
         arr_max = numpy.amax(self.vector_matrix, axis=0)
         arr_min = numpy.amin(self.vector_matrix, axis=0)
+        # Normalize feature vectors
         for i, vector in enumerate(self.vector_matrix):
             for j, val in enumerate(vector):
                 self.vector_matrix[i][j] = \
