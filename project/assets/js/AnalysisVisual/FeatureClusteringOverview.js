@@ -497,11 +497,11 @@ class FeatureClusteringOverview{
                 'size': '12',
             })
             .css({
-                'height': '40%',
+                'height': '45%',
                 'width': '30%',
                 'font-size': '12px',
                 'position': 'absolute',
-                'top': '60%',
+                'top': '55%',
                 'left': '0%',
             })
             .change(function() {
@@ -531,7 +531,7 @@ class FeatureClusteringOverview{
             }).css({
                 'position': 'absolute',
                 'left': '0%',
-                'top': '50%',
+                'top': '45%',
                 'width': '30%',
                 'height': '8%',
                 'overflow': 'scroll',
