@@ -326,20 +326,9 @@ class MatrixByMatrix():
                         self.vector_matrix[i].append(numpy.sum(row_values))
 
     def performFeatureClustering(self):
-        def findClosest(entry, list_of_lists):
-            min_value = float('inf')
-            min_index = None
-            for i, _list in enumerate(list_of_lists):
-                sum_of_differences = 0
-                for j, val in enumerate(entry):
-                    sum_of_differences += abs(val - _list[j])
-                if sum_of_differences < min_value:
-                    min_index = i
-                    min_value = sum_of_differences
-            return min_index
-
         self.kmeans_results = dict()
         whitened = whiten(self.vector_matrix)
+        std_devs = numpy.std(self.vector_matrix, axis=0)
         for k in range(2, 11):
             centroids, labels = kmeans2(whitened, k)
             self.kmeans_results[k] = {
@@ -347,9 +336,9 @@ class MatrixByMatrix():
                 'labels': labels.tolist()
                 }
             for i, centroid in enumerate(self.kmeans_results[k]['centroids']):
-                index = findClosest(centroid, whitened.tolist())
-                self.kmeans_results[k]['centroids'][i] = \
-                    self.vector_matrix[index]
+                for j, val in enumerate(centroid):
+                    self.kmeans_results[k]['centroids'][i][j] = \
+                        val * std_devs[j]
 
     def normalizeFeatureMatrix(self):
         arr_max = numpy.amax(self.vector_matrix, axis=0)
