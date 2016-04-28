@@ -219,12 +219,12 @@ class MatrixByMatrix():
 
     def getOutputDict(self):
         # make values more portable for output JSON
-        # for key in self.kmeans_results:
-        #     for i in range(len(self.kmeans_results[key]['centroids'])):
-        #         for j, val in enumerate(
-        #                 self.kmeans_results[key]['centroids'][i]):
-        #             self.kmeans_results[key]['centroids'][i][j] = \
-        #                 '%.2f' % round(val, 2)
+        for key in self.kmeans_results:
+            for i in range(len(self.kmeans_results[key]['centroids'])):
+                for j, val in enumerate(
+                        self.kmeans_results[key]['centroids'][i]):
+                    self.kmeans_results[key]['centroids'][i][j] = \
+                        '%.2f' % round(val, 2)
         for entry in self.vector_matrix:
             for i, val in enumerate(entry):
                 entry[i] = '%.2f' % round(val, 2)
@@ -348,6 +348,11 @@ class MatrixByMatrix():
             for j, val in enumerate(vector):
                 self.vector_matrix[i][j] = \
                     (val - arr_min[j])/(arr_max[j] - arr_min[j])
+        for k in self.kmeans_results:
+            for i, centroid in enumerate(self.kmeans_results[k]['centroids']):
+                for j, val in enumerate(centroid):
+                    self.kmeans_results[k]['centroids'][i][j] = \
+                        (val - arr_min[j])/(arr_max[j] - arr_min[j])
 
     def getClusterMembers(self):
         self.feature_cluster_members = dict()
