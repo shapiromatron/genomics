@@ -357,6 +357,7 @@ class FeatureClusteringOverview{
                 self.drawClusterSelect(this.value);
                 self.drawFeatureSelect(this.value, '--');
                 self.drawCentroidPlot(this.value, null);
+                self.drawCentroidPlotLegend(this.value);
             })
             .appendTo(this.el_1);
 
@@ -477,7 +478,7 @@ class FeatureClusteringOverview{
         //Add text
         this.el_1.find('#feature_prompt').remove();
         this.el_1.find('#pointer').remove();
-        var select_list = $('<div id="feature_prompt">Select feature from cluster:</div>')
+        var feature_prompt = $('<div id="feature_prompt">Select feature from cluster:</div>')
             .css({
                 'height': '8%',
                 'width': '20%',
@@ -496,11 +497,11 @@ class FeatureClusteringOverview{
                 'size': '12',
             })
             .css({
-                'height': '40%',
+                'height': '45%',
                 'width': '30%',
                 'font-size': '12px',
                 'position': 'absolute',
-                'top': '60%',
+                'top': '55%',
                 'left': '0%',
             })
             .change(function() {
@@ -530,7 +531,7 @@ class FeatureClusteringOverview{
             }).css({
                 'position': 'absolute',
                 'left': '0%',
-                'top': '50%',
+                'top': '45%',
                 'width': '30%',
                 'height': '8%',
                 'overflow': 'scroll',
@@ -556,7 +557,7 @@ class FeatureClusteringOverview{
         this.el_2.find('#centroid_plot').remove();
         $('<div id="centroid_plot">')
             .css({
-                'height': '100%',
+                'height': '80%',
                 'width': '70%',
                 'position': 'absolute',
                 'left': '30%',
@@ -604,6 +605,12 @@ class FeatureClusteringOverview{
             .orient('bottom')
             .outerTickSize(0)
             .tickFormat('');
+        var xGrid = d3.svg.axis()
+            .scale(x)
+            .orient('bottom')
+            .outerTickSize(0)
+            .innerTickSize(-(this.el_2.find('#centroid_plot').height() - offset.top - offset.bottom))
+            .tickFormat('');
         var yAxis = d3.svg.axis()
             .scale(y)
             .orient('left')
@@ -613,6 +620,12 @@ class FeatureClusteringOverview{
             .attr('class', 'x axis')
             .attr('transform', 'translate(0,' + (this.el_2.find('#centroid_plot').height() - offset.bottom) + ')')
             .call(xAxis);
+
+        graph.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + (this.el_2.find('#centroid_plot').height() - offset.bottom) + ')')
+            .style('stroke-dasharray', ('3, 3'))
+            .call(xGrid);
 
         graph.append('g')
             .attr('class', 'y axis')
@@ -638,14 +651,60 @@ class FeatureClusteringOverview{
                 .style('fill', 'none')
                 .style('stroke-width', '3');
         }
-    }
 
-    drawLegend() {
         // remove existing
-        this.el_1.find('#legend').remove();
+        this.el_2.find('#vert_names').remove();
 
         // create new
-        var legend = $('<div id="legend">')
+        var vert = $('<div id="vert_names">')
+            .css({
+                'position': 'absolute',
+                'left': '40%',
+                'top': '72%',
+                'overflow': 'hidden',
+                'height': '28%',
+                'width': '60%',
+            }).appendTo(this.el_2);
+
+        //Draw SVGs
+        var height = vert.height(),
+            width = vert.width(),
+            row_number = this.cluster_members.length,
+            cluster_medoids = this.cluster_medoids,
+            matrix_names = this.matrix_names;
+
+        var svg = d3.select(vert.get(0))
+            .append('svg')
+            .attr('height', height)
+            .attr('width', width);
+
+        svg.append('g')
+            .selectAll('text')
+            .data(this.cluster_members)
+            .enter()
+            .append('text')
+            .attr('class', 'heatmapLabelText')
+            .text(function(d,i) {
+                return (d.length > 1) ?
+                    '(' + d.length + ') ' + cluster_medoids[i]:
+                    matrix_names[i];
+            })
+            .attr('x', function(d,i) {
+                return (((0.5 / row_number) * width) + i * (width / row_number));
+            })
+            .attr('y', 0)
+            .attr('transform', function(d,i) {
+                var rot = (((0.5/row_number)*width) + i*(width/row_number));
+                return 'rotate(90 ' + rot + ',0)';
+            });
+    }
+
+    drawHeatmapLegend() {
+        // remove existing
+        this.el_1.find('#heatmap_legend').remove();
+
+        // create new
+        var legend = $('<div id="heatmap_legend">')
             .css({
                 'position': 'absolute',
                 'left': '5%',
@@ -728,16 +787,77 @@ class FeatureClusteringOverview{
             .style('text-anchor', 'middle');
     }
 
+    drawCentroidPlotLegend(k) {
+        this.el_2.find('#centroid_legend_header').remove();
+        $('<div id="centroid_legend_header">Centroid:</div>')
+            .css({
+                'height': '10%',
+                'width': '10%',
+                //'font-size': '12px',
+                'position': 'absolute',
+                'top': '10%',
+                'left': '20%',
+            })
+            .appendTo(this.el_2);
+
+        this.el_2.find('#centroid_legend').remove();
+        var legend = $('<div id="centroid_legend">')
+            .css({
+                'position': 'absolute',
+                'left': '20%',
+                'top': '20%',
+                'overflow': 'visible',
+                'height': '40%',
+                'width': '10%',
+            }).appendTo(this.el_2);
+
+        var centroid_list = d3.range(k);
+        var colors = this.colors;
+
+        var svg = d3.select(legend.get(0))
+            .append('svg')
+            .attr('width', legend.width())
+            .attr('height', legend.height())
+            .style('overflow', 'visible');
+
+        svg.append('g')
+            .selectAll('rect')
+            .data(centroid_list)
+            .enter()
+            .append('rect')
+            .text( function(d) { return d; } )
+            .attr('x', function(d,i) { return (Math.floor(i / 5) * (legend.width()*0.5)); })
+            .attr('y', function(d,i) { return ((i % 5) * (legend.height()*0.2)); })
+            .attr('width', legend.width()*0.1)
+            .attr('height', legend.width()*0.1)
+            .style('fill', function(d, i) { return colors[i]; });
+
+        svg.append('g')
+            .selectAll('text')
+            .data(centroid_list)
+            .enter()
+            .append('text')
+            .text( function(d) { return d+1; } )
+            .attr('x', function(d,i) { return (Math.floor(i / 5) * (legend.width()*0.5)); })
+            .attr('y', function(d,i) { return ((i % 5) * (legend.height()*0.2)); })
+            .attr('width', legend.width()*0.3)
+            .attr('height', legend.width()*0.2)
+            .attr('dx', legend.width()*0.2)
+            .attr('dy', '0.7em');
+            // .attr('transform', 'translate(' + (legend.width()*0.2) + ',0)');
+    }
+
     render() {
         this.drawHeatmap(2);
         this.drawClusterSelect(2);
         this.drawFeatureSelect(2, '--');
         this.drawCentroidPlot(2, null);
+        this.drawCentroidPlotLegend(2);
 
         this.makeKSelect();
         this.drawDendrogram();
         this.writeVertNames();
-        this.drawLegend();
+        this.drawHeatmapLegend();
     }
 }
 
