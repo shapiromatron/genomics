@@ -125,6 +125,20 @@ Navigate to [localhost:9000](http://127.0.0.1:9000/), and start developing!
 
 # Additional optional commands
 
+## Using celery task manager
+
+On the production server, celery tasks are used to run long-running tasks asynchronously. By default celery is not used on the development environment and tasks are handled synchronously.
+
+To use celery, you'll need to spawn a new celery process:
+
+    workon genomics
+    celery worker -A django_project -l info
+
+In addition, modify your environment variables:
+
+    workon genomics
+    echo "export \"USE_CELERY_IN_DEV=True\"" >> $VIRTUAL_ENV/bin/postactivate
+
 ## IPython/Jupyter notebooks (optional)
 
 If interested in the [ipython/jupyter notebooks](http://jupyter.org/) , you can run the notebook server using this command:

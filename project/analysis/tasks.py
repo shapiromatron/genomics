@@ -5,8 +5,6 @@ from celery import group, chain
 from django.apps import apps
 from django.utils import timezone
 
-import requests
-
 
 logger = get_task_logger(__name__)
 
