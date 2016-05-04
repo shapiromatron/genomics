@@ -290,6 +290,11 @@ class UserDataset(GenomicDataset):
         else:
             return self.ambiguous.status_code == success_code
 
+    @classmethod
+    def usable(cls, user):
+        # must be owned by user and validated
+        return cls.objects.filter(owner=user, validated=True)
+
     def get_absolute_url(self):
         return reverse('analysis:user_dataset', args=[self.pk, ])
 
@@ -413,6 +418,11 @@ class FeatureList(Dataset):
         blank=True,
         max_length=256)
 
+    @classmethod
+    def usable(cls, user):
+        # must be owned by user and validated
+        return cls.objects.filter(owner=user, validated=True)
+
     def get_absolute_url(self):
         return reverse('analysis:feature_list', args=[self.pk, ])
 
@@ -441,6 +451,11 @@ class SortVector(Dataset):
         FeatureList)
     vector = models.FileField(
         max_length=256)
+
+    @classmethod
+    def usable(cls, user):
+        # must be owned by user and validated
+        return cls.objects.filter(owner=user, validated=True)
 
     def get_absolute_url(self):
         return reverse('analysis:sort_vector', args=[self.pk, ])

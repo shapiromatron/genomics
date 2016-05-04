@@ -174,6 +174,11 @@ class SortVectorForm(BaseFormMixin, forms.ModelForm):
         model = models.SortVector
         exclude = ('owner', 'borrowers', 'validated', 'validation_notes')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['feature_list'].queryset = \
+            models.FeatureList.usable(self.instance.owner)
+
     def save(self, commit=True):
         if commit:
             self.instance.validated = False
@@ -227,9 +232,9 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['feature_list'].queryset = \
-            models.FeatureList.objects.filter(owner=self.instance.owner)
+            models.FeatureList.usable(self.instance.owner)
         self.fields['sort_vector'].queryset = \
-            models.SortVector.objects.filter(owner=self.instance.owner)
+            models.SortVector.usable(self.instance.owner)
 
         if self.instance.id:
             self.fields['datasets_json'].initial = self.instance.get_form_datasets()
