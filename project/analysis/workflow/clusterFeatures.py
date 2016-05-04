@@ -22,21 +22,20 @@ class ClusterFeatures():
             matrix_fn = entry[2]
             with open(matrix_fn) as f:
 
-                # DEAL WITH HEADERS
-                # IF EMPTY, POPULATE HEADERS
+                # Populate headers if empty
                 if headers is None:
                     headers = next(f).strip().split()
-                # ELSE, CHECK IF CONSISTENT
+                # ...otherwise ensure headers are consistent
                 else:
                     if headers != next(f).strip().split():
                         raise ValueError('Headers not consistent across matrices')
 
-                # POPULATE TEMPORARY MATRIX
+                # Create a temporary matrix
                 matrix_temp = []
                 for line in f:
                     matrix_temp.append(line.strip().split())
 
-                # ADD SUM TO VECTOR MATRIX
+                # Add sum to vector matrix
                 if vector_matrix is None:
                     vector_matrix = []
                     for i, entry in enumerate(matrix_temp):
