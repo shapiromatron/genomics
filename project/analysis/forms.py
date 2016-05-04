@@ -140,6 +140,8 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
 
     def save(self, commit=True):
         if commit:
+            self.instance.validated = False
+            self.instance.validation_notes = ''
             self.add_data_download(
                 self.cleaned_data.get('url_ambiguous'), 'ambiguous')
             self.add_data_download(
@@ -157,6 +159,12 @@ class FeatureListForm(BaseFormMixin, forms.ModelForm):
         model = models.FeatureList
         exclude = ('owner', 'borrowers', 'validated', 'validation_notes')
 
+    def save(self, commit=True):
+        if commit:
+            self.instance.validated = False
+            self.instance.validation_notes = ''
+        return super().save(commit=commit)
+
 
 class SortVectorForm(BaseFormMixin, forms.ModelForm):
     CREATE_LEGEND = 'Create sort vector'
@@ -165,6 +173,12 @@ class SortVectorForm(BaseFormMixin, forms.ModelForm):
     class Meta:
         model = models.SortVector
         exclude = ('owner', 'borrowers', 'validated', 'validation_notes')
+
+    def save(self, commit=True):
+        if commit:
+            self.instance.validated = False
+            self.instance.validation_notes = ''
+        return super().save(commit=commit)
 
 
 class DatasetField(forms.CharField):
@@ -230,6 +244,12 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
         ds = cleaned_data['datasets_json']
         if not self.fields['datasets_json'].is_valid(ds):
             raise forms.ValidationError("Improper dataset specification")
+
+    def save(self, commit=True):
+        if commit:
+            self.instance.validated = False
+            self.instance.validation_notes = ''
+        return super().save(commit=commit)
 
     def _save_m2m(self):
         ds = self.fields['datasets_json']\
