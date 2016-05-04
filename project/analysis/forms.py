@@ -155,7 +155,7 @@ class FeatureListForm(BaseFormMixin, forms.ModelForm):
 
     class Meta:
         model = models.FeatureList
-        exclude = ('owner', 'borrowers', 'validated', )
+        exclude = ('owner', 'borrowers', 'validated', 'validation_notes')
 
 
 class SortVectorForm(BaseFormMixin, forms.ModelForm):
@@ -164,7 +164,7 @@ class SortVectorForm(BaseFormMixin, forms.ModelForm):
 
     class Meta:
         model = models.SortVector
-        exclude = ('owner', 'borrowers', 'validated', )
+        exclude = ('owner', 'borrowers', 'validated', 'validation_notes')
 
 
 class DatasetField(forms.CharField):

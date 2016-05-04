@@ -51,6 +51,8 @@ class Dataset(models.Model):
         default=False)
     validated = models.BooleanField(
         default=False)
+    validation_notes = models.TextField(
+        blank=True)
     created = models.DateTimeField(
         auto_now_add=True)
     last_updated = models.DateTimeField(
@@ -453,6 +455,8 @@ class Analysis(GenomicBinSettings):
         null=True)
     validated = models.BooleanField(
         default=False)
+    validation_notes = models.TextField(
+        blank=True)
     start_time = models.DateTimeField(
         null=True)
     end_time = models.DateTimeField(
