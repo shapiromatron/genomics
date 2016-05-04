@@ -1,0 +1,33 @@
+{% load fabool %}
+
+{% if object_list %}
+    <table class='table table-condensed'>
+        <col style="width:30%">
+        <col style="width:15%">
+        <col style="width:15%">
+        <col style="width:15%">
+        <col style="width:20%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Genome assembly</th>
+                <th>Stranded</th>
+                <th>Validated</th>
+                <th>Last updated</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td><a href="{{object.get_absolute_url}}">{{object.name}}</a></td>
+                <td>{{object.get_genome_assembly_display}}</td>
+                <td>{{object.stranded|fabool}}</td>
+                <td>{{object.validated|fabool}}</td>
+                <td>{{object.last_updated}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class='help-block'>None - create one!</p>
+{% endif %}
