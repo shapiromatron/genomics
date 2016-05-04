@@ -17,12 +17,15 @@ def trigger_delete(sender, instance, **kwargs):
 
 @receiver(post_save, sender=models.FeatureList)
 @receiver(post_save, sender=models.SortVector)
+@receiver(post_save, sender=models.UserDataset)
 @receiver(post_save, sender=models.Analysis)
 def trigger_validation(sender, instance, **kwargs):
     if isinstance(instance, models.FeatureList):
         fn = tasks.validate_feature_list
     elif isinstance(instance, models.SortVector):
         fn = tasks.validate_sort_vector
+    elif isinstance(instance, models.UserDataset):
+        fn = tasks.validate_user_dataset
     elif isinstance(instance, models.Analysis):
         fn = tasks.validate_analysis
 

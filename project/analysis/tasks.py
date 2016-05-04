@@ -98,6 +98,12 @@ def validate_sort_vector(id_):
 
 
 @task()
+def validate_user_dataset(id_):
+    obj = apps.get_model('analysis', 'UserDataset').objects.get(id=id_)
+    obj.validate_and_save()
+
+
+@task()
 def validate_analysis(id_):
     obj = apps.get_model('analysis', 'Analysis').objects.get(id=id_)
     obj.validate_and_save()

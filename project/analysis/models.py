@@ -185,6 +185,8 @@ class DatasetDownload(models.Model):
             self.status_code = self.FINISHED_ERROR
             self.status = str(e)
         self.save()
+        for ds in self.related_datasets():
+            ds.validate_and_save()
 
     def get_md5(self):
         # equivalent to "md5 -q $FN"
@@ -207,6 +209,13 @@ class DatasetDownload(models.Model):
         if self.data and os.path.exists(self.data.path):
             logger.info('Deleting {}'.format(self.data.path))
             os.remove(self.data.path)
+
+    def related_datasets(self):
+        return itertools.chain(
+            self.plus.all(),
+            self.minus.all(),
+            self.ambiguous.all(),
+        )
 
 
 class GenomicDataset(Dataset):
@@ -289,6 +298,42 @@ class UserDataset(GenomicDataset):
 
     def get_delete_url(self):
         return reverse('analysis:user_dataset_delete', args=[self.pk, ])
+
+    def validate_and_save(self):
+        # wait until all files are downloaded before attempting validation
+        if not self.is_downloaded:
+            return
+
+        size_file = get_chromosome_size_file(self.genome_assembly)
+        if self.is_stranded:
+            validatorA = validation.BigWigValidator(
+                self.plus.data.path, size_file)
+            validatorA.validate()
+
+            validatorB = validation.BigWigValidator(
+                self.minus.data.path, size_file)
+            validatorB.validate()
+
+            is_valid = validatorA.is_valid and validatorB.is_valid
+            notes = '\n'.join(
+                validatorA.display_errors(),
+                validatorB.display_errors()
+            ).strip()
+
+        else:
+            validator = validation.BigWigValidator(
+                self.ambiguous.data.path, size_file)
+            validator.validate()
+
+            is_valid = validator.is_valid
+            notes = validator.display_errors()
+
+        # intentionally omit post_save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                validated=is_valid,
+                validation_notes=notes)
 
 
 class EncodeDataset(GenomicDataset):
