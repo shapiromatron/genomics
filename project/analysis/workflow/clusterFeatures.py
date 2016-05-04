@@ -2,17 +2,14 @@
 
 import click
 import numpy
-from scipy import stats
-from scipy.cluster.hierarchy import linkage, dendrogram, fclusterdata
 from scipy.cluster.vq import kmeans2, whiten
-from scipy.spatial.distance import squareform, pdist
 import os
 import json
+
 
 class ClusterFeatures():
 
     def __init__(self, matrix_list):
-
         self.matrix_list = matrix_list
         self.execute()
 
@@ -24,6 +21,7 @@ class ClusterFeatures():
         for entry in self.matrix_list:
             matrix_fn = entry[2]
             with open(matrix_fn) as f:
+
                 # DEAL WITH HEADERS
                 # IF EMPTY, POPULATE HEADERS
                 if not self.headers:
@@ -57,12 +55,12 @@ class ClusterFeatures():
 
     def performClustering(self):
         whitened = whiten(self.vector_matrix)
-        for i in range(2,11):
+        for i in range(2, 11):
             centroids, labels = kmeans2(whitened, i)
             self.kmeans_results[i] = {
                 'centroids': centroids.tolist(),
                 'labels': labels.tolist()
-                }
+            }
 
     def writeJson(self, fn):
         with open(fn, 'w') as f:
@@ -71,13 +69,13 @@ class ClusterFeatures():
                 'vector_matrix': self.vector_matrix,
                 'bins': self.headers,
                 'row_names': self.row_names
-                }, f, separators=(",", ": "))
+            }, f, separators=(",", ": "))
 
     def execute(self):
-        self.kmeans_results = dict()
-
+        self.kmeans_results = {}
         self.readMatrixFilesIntoVectorMatrix()
         self.performClustering()
+
 
 @click.command()
 @click.argument('matrix_list_fn', type=str)
@@ -107,6 +105,7 @@ def cli(matrix_list_fn, output_json):
 
     cf = ClusterFeatures(matrix_list)
     cf.writeJson(output_json)
+
 
 if __name__ == '__main__':
     cli()
