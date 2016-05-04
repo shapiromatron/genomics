@@ -11,7 +11,7 @@ class FeatureListValidator(Validator):
 
     def __init__(self, feature_list, chrom_sizes_file):
 
-        super().init()
+        super().__init__()
 
         assert os.path.exists(feature_list)
         assert os.path.exists(chrom_sizes_file)

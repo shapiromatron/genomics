@@ -18,7 +18,7 @@ class AnalysisValidator(Validator):
                  bin_number, bin_size, feature_bed,
                  chrom_sizes, stranded_bed):
 
-        super().init()
+        super().__init__()
 
         # Type checks
         assert isinstance(bin_anchor, str)

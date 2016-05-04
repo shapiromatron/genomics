@@ -10,7 +10,7 @@ class SortVectorValidator(Validator):
 
     def __init__(self, feature_bed, sort_vector):
 
-        super().init()
+        super().__init__()
 
         assert os.path.exists(feature_bed)
         assert os.path.exists(sort_vector)

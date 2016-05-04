@@ -11,7 +11,7 @@ class BigWigValidator(Validator):
 
     def __init__(self, bigwig, chrom_sizes_file):
 
-        super().init()
+        super().__init__()
 
         assert os.path.exists(bigwig)
         assert os.path.exists(chrom_sizes_file)
