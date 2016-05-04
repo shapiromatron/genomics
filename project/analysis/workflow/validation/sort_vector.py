@@ -3,10 +3,14 @@ import click
 import os
 import sys
 
+from . import Validator
 
-class SortVectorCheck(object):
+
+class SortVectorCheck(Validator):
 
     def __init__(self, feature_bed, sort_vector):
+
+        super().init()
 
         assert os.path.exists(feature_bed)
         assert os.path.exists(sort_vector)
@@ -14,7 +18,7 @@ class SortVectorCheck(object):
         self.feature_bed_fn = feature_bed
         self.sort_vector_fn = sort_vector
 
-        self.check_sort_vector()
+        self.validate()
 
     def is_float(self, s):
         try:
@@ -50,7 +54,7 @@ class SortVectorCheck(object):
                     return False
         return True
 
-    def check_sort_vector(self):
+    def validate(self):
         self.check_columns()
         self.check_ids()
 

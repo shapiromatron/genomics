@@ -3,12 +3,16 @@ import os
 import click
 import subprocess
 
+from . import Validator
 
-class FeatureListCheck(object):
+
+class FeatureListCheck(Validator):
 
     validateFiles_path = "/ddn/gs1/home/lavenderca/validateFiles"
 
     def __init__(self, feature_list, chrom_sizes_file):
+
+        super().init()
 
         assert os.path.exists(feature_list)
         assert os.path.exists(chrom_sizes_file)
@@ -16,7 +20,7 @@ class FeatureListCheck(object):
         self.feature_list = feature_list
         self.chrom_sizes_file = chrom_sizes_file
 
-        self.check_feature_list()
+        self.validate()
 
     def checkHeader(self, line):
         # Check to see if line is header
@@ -62,9 +66,8 @@ class FeatureListCheck(object):
                     else:
                         used_feature_names.append(feature_name)
 
-    def check_feature_list(self):
+    def validate(self):
         self.find_col_number()
-
         self.run_validate_file()
         if self.col_number >= 4:
             self.check_feature_names()

@@ -3,12 +3,16 @@ import os
 import click
 import subprocess
 
+from . import Validator
 
-class BigWigCheck(object):
+
+class BigWigCheck(Validator):
 
     validateFiles_path = "/ddn/gs1/home/lavenderca/validateFiles"
 
     def __init__(self, bigwig, chrom_sizes_file):
+
+        super().init()
 
         assert os.path.exists(bigwig)
         assert os.path.exists(chrom_sizes_file)
@@ -16,9 +20,9 @@ class BigWigCheck(object):
         self.bigwig = bigwig
         self.chrom_sizes_file = chrom_sizes_file
 
-        self.check_bigwig()
+        self.validate()
 
-    def run_validate_file(self):
+    def validate(self):
         proc = subprocess.Popen([
             self.validateFiles_path,
             "-chromInfo=" + self.chrom_sizes_file,
@@ -29,9 +33,6 @@ class BigWigCheck(object):
 
         if output != "Error count 0\n":
             raise Exception("validateFiles returns the following error:\n" + errors.strip())
-
-    def check_bigwig(self):
-        self.run_validate_file()
 
 
 @click.command()

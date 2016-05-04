@@ -3,8 +3,10 @@ import click
 import os
 import sys
 
+from . import Validator
 
-class BinValueCheck(object):
+
+class BinValueCheck(Validator):
 
     ANCHOR_OPTIONS = ('start', 'end', 'center')
     max_window_size = 100000
@@ -13,6 +15,8 @@ class BinValueCheck(object):
     def __init__(self, bin_anchor, bin_start,
                  bin_number, bin_size, feature_bed,
                  chrom_sizes, stranded_bed):
+
+        super().init()
 
         # Type checks
         assert isinstance(bin_anchor, str)
@@ -33,7 +37,7 @@ class BinValueCheck(object):
         self.stranded_bed = stranded_bed
 
         # Execute
-        self.checkValues()
+        self.validate()
 
     def checkNegatives(self):
         if self.bin_number < 1:
@@ -124,7 +128,7 @@ class BinValueCheck(object):
             return False
         return True
 
-    def checkValues(self):
+    def validate(self):
         self.checkNegatives()
         self.checkIfOutside()
         self.checkWindowSize()
