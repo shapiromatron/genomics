@@ -9,8 +9,10 @@ from . import Validator
 class BinValueCheck(Validator):
 
     ANCHOR_OPTIONS = ('start', 'end', 'center')
-    max_window_size = 100000
-    max_bin_number = 250
+    MIN_BIN_NUMBER = 1
+    MAX_BIN_NUMBER = 250
+    MIN_BIN_SIZE = 1
+    MAX_WINDOW_SIZE = 100000
 
     def __init__(self, bin_anchor, bin_start,
                  bin_number, bin_size, feature_bed,
@@ -36,17 +38,32 @@ class BinValueCheck(Validator):
         self.chrom_sizes_fn = chrom_sizes
         self.stranded_bed = stranded_bed
 
-        # Execute
-        self.validate()
+    def validate(self):
+        self.checkInputDomains()
+        self.checkIfOutside()
 
-    def checkNegatives(self):
-        if self.bin_number < 1:
-            sys.stdout.write('bin_number is less than 1!!\n')
-            return False
-        if self.bin_size < 1:
-            sys.stdout.write('bin_size is less than 1!!\n')
-            return False
-        return True
+    def checkInputDomains(self):
+
+        if self.bin_size < self.MIN_BIN_SIZE:
+            self.add_error(
+                'Bin size {} less than minimum {}'.format(
+                    self.bin_size, self.MIN_BIN_SIZE))
+
+        window_size = self.bin_size * self.bin_number
+        if window_size > self.MAX_WINDOW_SIZE:
+            self.add_error(
+                'Window size {} exceeds maximum {}'.format(
+                   window_size, self.MAX_WINDOW_SIZE))
+
+        if self.bin_number < self.MIN_BIN_NUMBER:
+            self.add_error(
+                'Bin number {} less than minimum {}'.format(
+                    self.bin_number, self.MIN_BIN_NUMBER))
+
+        if self.bin_number > self.MAX_BIN_NUMBER:
+            self.add_error(
+                'Bin number {} exceeds maximum {}'.format(
+                    self.bin_number, self.MAX_BIN_NUMBER))
 
     def readChrom(self, chrom_sizes_fn):
         chrom_sizes = dict()
@@ -68,6 +85,7 @@ class BinValueCheck(Validator):
             return False
 
     def checkIfOutside(self):
+        window_size = self.bin_size * self.bin_number
         chrom_sizes = self.readChrom(self.chrom_sizes_fn)
         with open(self.feature_bed_fn) as f:
             for line in f:
@@ -81,9 +99,10 @@ class BinValueCheck(Validator):
                         if bed_fields >= 6:  # Contains strand information?
                             strand = line.strip().split()[5]
                         else:
-                            raise ValueError('BED file lacks strand column!!')
+                            self.add_error('BED file lacks strand column')
                     else:
                         strand = 'AMBIG'
+
                     # Define start and end points for window
                     if self.bin_anchor == 'center':
                         if strand == '+' or strand == 'AMBIG':
@@ -102,37 +121,23 @@ class BinValueCheck(Validator):
                             window_start = start - self.bin_start
 
                     if strand == '+' or strand == 'AMBIG':
-                        window_end = window_start + self.bin_size * self.bin_number
+                        window_end = window_start + window_size
                     elif strand == '-':
-                        window_end = window_start - self.bin_size * self.bin_number
+                        window_end = window_start - window_size
 
                     if strand == '+' or strand == 'AMBIG':
-                        if window_start < 1 or window_end > chrom_sizes[chromosome]:
-                            sys.stdout.write('Feature window extends outside chromosome!!\n')
-                            return False
+                        if window_start < 1 or \
+                                window_end > chrom_sizes[chromosome]:
+                            self.add_error(
+                                'Feature window extends outside chromosome {}'
+                                .format(chromosome))
+
                     if strand == '-':
-                        if window_start > chrom_sizes[chromosome] or window_end < 1:
-                            sys.stdout.write('Feature window extends outside chromosome!!\n')
-                            return False
-        return True
-
-    def checkWindowSize(self):
-        if self.bin_size * self.bin_number > self.max_window_size:
-            sys.stdout.write('Window size exceeds maximum allowed!!\n')
-            return False
-        return True
-
-    def checkBinNumber(self):
-        if self.bin_number > self.max_bin_number:
-            sys.stdout.write('Bin number exceeds maximum allowed!!\n')
-            return False
-        return True
-
-    def validate(self):
-        self.checkNegatives()
-        self.checkIfOutside()
-        self.checkWindowSize()
-        self.checkBinNumber()
+                        if window_end < 1 or \
+                                window_start > chrom_sizes[chromosome]:
+                            self.add_error(
+                                'Feature window extends outside chromosome {}'
+                                .format(chromosome))
 
 
 @click.command()
@@ -149,10 +154,12 @@ def cli(bin_anchor, bin_start, bin_number,
     """
     Check and validate window parameters for analysis.
     """
-    BinValueCheck(
+    validator = BinValueCheck(
         bin_anchor, bin_start, bin_number,
         bin_size, feature_bed, chrom_sizes,
         stranded_bed)
+    validator.validate()
+    sys.stdout.write(validator.display_errors)
 
 
 if __name__ == '__main__':

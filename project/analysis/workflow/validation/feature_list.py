@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 import os
 import click
 import subprocess
@@ -7,8 +8,6 @@ from . import Validator
 
 
 class FeatureListCheck(Validator):
-
-    validateFiles_path = "/ddn/gs1/home/lavenderca/validateFiles"
 
     def __init__(self, feature_list, chrom_sizes_file):
 
@@ -19,8 +18,6 @@ class FeatureListCheck(Validator):
 
         self.feature_list = feature_list
         self.chrom_sizes_file = chrom_sizes_file
-
-        self.validate()
 
     def checkHeader(self, line):
         # Check to see if line is header
@@ -33,44 +30,61 @@ class FeatureListCheck(Validator):
         else:
             return False
 
-    def find_col_number(self):
+    def get_executable(self):
+        root = os.path.abspath(
+            os.path.pardir(os.path.dirname(os.path.abspath(__file__)))
+        )
+        path = os.path.join(root, 'validateFiles')
+        if not os.path.exists(path):
+            raise IOError('validateFiles not found, expected {}'.format(path))
+        return path
+
+    def set_number_columns(self):
         # Find number of columns in bed
         with open(self.feature_list) as f:
             for line in f:
                 if not (self.checkHeader(line)):
-                    self.col_number = len(line.split())
+                    self.number_columns = len(line.split())
                     break
 
     def run_validate_file(self):
+        executable = self.get_executable()
         proc = subprocess.Popen([
-            self.validateFiles_path,
+            executable,
             "-chromInfo=" + self.chrom_sizes_file,
-            "-type=bed" + str(self.col_number),
+            "-type=bed" + str(self.number_columns),
             self.feature_list
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, errors = proc.communicate()
 
-        if output != "Error count 0\n":
-            raise Exception("validateFiles returns the following error:\n" + errors.strip())
+        if output != 'Error count 0\n':
+            outputs = output.splitlines()
+            self.add_errors(outputs)
 
-    def check_feature_names(self):
+        if errors:
+            errors = errors.splitlines()
+            self.add_errors(errors)
+
+    def check_unique_feature_names(self):
         # If BED file contains names (cols >= 4), make sure they are unique
-        used_feature_names = []
+        if self.number_columns < 4:
+            return
+
+        feature_names = set()
         with open(self.feature_list) as f:
             for line in f:
                 if not (self.checkHeader(line)):
                     feature_name = line.strip().split()[3]
-                    if feature_name in used_feature_names:
-                        raise Exception("Feature list includes duplicate feature names!!")
-                        break
+                    if feature_name in feature_names:
+                        self.add_error(
+                            'Duplicate feature name: {}'.format(feature_name))
                     else:
-                        used_feature_names.append(feature_name)
+                        feature_names.add(feature_name)
 
     def validate(self):
-        self.find_col_number()
+        self.set_number_columns()
         self.run_validate_file()
-        if self.col_number >= 4:
-            self.check_feature_names()
+        self.check_unique_feature_names()
 
 
 @click.command()
@@ -80,7 +94,9 @@ def cli(feature_list, chrom_sizes_file):
     """
     Validate feature_list file.
     """
-    FeatureListCheck(feature_list, chrom_sizes_file)
+    validator = FeatureListCheck(feature_list, chrom_sizes_file)
+    validator.validate()
+    sys.stdout.write(validator.display_errors)
 
 
 if __name__ == '__main__':

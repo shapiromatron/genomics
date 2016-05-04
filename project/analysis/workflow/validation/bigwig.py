@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import click
 import subprocess
 
@@ -7,8 +8,6 @@ from . import Validator
 
 
 class BigWigCheck(Validator):
-
-    validateFiles_path = "/ddn/gs1/home/lavenderca/validateFiles"
 
     def __init__(self, bigwig, chrom_sizes_file):
 
@@ -20,19 +19,32 @@ class BigWigCheck(Validator):
         self.bigwig = bigwig
         self.chrom_sizes_file = chrom_sizes_file
 
-        self.validate()
+    def get_executable(self):
+        root = os.path.abspath(
+            os.path.pardir(os.path.dirname(os.path.abspath(__file__)))
+        )
+        path = os.path.join(root, 'validateFiles')
+        if not os.path.exists(path):
+            raise IOError('validateFiles not found, expected {}'.format(path))
+        return path
 
     def validate(self):
+        executable = self.get_executable()
         proc = subprocess.Popen([
-            self.validateFiles_path,
+            executable,
             "-chromInfo=" + self.chrom_sizes_file,
             "-type=bigWig",
             self.bigwig
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, errors = proc.communicate()
 
-        if output != "Error count 0\n":
-            raise Exception("validateFiles returns the following error:\n" + errors.strip())
+        if output != 'Error count 0\n':
+            outputs = output.splitlines()
+            self.add_errors(outputs)
+
+        if errors:
+            errors = errors.splitlines()
+            self.add_errors(errors)
 
 
 @click.command()
@@ -42,7 +54,9 @@ def cli(bigwig, chrom_sizes_file):
     """
     Validate bigwig file.
     """
-    BigWigCheck(bigwig, chrom_sizes_file)
+    validator = BigWigCheck(bigwig, chrom_sizes_file)
+    validator.validate()
+    sys.stdout.write(validator.display_errors)
 
 
 if __name__ == '__main__':
