@@ -36,3 +36,11 @@ def get_validateFiles_path():
     if not os.path.exists(path):
         raise IOError('validateFiles not found, expected {}'.format(path))
     return path
+
+
+def get_chromosome_size_path(genome):
+    root = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(root, 'data', genome + '.chromSizes.txt')
+    if not os.path.exists(path):
+        raise IOError('File not found: {0}'.format(path))
+    return path
