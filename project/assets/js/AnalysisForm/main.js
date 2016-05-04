@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
+import _ from 'underscore';
 
 import Root from './containers/Root';
 
@@ -46,6 +47,56 @@ let wrapAdditionalSettings = function($el){
 
     $el.find('.form-actions').before('<hr>');
 
+    let config = JSON.parse(document.getElementById('config').textContent),
+        fls = _.groupBy(config.feature_lists, 'genome_assembly'),
+        svs = _.groupBy(config.sort_vectors, 'feature_list_id'),
+        create_option = function(el){
+            return `<option value="${el.id}">${el.name}</option>`;
+        },
+        create_null = function(){
+            return create_option({id: '1', name: '---------'});
+        },
+        $fl = $('#id_feature_list'),
+        $sv = $('#id_sort_vector');
+
+    // change feature-list based on genome
+    $('#id_genome_assembly')
+        .change(function(e){
+            let genome = parseInt(e.target.value),
+                existing = parseInt($fl.val()),
+                choices = fls[genome] || [],
+                opts = choices.map(create_option);
+
+            opts.unshift(create_null());
+
+            $fl.empty()
+               .html(opts);
+
+            if (_.contains(_.pluck(choices, 'id'), existing)){
+                $fl.val(existing);
+            }
+
+        })
+        .trigger('change');
+
+    // change sort-vector based on feature-list
+    $fl
+        .change(function(e){
+            let fl = parseInt($fl.val()),
+                existing = parseInt($sv.val()),
+                choices = svs[fl] || [],
+                opts = choices.map(create_option);
+
+            opts.unshift(create_null());
+
+            $sv.empty()
+               .html(opts);
+
+            if (_.contains(_.pluck(choices, 'id'), existing)){
+                $sv.val(existing);
+            }
+        })
+        .trigger('change');
 };
 
 let renderEncodePicker = function($el){

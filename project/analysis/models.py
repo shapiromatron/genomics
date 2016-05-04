@@ -423,6 +423,13 @@ class FeatureList(Dataset):
         # must be owned by user and validated
         return cls.objects.filter(owner=user, validated=True)
 
+    @classmethod
+    def usable_json(cls, user):
+        return json.dumps(list(
+            cls.usable(user)
+               .values('id', 'name', 'genome_assembly')
+        ))
+
     def get_absolute_url(self):
         return reverse('analysis:feature_list', args=[self.pk, ])
 
@@ -456,6 +463,13 @@ class SortVector(Dataset):
     def usable(cls, user):
         # must be owned by user and validated
         return cls.objects.filter(owner=user, validated=True)
+
+    @classmethod
+    def usable_json(cls, user):
+        return json.dumps(list(
+            cls.usable(user)
+               .values('id', 'name', 'feature_list_id')
+        ))
 
     def get_absolute_url(self):
         return reverse('analysis:sort_vector', args=[self.pk, ])

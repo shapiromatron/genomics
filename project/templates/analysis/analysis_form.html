@@ -28,7 +28,9 @@
         "encode_dataset": "{% url 'analysis:api:encode-dataset-list' %}",
         "encode_dataset_options": "{% url 'analysis:api:encode-dataset-field-options' %}",
         "genome_assembly_selector": "#id_genome_assembly",
-        "datasets_json_selector": "#id_datasets_json"
+        "datasets_json_selector": "#id_datasets_json",
+        "feature_lists": {{feature_lists|safe}},
+        "sort_vectors": {{sort_vectors|safe}}
     }
 </script>
 {% render_bundle 'main' %}
