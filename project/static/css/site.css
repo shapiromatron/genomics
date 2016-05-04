@@ -157,3 +157,9 @@ input[type=number] {
 .datasetPopover.popover>.arrow:after {
     border-right-color: #f7f7f7;
 }
+
+/* validation_notes */
+.validation_notes{
+  max-width: 70em;
+  overflow: auto;
+}
