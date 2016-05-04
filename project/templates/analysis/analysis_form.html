@@ -3,7 +3,13 @@
 {% load crispy_forms_tags %}
 {% load render_bundle from webpack_loader %}
 
-{% block title %}Create new analysis{% endblock %}
+{% block title %}
+    {% if object %}
+        Update {{object}}
+    {% else %}
+        Create new analysis
+    {% endif %}
+{% endblock %}
 
 {% block crumbs_inner %}
     {% if object %}

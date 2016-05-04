@@ -2,7 +2,13 @@
 
 {% load crispy_forms_tags %}
 
-{% block title %}Create feature list{% endblock %}
+{% block title %}
+    {% if object %}
+        Update {{object}}
+    {% else %}
+        Create feature list
+    {% endif %}
+{% endblock %}
 
 {% block crumbs_inner %}
     <li><a href="{% url 'analysis:manage_data' %}">Data management</a></li>
