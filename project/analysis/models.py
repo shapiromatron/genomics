@@ -315,10 +315,10 @@ class UserDataset(GenomicDataset):
             validatorB.validate()
 
             is_valid = validatorA.is_valid and validatorB.is_valid
-            notes = '\n'.join(
+            notes = '\n'.join([
                 validatorA.display_errors(),
                 validatorB.display_errors()
-            ).strip()
+            ]).strip()
 
         else:
             validator = validation.BigWigValidator(
