@@ -22,6 +22,7 @@ from .import tasks
 
 from .workflow.matrix import BedMatrix
 from .workflow.matrixByMatrix import MatrixByMatrix
+from .workflow import validation
 
 
 logger = logging.getLogger(__name__)
@@ -369,6 +370,25 @@ class FeatureList(Dataset):
     def get_delete_url(self):
         return reverse('analysis:feature_list_delete', args=[self.pk, ])
 
+    def get_chromosome_size_file(self):
+        if self.genome_assembly == HG19:
+            return validation.get_chromosome_size_path('hg19')
+        elif self.genome_assembly == MM9:
+            raise NotImplementedError()
+
+    def validate_and_save(self):
+        size_file = self.get_chromosome_size_file()
+        validator = validation.FeatureListValidator(
+            self.dataset.path, size_file)
+        validator.validate()
+
+        # intentionally omit post_save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                validated=validator.is_valid,
+                validation_notes=validator.display_errors())
+
 
 class SortVector(Dataset):
     feature_list = models.ForeignKey(
@@ -384,6 +404,19 @@ class SortVector(Dataset):
 
     def get_delete_url(self):
         return reverse('analysis:sort_vector_delete', args=[self.pk, ])
+
+    def validate_and_save(self):
+        validator = validation.SortVectorValidator(
+            self.feature_list.dataset.path,
+            self.vector.path)
+        validator.validate()
+
+        # intentionally omit post_save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                validated=validator.is_valid,
+                validation_notes=validator.display_errors())
 
 
 class AnalysisDatasets(models.Model):
@@ -486,6 +519,24 @@ class Analysis(GenomicBinSettings):
     @classmethod
     def complete(cls, owner):
         return cls.objects.filter(end_time__isnull=False, owner=owner)
+
+    def validate_and_save(self):
+        validator = validation.AnalysisValidator(
+            bin_anchor=self.get_anchor_display(),
+            bin_start=self.bin_start,
+            bin_number=self.bin_number,
+            bin_size=self.bin_size,
+            feature_bed=self.feature_list.dataset.path,
+            chrom_sizes=self.feature_list.get_chromosome_size_file(),
+            stranded_bed=self.feature_list.stranded,
+        )
+        validator.validate()
+        # intentionally omit post_save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                validated=validator.is_valid,
+                validation_notes=validator.display_errors())
 
     def get_absolute_url(self):
         return reverse('analysis:analysis', args=[self.pk, ])
