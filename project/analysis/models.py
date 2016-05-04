@@ -80,6 +80,13 @@ GENOME_ASSEMBLY_CHOICES = (
 )
 
 
+def get_chromosome_size_file(genome_assembly):
+    if genome_assembly == HG19:
+        return validation.get_chromosome_size_path('hg19')
+    elif genome_assembly == MM9:
+        raise NotImplementedError()
+
+
 class DatasetDownload(models.Model):
     NOT_STARTED = 0
     STARTED = 1
@@ -370,14 +377,8 @@ class FeatureList(Dataset):
     def get_delete_url(self):
         return reverse('analysis:feature_list_delete', args=[self.pk, ])
 
-    def get_chromosome_size_file(self):
-        if self.genome_assembly == HG19:
-            return validation.get_chromosome_size_path('hg19')
-        elif self.genome_assembly == MM9:
-            raise NotImplementedError()
-
     def validate_and_save(self):
-        size_file = self.get_chromosome_size_file()
+        size_file = self.get_chromosome_size_file(self.genome_assembly)
         validator = validation.FeatureListValidator(
             self.dataset.path, size_file)
         validator.validate()
@@ -527,7 +528,7 @@ class Analysis(GenomicBinSettings):
             bin_number=self.bin_number,
             bin_size=self.bin_size,
             feature_bed=self.feature_list.dataset.path,
-            chrom_sizes=self.feature_list.get_chromosome_size_file(),
+            chrom_sizes=get_chromosome_size_file(self.genome_assembly),
             stranded_bed=self.feature_list.stranded,
         )
         validator.validate()
