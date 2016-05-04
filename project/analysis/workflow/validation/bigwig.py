@@ -56,7 +56,7 @@ def cli(bigwig, chrom_sizes_file):
     """
     validator = BigWigValidator(bigwig, chrom_sizes_file)
     validator.validate()
-    sys.stdout.write(validator.display_errors)
+    sys.stdout.write(validator.display_errors())
 
 
 if __name__ == '__main__':

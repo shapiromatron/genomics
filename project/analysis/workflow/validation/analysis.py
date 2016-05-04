@@ -159,7 +159,7 @@ def cli(bin_anchor, bin_start, bin_number,
         bin_size, feature_bed, chrom_sizes,
         stranded_bed)
     validator.validate()
-    sys.stdout.write(validator.display_errors)
+    sys.stdout.write(validator.display_errors())
 
 
 if __name__ == '__main__':

@@ -73,7 +73,7 @@ def cli(feature_bed, sort_vector):
     """
     validator = SortVectorValidator(feature_bed, sort_vector)
     validator.validate()
-    sys.stdout.write(validator.display_errors)
+    sys.stdout.write(validator.display_errors())
 
 
 if __name__ == '__main__':
