@@ -4,7 +4,7 @@ import sys
 import click
 import subprocess
 
-from .base import Validator
+from .base import Validator, get_validateFiles_path
 
 
 class BigWigValidator(Validator):
@@ -19,17 +19,8 @@ class BigWigValidator(Validator):
         self.bigwig = bigwig
         self.chrom_sizes_file = chrom_sizes_file
 
-    def get_executable(self):
-        root = os.path.abspath(
-            os.path.pardir(os.path.dirname(os.path.abspath(__file__)))
-        )
-        path = os.path.join(root, 'validateFiles')
-        if not os.path.exists(path):
-            raise IOError('validateFiles not found, expected {}'.format(path))
-        return path
-
     def validate(self):
-        executable = self.get_executable()
+        executable = get_validateFiles_path()
         proc = subprocess.Popen([
             executable,
             "-chromInfo=" + self.chrom_sizes_file,

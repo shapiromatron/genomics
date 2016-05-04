@@ -1,3 +1,4 @@
+import os
 from abc import abstractmethod
 
 
@@ -22,3 +23,16 @@ class Validator(object):
 
     def display_errors(self):
         return '\n'.join(self.validation_errors)
+
+
+def get_validateFiles_path():
+    path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.path.pardir,
+            'validateFiles'
+        )
+    )
+    if not os.path.exists(path):
+        raise IOError('validateFiles not found, expected {}'.format(path))
+    return path

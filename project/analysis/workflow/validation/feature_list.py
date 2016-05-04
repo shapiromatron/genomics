@@ -4,7 +4,7 @@ import os
 import click
 import subprocess
 
-from .base import Validator
+from .base import Validator, get_validateFiles_path
 
 
 class FeatureListValidator(Validator):
@@ -30,15 +30,6 @@ class FeatureListValidator(Validator):
         else:
             return False
 
-    def get_executable(self):
-        root = os.path.abspath(
-            os.path.pardir(os.path.dirname(os.path.abspath(__file__)))
-        )
-        path = os.path.join(root, 'validateFiles')
-        if not os.path.exists(path):
-            raise IOError('validateFiles not found, expected {}'.format(path))
-        return path
-
     def set_number_columns(self):
         # Find number of columns in bed
         with open(self.feature_list) as f:
@@ -48,7 +39,7 @@ class FeatureListValidator(Validator):
                     break
 
     def run_validate_file(self):
-        executable = self.get_executable()
+        executable = get_validateFiles_path()
         proc = subprocess.Popen([
             executable,
             "-chromInfo=" + self.chrom_sizes_file,
