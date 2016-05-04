@@ -75,8 +75,7 @@ class UserDatasetViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
         return serializers.UserDatasetSerializer
 
     def get_queryset(self):
-        query = owner_or_public(self.request.user)
-        return models.UserDataset.objects.filter(query)
+        return models.UserDataset.usable(self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

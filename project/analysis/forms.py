@@ -140,6 +140,8 @@ class UserDatasetForm(BaseFormMixin, forms.ModelForm):
 
     def save(self, commit=True):
         if commit:
+            self.instance.validated = False
+            self.instance.validation_notes = ''
             self.add_data_download(
                 self.cleaned_data.get('url_ambiguous'), 'ambiguous')
             self.add_data_download(
@@ -155,7 +157,13 @@ class FeatureListForm(BaseFormMixin, forms.ModelForm):
 
     class Meta:
         model = models.FeatureList
-        exclude = ('owner', 'borrowers', 'validated', )
+        exclude = ('owner', 'borrowers', 'validated', 'validation_notes')
+
+    def save(self, commit=True):
+        if commit:
+            self.instance.validated = False
+            self.instance.validation_notes = ''
+        return super().save(commit=commit)
 
 
 class SortVectorForm(BaseFormMixin, forms.ModelForm):
@@ -164,7 +172,18 @@ class SortVectorForm(BaseFormMixin, forms.ModelForm):
 
     class Meta:
         model = models.SortVector
-        exclude = ('owner', 'borrowers', 'validated', )
+        exclude = ('owner', 'borrowers', 'validated', 'validation_notes')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['feature_list'].queryset = \
+            models.FeatureList.usable(self.instance.owner)
+
+    def save(self, commit=True):
+        if commit:
+            self.instance.validated = False
+            self.instance.validation_notes = ''
+        return super().save(commit=commit)
 
 
 class DatasetField(forms.CharField):
@@ -213,9 +232,9 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['feature_list'].queryset = \
-            models.FeatureList.objects.filter(owner=self.instance.owner)
+            models.FeatureList.usable(self.instance.owner)
         self.fields['sort_vector'].queryset = \
-            models.SortVector.objects.filter(owner=self.instance.owner)
+            models.SortVector.usable(self.instance.owner)
 
         if self.instance.id:
             self.fields['datasets_json'].initial = self.instance.get_form_datasets()
@@ -230,6 +249,12 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
         ds = cleaned_data['datasets_json']
         if not self.fields['datasets_json'].is_valid(ds):
             raise forms.ValidationError("Improper dataset specification")
+
+    def save(self, commit=True):
+        if commit:
+            self.instance.validated = False
+            self.instance.validation_notes = ''
+        return super().save(commit=commit)
 
     def _save_m2m(self):
         ds = self.fields['datasets_json']\

@@ -4,14 +4,14 @@ import os
 import click
 import subprocess
 
-from . import Validator
+from .base import Validator, get_validateFiles_path
 
 
-class FeatureListCheck(Validator):
+class FeatureListValidator(Validator):
 
     def __init__(self, feature_list, chrom_sizes_file):
 
-        super().init()
+        super().__init__()
 
         assert os.path.exists(feature_list)
         assert os.path.exists(chrom_sizes_file)
@@ -30,15 +30,6 @@ class FeatureListCheck(Validator):
         else:
             return False
 
-    def get_executable(self):
-        root = os.path.abspath(
-            os.path.pardir(os.path.dirname(os.path.abspath(__file__)))
-        )
-        path = os.path.join(root, 'validateFiles')
-        if not os.path.exists(path):
-            raise IOError('validateFiles not found, expected {}'.format(path))
-        return path
-
     def set_number_columns(self):
         # Find number of columns in bed
         with open(self.feature_list) as f:
@@ -48,14 +39,17 @@ class FeatureListCheck(Validator):
                     break
 
     def run_validate_file(self):
-        executable = self.get_executable()
+        executable = get_validateFiles_path()
         proc = subprocess.Popen([
             executable,
             "-chromInfo=" + self.chrom_sizes_file,
             "-type=bed" + str(self.number_columns),
             self.feature_list
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
         output, errors = proc.communicate()
+        output = output.decode(encoding='UTF-8')
+        errors = errors.decode(encoding='UTF-8')
 
         if output != 'Error count 0\n':
             outputs = output.splitlines()
@@ -94,9 +88,9 @@ def cli(feature_list, chrom_sizes_file):
     """
     Validate feature_list file.
     """
-    validator = FeatureListCheck(feature_list, chrom_sizes_file)
+    validator = FeatureListValidator(feature_list, chrom_sizes_file)
     validator.validate()
-    sys.stdout.write(validator.display_errors)
+    sys.stdout.write(validator.display_errors())
 
 
 if __name__ == '__main__':

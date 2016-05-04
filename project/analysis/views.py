@@ -138,10 +138,22 @@ class AnalysisCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
     form_class = forms.AnalysisForm
     success_url = reverse_lazy('analysis:dashboard')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['feature_lists'] = models.FeatureList.usable_json(self.request.user)
+        context['sort_vectors'] = models.SortVector.usable_json(self.request.user)
+        return context
+
 
 class AnalysisUpdate(OwnerOrStaff, UpdateView):
     model = models.Analysis
     form_class = forms.AnalysisForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['feature_lists'] = models.FeatureList.usable_json(self.request.user)
+        context['sort_vectors'] = models.SortVector.usable_json(self.request.user)
+        return context
 
 
 class AnalysisDelete(OwnerOrStaff, DeleteView):

@@ -83,3 +83,27 @@ def execute_matrix_combination(analysis_id):
 def download_dataset(id_):
     dd = apps.get_model('analysis', 'DatasetDownload').objects.get(id=id_)
     dd.download()
+
+
+@task()
+def validate_feature_list(id_):
+    obj = apps.get_model('analysis', 'FeatureList').objects.get(id=id_)
+    obj.validate_and_save()
+
+
+@task()
+def validate_sort_vector(id_):
+    obj = apps.get_model('analysis', 'SortVector').objects.get(id=id_)
+    obj.validate_and_save()
+
+
+@task()
+def validate_user_dataset(id_):
+    obj = apps.get_model('analysis', 'UserDataset').objects.get(id=id_)
+    obj.validate_and_save()
+
+
+@task()
+def validate_analysis(id_):
+    obj = apps.get_model('analysis', 'Analysis').objects.get(id=id_)
+    obj.validate_and_save()

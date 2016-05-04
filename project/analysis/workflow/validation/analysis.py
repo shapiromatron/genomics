@@ -3,10 +3,10 @@ import click
 import os
 import sys
 
-from . import Validator
+from .base import Validator
 
 
-class BinValueCheck(Validator):
+class AnalysisValidator(Validator):
 
     ANCHOR_OPTIONS = ('start', 'end', 'center')
     MIN_BIN_NUMBER = 1
@@ -18,7 +18,7 @@ class BinValueCheck(Validator):
                  bin_number, bin_size, feature_bed,
                  chrom_sizes, stranded_bed):
 
-        super().init()
+        super().__init__()
 
         # Type checks
         assert isinstance(bin_anchor, str)
@@ -141,7 +141,7 @@ class BinValueCheck(Validator):
 
 
 @click.command()
-@click.argument('bin_anchor', type=click.Choice(BinValueCheck.ANCHOR_OPTIONS))
+@click.argument('bin_anchor', type=click.Choice(AnalysisValidator.ANCHOR_OPTIONS))
 @click.argument('bin_start', type=int)
 @click.argument('bin_number', type=int)
 @click.argument('bin_size', type=int)
@@ -154,12 +154,12 @@ def cli(bin_anchor, bin_start, bin_number,
     """
     Check and validate window parameters for analysis.
     """
-    validator = BinValueCheck(
+    validator = AnalysisValidator(
         bin_anchor, bin_start, bin_number,
         bin_size, feature_bed, chrom_sizes,
         stranded_bed)
     validator.validate()
-    sys.stdout.write(validator.display_errors)
+    sys.stdout.write(validator.display_errors())
 
 
 if __name__ == '__main__':
