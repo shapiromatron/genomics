@@ -36,7 +36,10 @@ class BigWigValidator(Validator):
             "-type=bigWig",
             self.bigwig
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
         output, errors = proc.communicate()
+        output = output.decode(encoding='UTF-8')
+        errors = errors.decode(encoding='UTF-8')
 
         if output != 'Error count 0\n':
             outputs = output.splitlines()
