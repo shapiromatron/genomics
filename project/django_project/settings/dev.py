@@ -14,7 +14,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LOGGING['loggers']['']['handlers'] = ['console']
 
 USE_CELERY_IN_DEV = os.environ.get('USE_CELERY_IN_DEV', 'False') == 'True'
-print(USE_CELERY_IN_DEV)
 if USE_CELERY_IN_DEV:
     # swap cache to filebased so multiple workers can use
     CACHES['default'] = {
