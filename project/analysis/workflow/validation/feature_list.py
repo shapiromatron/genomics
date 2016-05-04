@@ -4,10 +4,10 @@ import os
 import click
 import subprocess
 
-from . import Validator
+from .base import Validator
 
 
-class FeatureListCheck(Validator):
+class FeatureListValidator(Validator):
 
     def __init__(self, feature_list, chrom_sizes_file):
 
@@ -94,7 +94,7 @@ def cli(feature_list, chrom_sizes_file):
     """
     Validate feature_list file.
     """
-    validator = FeatureListCheck(feature_list, chrom_sizes_file)
+    validator = FeatureListValidator(feature_list, chrom_sizes_file)
     validator.validate()
     sys.stdout.write(validator.display_errors)
 

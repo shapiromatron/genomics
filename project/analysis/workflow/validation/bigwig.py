@@ -4,10 +4,10 @@ import sys
 import click
 import subprocess
 
-from . import Validator
+from .base import Validator
 
 
-class BigWigCheck(Validator):
+class BigWigValidator(Validator):
 
     def __init__(self, bigwig, chrom_sizes_file):
 
@@ -54,7 +54,7 @@ def cli(bigwig, chrom_sizes_file):
     """
     Validate bigwig file.
     """
-    validator = BigWigCheck(bigwig, chrom_sizes_file)
+    validator = BigWigValidator(bigwig, chrom_sizes_file)
     validator.validate()
     sys.stdout.write(validator.display_errors)
 

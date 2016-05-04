@@ -3,10 +3,10 @@ import click
 import os
 import sys
 
-from . import Validator
+from .base import Validator
 
 
-class SortVectorCheck(Validator):
+class SortVectorValidator(Validator):
 
     def __init__(self, feature_bed, sort_vector):
 
@@ -71,7 +71,7 @@ def cli(feature_bed, sort_vector):
     """
     Validate sort vector against feature bed file.
     """
-    validator = SortVectorCheck(feature_bed, sort_vector)
+    validator = SortVectorValidator(feature_bed, sort_vector)
     validator.validate()
     sys.stdout.write(validator.display_errors)
 
