@@ -14,9 +14,9 @@ class ClusterFeatures():
         self.execute()
 
     def readMatrixFilesIntoVectorMatrix(self):
-        self.headers = None
-        self.row_names = []
-        self.vector_matrix = None
+        headers = None
+        vector_matrix = None
+        row_names = []
 
         for entry in self.matrix_list:
             matrix_fn = entry[2]
@@ -24,11 +24,11 @@ class ClusterFeatures():
 
                 # DEAL WITH HEADERS
                 # IF EMPTY, POPULATE HEADERS
-                if not self.headers:
-                    self.headers = next(f).strip().split()
+                if headers is None:
+                    headers = next(f).strip().split()
                 # ELSE, CHECK IF CONSISTENT
                 else:
-                    if self.headers != next(f).strip().split():
+                    if headers != next(f).strip().split():
                         raise ValueError('Headers not consistent across matrices')
 
                 # POPULATE TEMPORARY MATRIX
@@ -37,21 +37,24 @@ class ClusterFeatures():
                     matrix_temp.append(line.strip().split())
 
                 # ADD SUM TO VECTOR MATRIX
-                if not self.vector_matrix:
-                    self.vector_matrix = []
+                if vector_matrix is None:
+                    vector_matrix = []
                     for i, entry in enumerate(matrix_temp):
                         row_name = entry[0]
                         row_values = numpy.array(entry[1:]).astype(float)
-                        self.row_names.append(row_name)
-                        self.vector_matrix.append([numpy.sum(row_values)])
+                        row_names.append(row_name)
+                        vector_matrix.append([numpy.sum(row_values)])
                 else:
                     for i, entry in enumerate(matrix_temp):
                         row_name = entry[0]
                         row_values = numpy.array(entry[1:]).astype(float)
-                        if row_name != self.row_names[i]:
+                        if row_name != row_names[i]:
                             raise ValueError('Row names do not match across matrices')
-                        self.vector_matrix[i].append(numpy.sum(row_values))
-        return self.vector_matrix, self.row_names
+                        vector_matrix[i].append(numpy.sum(row_values))
+
+        self.headers = headers
+        self.row_names = row_names
+        self.vector_matrix = vector_matrix
 
     def performClustering(self):
         whitened = whiten(self.vector_matrix)
