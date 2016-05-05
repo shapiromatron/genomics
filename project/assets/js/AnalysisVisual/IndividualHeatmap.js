@@ -447,14 +447,20 @@ class IndividualHeatmap {
             context = document.getElementById('heatmap_canvas').getContext('2d');
 
         var data_max = -Infinity;
+        var data_values = []
         for (i = 0; i < display_data.length; i++) {
             for (var j = 0; j < display_data[i].length; j++) {
                 if (display_data[i][j] > data_max) data_max = display_data[i][j];
+                data_values.push(display_data[i][j]);
             }
         }
+        data_values.sort(function(a,b){
+            return a - b;
+        });
+        var upper_quartile = d3.quantile(data_values, 0.75);
 
         var colorScale = d3.scale.linear()
-            .domain([0, data_max])
+            .domain([0, upper_quartile])
             .range(['white', 'red']);
 
         var scale_x = width/col_number,
