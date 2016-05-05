@@ -84,7 +84,7 @@ def get_chromosome_size_file(genome_assembly):
     if genome_assembly == HG19:
         return validation.get_chromosome_size_path('hg19')
     elif genome_assembly == MM9:
-        raise NotImplementedError()
+        return validation.get_chromosome_size_path('mm9')
 
 
 class DatasetDownload(models.Model):
