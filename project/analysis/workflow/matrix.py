@@ -269,7 +269,7 @@ class BedMatrix(object):
             for feature in self.feature_order:
                 row_dict[feature] = []
                 for i in range(self.bin_number):
-                    row_dict[feature].append(None)
+                    row_dict[feature].append('0')
 
             for line in f:
                 tab_name, size, covered, bed_sum, bed_mean_zero, bed_mean = \
@@ -283,8 +283,8 @@ class BedMatrix(object):
 
             lines = dict()
             for feature in row_dict:
-                lines[feature] = row_dict[feature][0]
-                for i in range(1, len(row_dict[feature])):
+                lines[feature] = ''
+                for i in range(len(row_dict[feature])):
                     lines[feature] += '\t' + row_dict[feature][i]
 
             # Write to output based on order in feature list
