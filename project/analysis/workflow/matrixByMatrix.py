@@ -341,18 +341,38 @@ class MatrixByMatrix():
                         val * std_devs[j]
 
     def normalizeFeatureMatrix(self):
-        arr_max = numpy.amax(self.vector_matrix, axis=0)
-        arr_min = numpy.amin(self.vector_matrix, axis=0)
+        # arr_max = numpy.amax(self.vector_matrix, axis=0)
+        # arr_min = numpy.amin(self.vector_matrix, axis=0)
+
+        # first_quartile = numpy.percentile(self.vector_matrix, 25, axis=0)
+        third_quartile = numpy.percentile(self.vector_matrix, 75, axis=0)
+
+        # print('Vector maximum:')
+        # print(arr_max.tolist())
+        # print('Vector minimum:')
+        # print(arr_min.tolist())
+        # print('Vector first quartile:')
+        # print(first_quartile.tolist())
+        # print('Vector third quartile:')
+        # print(third_quartile.tolist())
+
+        # print('Centroids:')
+        # for centroid in self.kmeans_results[2]['centroids']:
+        #     print(centroid)
+
         # Normalize feature vectors
         for i, vector in enumerate(self.vector_matrix):
             for j, val in enumerate(vector):
+                # self.vector_matrix[i][j] = \
+                #     (val - first_quartile[j]) / \
+                #     (third_quartile[j] - first_quartile[j])
                 self.vector_matrix[i][j] = \
-                    (val - arr_min[j])/(arr_max[j] - arr_min[j])
+                    val / third_quartile[j]
         for k in self.kmeans_results:
             for i, centroid in enumerate(self.kmeans_results[k]['centroids']):
                 for j, val in enumerate(centroid):
                     self.kmeans_results[k]['centroids'][i][j] = \
-                        (val - arr_min[j])/(arr_max[j] - arr_min[j])
+                        val / third_quartile[j]
 
     def getClusterMembers(self):
         self.feature_cluster_members = dict()
