@@ -778,8 +778,8 @@ class FeatureClusteringOverview{
             .attr('stroke-width', '1');
 
         var legend_lines = [
-            {text: 'Minimum', position: 0},
-            {text: 'Maximum', position: width},
+            {text: '0', position: 0},
+            {text: 'Upper Quartile', position: width},
         ];
 
         svg.append('g')
