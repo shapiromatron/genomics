@@ -581,6 +581,27 @@ class FeatureClusteringOverview{
             'right': 0,
         };
 
+        var plot_max = 0;
+        for (var cluster = 0; cluster < this.feature_clusters[k]['centroids'].length; cluster++) {
+            // console.log(cluster);
+            for (var i = 0; i < this.feature_clusters[k]['centroids'][cluster].length; i++) {
+                if (this.feature_clusters[k]['centroids'][cluster][i] > plot_max) {
+                    plot_max = this.feature_clusters[k]['centroids'][cluster][i];
+                }
+            }
+        }
+        if (feature) {
+            var feature_data = this.feature_vectors[this.feature_names.indexOf(feature)];
+            for (var i = 0; i < feature_data.length; i++) {
+                if (feature_data[i] > plot_max) {
+                    plot_max = feature_data[i]
+                }
+            }
+        }
+
+        // console.log(this.feature_clusters[k]['centroids']);
+        // console.log(plot_max);
+
         var graph = d3.select(this.el_2.find('#graph').get(0)).append('svg')
             .attr('width', this.el_2.find('#centroid_plot').width())
             .attr('height', this.el_2.find('#centroid_plot').height())
@@ -588,8 +609,8 @@ class FeatureClusteringOverview{
 
         var feature_columns = this.feature_columns;
         var y = d3.scale.linear()
-            .domain([0,1])
-            .range([this.el_2.find('#centroid_plot').height() - offset.top - offset.bottom,0]);
+            .domain([0,plot_max])
+            .range([this.el_2.find('#centroid_plot').height() - offset.bottom, offset.top]);
         var x = d3.scale.ordinal()
             .domain(this.feature_columns)
             .rangePoints([offset.left,this.el_2.find('#centroid_plot').width() - offset.right], 1);
@@ -629,7 +650,7 @@ class FeatureClusteringOverview{
 
         graph.append('g')
             .attr('class', 'y axis')
-            .attr('transform', 'translate(' + offset.left + ',' + offset.top +')')
+            .attr('transform', 'translate(' + offset.left + ',0)')
             .call(yAxis);
 
         var colors = this.colors;
