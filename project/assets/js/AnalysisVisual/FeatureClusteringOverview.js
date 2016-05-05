@@ -583,23 +583,23 @@ class FeatureClusteringOverview{
 
         var plot_max = 0;
         for (var cluster = 0; cluster < this.feature_clusters[k]['centroids'].length; cluster++) {
-            // console.log(cluster);
+            console.log(cluster);
             for (var i = 0; i < this.feature_clusters[k]['centroids'][cluster].length; i++) {
-                if (this.feature_clusters[k]['centroids'][cluster][i] > plot_max) {
-                    plot_max = this.feature_clusters[k]['centroids'][cluster][i];
+                if (parseFloat(this.feature_clusters[k]['centroids'][cluster][i]) > plot_max) {
+                    plot_max = parseFloat(this.feature_clusters[k]['centroids'][cluster][i]);
                 }
             }
         }
         if (feature) {
             var feature_data = this.feature_vectors[this.feature_names.indexOf(feature)];
             for (var i = 0; i < feature_data.length; i++) {
-                if (feature_data[i] > plot_max) {
-                    plot_max = feature_data[i]
+                if (parseFloat(feature_data[i]) > plot_max) {
+                    plot_max = parseFloat(feature_data[i]);
                 }
             }
         }
-
-        // console.log(this.feature_clusters[k]['centroids']);
+        console.log(plot_max);
+        console.log(this.feature_clusters[k]['centroids']);
         // console.log(plot_max);
 
         var graph = d3.select(this.el_2.find('#graph').get(0)).append('svg')
