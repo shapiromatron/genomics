@@ -1,6 +1,6 @@
 # Development startup.
 
-The development instructions here list setup for both the backend (a Python django application with a PostgreSQL database), as well as the frontend (a React application with Babel ES6 javascript). Note that this is a complex web application, and therefore multiple steps are required: 
+The development instructions here list setup for both the backend (a Python django application with a PostgreSQL database), as well as the frontend (a React application with Babel ES6 javascript). Note that this is a complex web application, and therefore multiple steps are required:
 
 1. Setting up the [python webserver](#python-webserver-setup) backend
 2. Setting up the [database](#database-setup)
@@ -13,7 +13,7 @@ To begin, clone this repository:
 
     git clone git@github.com:shapiromatron/genomics.git
 
-The path where this repository is found on your computer will be the project-root path, referred to frequently in the rest of this documentation. 
+The path where this repository is found on your computer will be the project-root path, referred to frequently in the rest of this documentation.
 
 ## Python webserver setup
 
@@ -45,7 +45,7 @@ Setup commands to start when activating the virtual environment:
 Next, create a database:
 
     createdb -E UTF-8 genomics
-    
+
 ## Webserver database sync
 
 Restart your virtual environment (`deactivate`, then `workon genomics`). Navigate
@@ -57,7 +57,7 @@ to the `/project` path in the repository.
 
 ## Frontend Javascript bundling
 
-Make sure [node.js](https://nodejs.org/en/foundation/) and [npm](https://www.npmjs.com/) are installed, and are accessible in our environment.
+Make sure [node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) are installed, and are accessible in our environment.
 
 Then, change directory  to the `/project` path of our project. Run the following command, which will install all javascript packages for our development environment:
 
@@ -83,13 +83,13 @@ Example data can be downloaded here:
 - [ENCODE data subset JSON metadata](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/load_encode.json) (6 MB)
 - [Example feature-list](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/unt1hr.obsTSS.bed) (0.4 MB)
 - [Example sort-vector](http://manticore.niehs.nih.gov/ucscview/shapiroaj4/wgEncodeBroadHistoneA549CtcfEtoh02Sig.sortVector.txt) (0.2 MB)
-  
-The feature-list and sort-vector are loaded from the the web-interface after the server has been started (see below). 
+
+The feature-list and sort-vector are loaded from the the web-interface after the server has been started (see below).
 
 To load the encode data:
 
 1. Unzip the encode data subset into a `/data` folder from the root-folder of the application. After unzipping, the file structure should look like this:
-        
+
         /
             data/
                 encode/
@@ -111,7 +111,7 @@ To load the encode data:
 Whenever we want to start coding, we'll need to start the django backend application and the javascript frontend hot--reloading application.
 
 Start the backend python client in one terminal window:
-    
+
     workon genomics
     cd /path/to/genomics/project/
     python manage.py runserver 9000
