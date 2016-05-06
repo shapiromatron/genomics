@@ -42,8 +42,10 @@ class SortVectorValidator(Validator):
             self.add_error('Column two contains a non-float value')
 
     def check_ids(self):
-        svs = open(self.sort_vector_fn, 'r').read().splitlines()
-        fbs = open(self.feature_bed_fn, 'r').read().splitlines()
+        with open(self.sort_vector_fn, 'r') as f:
+            svs = f.read().splitlines()
+        with open(self.feature_bed_fn, 'r') as f:
+            fbs = f.read().splitlines()
 
         if len(fbs) != len(svs):
             self.add_error(
