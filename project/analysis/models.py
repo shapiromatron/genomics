@@ -851,6 +851,10 @@ class Analysis(GenomicBinSettings):
         ofTotal = float(cache.get(self.cache_key_total))
         return complete / ofTotal
 
+    def reset_execution_status(self):
+        cache.delete(self.cache_key_complete)
+        cache.delete(self.cache_key_total)
+
 
 class FeatureListCountMatrix(GenomicBinSettings):
     UPLOAD_TO = 'fcm/'

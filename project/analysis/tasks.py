@@ -74,9 +74,10 @@ def execute_matrix_combination(analysis_id):
     # save results from matrix combination
     analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
     analysis.output = analysis.execute_mat2mat()
+    analysis.increment_execution_status()
     analysis.end_time = timezone.now()
     analysis.save()
-    analysis.increment_execution_status()
+    analysis.reset_execution_status()
 
 
 @task()
