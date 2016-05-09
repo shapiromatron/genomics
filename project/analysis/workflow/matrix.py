@@ -135,6 +135,9 @@ class BedMatrix(object):
         feature_name = "_".join(feature_name)
         return feature_name
 
+    def readFeatureIndex(self, tab_name):
+        return int(tab_name.split('_')[-1])
+
     def make_bed(self):
         """
         Open bed file, create a bed of bins.
@@ -262,18 +265,31 @@ class BedMatrix(object):
 
             # Make features, add to dictionary
             row_dict = dict()
+
+            for feature in self.feature_order:
+                row_dict[feature] = []
+                for i in range(self.bin_number):
+                    row_dict[feature].append('0')
+
             for line in f:
                 tab_name, size, covered, bed_sum, bed_mean_zero, bed_mean = \
                     line.strip().split()
                 bed_sum = self.checkInt(bed_sum)
                 feature_name = self.readTabName(tab_name)
-                if feature_name not in row_dict:
-                    row_dict[feature_name] = ""
-                row_dict[feature_name] += "\t" + str(bed_sum)
+                feature_index = self.readFeatureIndex(tab_name)
+                # if feature_name not in row_dict:
+                #     row_dict[feature_name] = ""
+                row_dict[feature_name][feature_index] = str(bed_sum)
+
+            lines = dict()
+            for feature in row_dict:
+                lines[feature] = ''
+                for i in range(len(row_dict[feature])):
+                    lines[feature] += '\t' + row_dict[feature][i]
 
             # Write to output based on order in feature list
             for feature_name in self.feature_order:
-                OUTPUT.write(feature_name + row_dict[feature_name] + "\n")
+                OUTPUT.write(feature_name + lines[feature_name] + "\n")
 
     def make_stranded_matrix(self):
         """
