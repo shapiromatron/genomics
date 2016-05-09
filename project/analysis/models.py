@@ -637,6 +637,47 @@ class Analysis(GenomicBinSettings):
     def get_zip_url(self):
         return reverse('analysis:analysis_zip', args=[self.pk, ])
 
+    def reset_if_needed(self, dsIds):
+        """
+        If certain settings have changed, reset validation and output results.
+        This method should be called from a changed form-instance, before
+        saving.
+        """
+        formObj = self
+        id_ = formObj.id
+        reset = False
+        if id_ is None:
+            reset = True
+        else:
+            dbObj = self.__class__.objects.get(id=id_)
+            for fld in [
+                'anchor',
+                'bin_start',
+                'bin_number',
+                'bin_size',
+                'genome_assembly',
+                'feature_list_id',
+                'sort_vector_id',
+            ]:
+                if getattr(dbObj, fld) != getattr(formObj, fld):
+                    reset = True
+                    break
+
+            dbIds = set(dbObj.analysisdatasets_set.values_list('dataset_id', flat=True))
+            formIds = set(dsIds)
+            if dbIds != formIds:
+                reset = True
+
+        if reset:
+            logger.info('Analysis reset required %s' % id_)
+            formObj.validated = False
+            formObj.validation_notes = ''
+            formObj.output = None
+            formObj.start_time = None
+            formObj.end_time = None
+        else:
+            logger.info('Analysis reset not required %s' % id_)
+
     @property
     def user_datasets(self):
         return UserDataset.objects.filter(id__in=self.datasets.values_list('id', flat=True))

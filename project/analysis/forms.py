@@ -195,6 +195,12 @@ class DatasetField(forms.CharField):
             'encodeDatasets': d.get('encodeDatasets', []),
         }
 
+    def get_dataset_ids(self, value):
+        ds = self.get_datasets(value)
+        return [
+            d['dataset'] for d in
+            itertools.chain(ds['userDatasets'], ds['encodeDatasets'])]
+
     def is_valid(self, cleaned):
         d = self.get_datasets(cleaned)
         if len(d['userDatasets']) + len(d['encodeDatasets']) < 2:
@@ -239,21 +245,17 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
         if self.instance.id:
             self.fields['datasets_json'].initial = self.instance.get_form_datasets()
 
-        # todo - be smarter about this; only delete results if needed.
-        self.instance.start_time = None
-        self.instance.end_time = None
-
     def clean(self):
         cleaned_data = super().clean()
-
         ds = cleaned_data['datasets_json']
         if not self.fields['datasets_json'].is_valid(ds):
             raise forms.ValidationError("Improper dataset specification")
 
     def save(self, commit=True):
         if commit:
-            self.instance.validated = False
-            self.instance.validation_notes = ''
+            dsIds = self.fields['datasets_json']\
+                .get_dataset_ids(self.cleaned_data['datasets_json'])
+            self.instance.reset_if_needed(dsIds)
         return super().save(commit=commit)
 
     def _save_m2m(self):
