@@ -54,7 +54,7 @@ let wrapAdditionalSettings = function($el){
             return `<option value="${el.id}">${el.name}</option>`;
         },
         create_null = function(){
-            return create_option({id: '1', name: '---------'});
+            return create_option({id: '', name: '---------'});
         },
         $fl = $('#id_feature_list'),
         $sv = $('#id_sort_vector');
