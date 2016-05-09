@@ -1,4 +1,5 @@
 # ignore paths from language statistics:
-# https://github.com/github/linguist#using-gitattributes 
+# https://github.com/github/linguist#using-gitattributes
 notebooks/* linguist-vendored
 scripts/data/* linguist-vendored
+project/static/lib/* linguist-vendored
