@@ -458,9 +458,10 @@ class IndividualHeatmap {
             return a - b;
         });
         var upper_quartile = d3.quantile(data_values, 0.75);
+        var median = d3.quantile(data_values, 0.50);
 
         var colorScale = d3.scale.linear()
-            .domain([0, upper_quartile])
+            .domain([median, upper_quartile])
             .range(['white', 'red']);
 
         var scale_x = width/col_number,
