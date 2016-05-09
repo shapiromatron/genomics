@@ -11,7 +11,7 @@ module.exports = {
     context: __dirname,
 
     entry: [
-        './assets/js/index',
+        './assets/index',
     ],
 
     output: {
@@ -49,7 +49,7 @@ module.exports = {
     },
 
     resolve: {
-        root: path.resolve(__dirname, 'assets/js'),
+        root: path.resolve(__dirname, 'assets'),
         modulesDirectories: [
             'node_modules',
             'bower_components',

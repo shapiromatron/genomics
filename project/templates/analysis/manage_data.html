@@ -15,13 +15,13 @@
             <a href="{% url 'analysis:feature_list_create' %}"
                class='btn btn-primary pull-right'>Create new</a>
         </h2>
-        {% include 'analysis/manage_data_table.html' with object_list=feature_lists %}
+        {% include 'analysis/featurelist_list.html' with object_list=feature_lists %}
 
         <h2>Sort vectors
             <a href="{% url 'analysis:sort_vector_create' %}"
                class='btn btn-primary pull-right'>Create new</a>
         </h2>
-        {% include 'analysis/manage_data_table.html' with object_list=sort_vectors %}
+        {% include 'analysis/sortvector_list.html' with object_list=sort_vectors %}
     </div>
 
     <div class="col-sm-6">
@@ -29,7 +29,7 @@
             <a href="{% url 'analysis:user_dataset_create' %}"
                class='btn btn-primary pull-right'>Create new</a>
         </h2>
-        {% include 'analysis/manage_data_table.html' with object_list=user_datasets %}
+        {% include 'analysis/userdataset_list.html' with object_list=user_datasets %}
     </div>
 </div>
 {% endblock mid_content %}

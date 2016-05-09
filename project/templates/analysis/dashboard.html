@@ -17,11 +17,13 @@
 <div class="row">
 
     <div class="col-sm-10">
-        <h2>Completed analysis</h2>
-        {% include 'analysis/manage_data_table.html' with object_list=analysis_complete %}
+        <h2>Completed analyses</h2>
+        {% include 'analysis/analysis_list_complete.html' with object_list=analysis_complete %}
 
-        <h2>Analyses currently running</h2>
-        {% include 'analysis/manage_data_table.html' with object_list=analysis_running %}
+        {% if analysis_running %}
+        <h2>Analyses currently under development</h2>
+        {% include 'analysis/analysis_list_incomplete.html' with object_list=analysis_running %}
+        {% endif %}
     </div>
 
     <div class="col-sm-2">

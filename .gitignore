@@ -1,5 +1,6 @@
 *.log
 *.py[co]
+*.djcache
 celerybeat-schedule
 project/django_project/settings/local.py
 tmux.sh

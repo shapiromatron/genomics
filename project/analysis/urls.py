@@ -111,9 +111,4 @@ urlpatterns = [
         views.SortVectorDelete.as_view(),
         name='sort_vector_delete'),
 
-    # default dashboard (deprecated)
-    url(r'^old/',
-        views.DashboardOld.as_view(),
-        name='dashboard_old'),
-
 ]

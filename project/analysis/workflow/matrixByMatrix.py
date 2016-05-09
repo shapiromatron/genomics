@@ -251,6 +251,8 @@ class MatrixByMatrix():
             feature_clusters=self.kmeans_results,
             feature_vectors=self.vector_matrix,
             feature_columns=self.vector_columns,
+            feature_names=self.feature_names,
+            feature_cluster_members=self.feature_cluster_members,
         )
 
     def writeJson(self, fn):
@@ -284,7 +286,7 @@ class MatrixByMatrix():
     def createFeatureMatrix(self):
         self.vector_matrix = None
         headers = None
-        row_names = []
+        self.feature_names = []
         self.vector_columns = []
 
         for matrix in self.matrix_list:
@@ -312,13 +314,13 @@ class MatrixByMatrix():
                     for i, entry in enumerate(matrix_temp):
                         row_name = entry[0]
                         row_values = numpy.array(entry[1:]).astype(float)
-                        row_names.append(row_name)
+                        self.feature_names.append(row_name)
                         self.vector_matrix.append([numpy.sum(row_values)])
                 else:
                     for i, entry in enumerate(matrix_temp):
                         row_name = entry[0]
                         row_values = numpy.array(entry[1:]).astype(float)
-                        if row_name != row_names[i]:
+                        if row_name != self.feature_names[i]:
                             raise ValueError('Row names do not match across \
                                 matrices')
                         self.vector_matrix[i].append(numpy.sum(row_values))
@@ -326,20 +328,49 @@ class MatrixByMatrix():
     def performFeatureClustering(self):
         self.kmeans_results = dict()
         whitened = whiten(self.vector_matrix)
-        for i in range(2, 11):
-            centroids, labels = kmeans2(whitened, i)
-            self.kmeans_results[i] = {
+        std_devs = numpy.std(self.vector_matrix, axis=0)
+        for k in range(2, 11):
+            centroids, labels = kmeans2(whitened, k)
+            self.kmeans_results[k] = {
                 'centroids': centroids.tolist(),
                 'labels': labels.tolist()
                 }
+            for i, centroid in enumerate(self.kmeans_results[k]['centroids']):
+                for j, val in enumerate(centroid):
+                    self.kmeans_results[k]['centroids'][i][j] = \
+                        val * std_devs[j]
 
     def normalizeFeatureMatrix(self):
         arr_max = numpy.amax(self.vector_matrix, axis=0)
         arr_min = numpy.amin(self.vector_matrix, axis=0)
+        # Normalize feature vectors
         for i, vector in enumerate(self.vector_matrix):
             for j, val in enumerate(vector):
                 self.vector_matrix[i][j] = \
                     (val - arr_min[j])/(arr_max[j] - arr_min[j])
+        for k in self.kmeans_results:
+            for i, centroid in enumerate(self.kmeans_results[k]['centroids']):
+                for j, val in enumerate(centroid):
+                    self.kmeans_results[k]['centroids'][i][j] = \
+                        (val - arr_min[j])/(arr_max[j] - arr_min[j])
+
+    def getClusterMembers(self):
+        self.feature_cluster_members = dict()
+        for k in self.kmeans_results:
+            self.feature_cluster_members[k] = dict()
+            for i in range(1, k+1):
+                self.feature_cluster_members[k][i] = []
+            for i, cluster in enumerate(self.kmeans_results[k]['labels']):
+                self.feature_cluster_members[k][int(cluster)+1].append(
+                    self.feature_names[i])
+
+    def reorderFeatureMatrixByDendrogram(self):
+        order = self.dendrogram['leaves']
+        for i, row in enumerate(self.vector_matrix):
+            temp = []
+            for index in order:
+                temp.append(row[index])
+            self.vector_matrix[i] = temp
 
     def execute(self):
         self.readMatrixFiles()
@@ -349,8 +380,10 @@ class MatrixByMatrix():
         self.findClusterCorrelationValues()
 
         self.createFeatureMatrix()
+        self.reorderFeatureMatrixByDendrogram()
         self.performFeatureClustering()
         self.normalizeFeatureMatrix()
+        self.getClusterMembers()
 
 @click.command()
 @click.argument('matrix_list_fn', type=str)

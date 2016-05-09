@@ -98,7 +98,7 @@ class EncodeDatasetFiltering extends React.Component {
     }
 
     render() {
-        let opts = this.props.options,
+        let opts = this.props.options[this.props.genome_assembly],
             vals = this.state.filters;
 
         return (

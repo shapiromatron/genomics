@@ -8,7 +8,7 @@ config.__devFlagPlugin.definitions.__DEBUG__ = true;
 config.entry = [
     'webpack-dev-server/client?http://localhost:9001',
     'webpack/hot/only-dev-server',
-    './assets/js/index',
+    './assets/index',
 ];
 
 // override django's STATIC_URL for webpack bundles

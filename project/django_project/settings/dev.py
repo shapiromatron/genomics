@@ -11,13 +11,20 @@ INTERNAL_IPS = ('127.0.0.1', )
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-CACHES['default']['BACKEND'] = 'django.core.cache.backends.locmem.LocMemCache'
-
 LOGGING['loggers']['']['handlers'] = ['console']
 
-# Celery settings
-CELERY_ALWAYS_EAGER = True
-CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+USE_CELERY_IN_DEV = os.environ.get('USE_CELERY_IN_DEV', 'False') == 'True'
+if USE_CELERY_IN_DEV:
+    # swap cache to filebased so multiple workers can use
+    CACHES['default'] = {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(PROJECT_ROOT, 'django_cache'),
+    }
+else:
+    # use simpler cache
+    CACHES['default']['BACKEND'] = 'django.core.cache.backends.locmem.LocMemCache'
+    CELERY_ALWAYS_EAGER = True
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 
 COMPRESS_ENABLED = False
 

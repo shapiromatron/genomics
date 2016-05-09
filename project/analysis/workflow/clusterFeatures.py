@@ -2,67 +2,67 @@
 
 import click
 import numpy
-from scipy import stats
-from scipy.cluster.hierarchy import linkage, dendrogram, fclusterdata
 from scipy.cluster.vq import kmeans2, whiten
-from scipy.spatial.distance import squareform, pdist
 import os
 import json
+
 
 class ClusterFeatures():
 
     def __init__(self, matrix_list):
-
         self.matrix_list = matrix_list
         self.execute()
 
     def readMatrixFilesIntoVectorMatrix(self):
-        self.headers = None
-        self.row_names = []
-        self.vector_matrix = None
+        headers = None
+        vector_matrix = None
+        row_names = []
 
         for entry in self.matrix_list:
             matrix_fn = entry[2]
             with open(matrix_fn) as f:
-                # DEAL WITH HEADERS
-                # IF EMPTY, POPULATE HEADERS
-                if not self.headers:
-                    self.headers = next(f).strip().split()
-                # ELSE, CHECK IF CONSISTENT
+
+                # Populate headers if empty
+                if headers is None:
+                    headers = next(f).strip().split()
+                # ...otherwise ensure headers are consistent
                 else:
-                    if self.headers != next(f).strip().split():
+                    if headers != next(f).strip().split():
                         raise ValueError('Headers not consistent across matrices')
 
-                # POPULATE TEMPORARY MATRIX
+                # Create a temporary matrix
                 matrix_temp = []
                 for line in f:
                     matrix_temp.append(line.strip().split())
 
-                # ADD SUM TO VECTOR MATRIX
-                if not self.vector_matrix:
-                    self.vector_matrix = []
+                # Add sum to vector matrix
+                if vector_matrix is None:
+                    vector_matrix = []
                     for i, entry in enumerate(matrix_temp):
                         row_name = entry[0]
                         row_values = numpy.array(entry[1:]).astype(float)
-                        self.row_names.append(row_name)
-                        self.vector_matrix.append([numpy.sum(row_values)])
+                        row_names.append(row_name)
+                        vector_matrix.append([numpy.sum(row_values)])
                 else:
                     for i, entry in enumerate(matrix_temp):
                         row_name = entry[0]
                         row_values = numpy.array(entry[1:]).astype(float)
-                        if row_name != self.row_names[i]:
+                        if row_name != row_names[i]:
                             raise ValueError('Row names do not match across matrices')
-                        self.vector_matrix[i].append(numpy.sum(row_values))
-        return self.vector_matrix, self.row_names
+                        vector_matrix[i].append(numpy.sum(row_values))
+
+        self.headers = headers
+        self.row_names = row_names
+        self.vector_matrix = vector_matrix
 
     def performClustering(self):
         whitened = whiten(self.vector_matrix)
-        for i in range(2,11):
+        for i in range(2, 11):
             centroids, labels = kmeans2(whitened, i)
             self.kmeans_results[i] = {
                 'centroids': centroids.tolist(),
                 'labels': labels.tolist()
-                }
+            }
 
     def writeJson(self, fn):
         with open(fn, 'w') as f:
@@ -71,13 +71,13 @@ class ClusterFeatures():
                 'vector_matrix': self.vector_matrix,
                 'bins': self.headers,
                 'row_names': self.row_names
-                }, f, separators=(",", ": "))
+            }, f, separators=(",", ": "))
 
     def execute(self):
-        self.kmeans_results = dict()
-
+        self.kmeans_results = {}
         self.readMatrixFilesIntoVectorMatrix()
         self.performClustering()
+
 
 @click.command()
 @click.argument('matrix_list_fn', type=str)
@@ -107,6 +107,7 @@ def cli(matrix_list_fn, output_json):
 
     cf = ClusterFeatures(matrix_list)
     cf.writeJson(output_json)
+
 
 if __name__ == '__main__':
     cli()

@@ -22,6 +22,7 @@ from .import tasks
 
 from .workflow.matrix import BedMatrix
 from .workflow.matrixByMatrix import MatrixByMatrix
+from .workflow import validation
 
 
 logger = logging.getLogger(__name__)
@@ -51,6 +52,8 @@ class Dataset(models.Model):
         default=False)
     validated = models.BooleanField(
         default=False)
+    validation_notes = models.TextField(
+        blank=True)
     created = models.DateTimeField(
         auto_now_add=True)
     last_updated = models.DateTimeField(
@@ -75,6 +78,13 @@ GENOME_ASSEMBLY_CHOICES = (
     (HG19, 'hg19'),
     (MM9,  'mm9'),
 )
+
+
+def get_chromosome_size_file(genome_assembly):
+    if genome_assembly == HG19:
+        return validation.get_chromosome_size_path('hg19')
+    elif genome_assembly == MM9:
+        return validation.get_chromosome_size_path('mm9')
 
 
 class DatasetDownload(models.Model):
@@ -175,6 +185,8 @@ class DatasetDownload(models.Model):
             self.status_code = self.FINISHED_ERROR
             self.status = str(e)
         self.save()
+        for ds in self.related_datasets():
+            ds.validate_and_save()
 
     def get_md5(self):
         # equivalent to "md5 -q $FN"
@@ -197,6 +209,13 @@ class DatasetDownload(models.Model):
         if self.data and os.path.exists(self.data.path):
             logger.info('Deleting {}'.format(self.data.path))
             os.remove(self.data.path)
+
+    def related_datasets(self):
+        return itertools.chain(
+            self.plus.all(),
+            self.minus.all(),
+            self.ambiguous.all(),
+        )
 
 
 class GenomicDataset(Dataset):
@@ -271,6 +290,11 @@ class UserDataset(GenomicDataset):
         else:
             return self.ambiguous.status_code == success_code
 
+    @classmethod
+    def usable(cls, user):
+        # must be owned by user and validated
+        return cls.objects.filter(owner=user, validated=True)
+
     def get_absolute_url(self):
         return reverse('analysis:user_dataset', args=[self.pk, ])
 
@@ -279,6 +303,42 @@ class UserDataset(GenomicDataset):
 
     def get_delete_url(self):
         return reverse('analysis:user_dataset_delete', args=[self.pk, ])
+
+    def validate_and_save(self):
+        # wait until all files are downloaded before attempting validation
+        if not self.is_downloaded:
+            return
+
+        size_file = get_chromosome_size_file(self.genome_assembly)
+        if self.is_stranded:
+            validatorA = validation.BigWigValidator(
+                self.plus.data.path, size_file)
+            validatorA.validate()
+
+            validatorB = validation.BigWigValidator(
+                self.minus.data.path, size_file)
+            validatorB.validate()
+
+            is_valid = validatorA.is_valid and validatorB.is_valid
+            notes = '\n'.join([
+                validatorA.display_errors(),
+                validatorB.display_errors()
+            ]).strip()
+
+        else:
+            validator = validation.BigWigValidator(
+                self.ambiguous.data.path, size_file)
+            validator.validate()
+
+            is_valid = validator.is_valid
+            notes = validator.display_errors()
+
+        # intentionally omit post_save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                validated=is_valid,
+                validation_notes=notes)
 
 
 class EncodeDataset(GenomicDataset):
@@ -338,8 +398,14 @@ class EncodeDataset(GenomicDataset):
             'phase',
             'localization',
         ]
-        for fld in fields:
-            dicts[fld] = cls.objects.values_list(fld, flat=True).distinct().order_by(fld)
+        for genome, _ in GENOME_ASSEMBLY_CHOICES:
+            dicts[genome] = {}
+            for fld in fields:
+                dicts[genome][fld] = cls.objects\
+                    .filter(genome_assembly=genome)\
+                    .values_list(fld, flat=True)\
+                    .distinct()\
+                    .order_by(fld)
         return dicts
 
 
@@ -352,6 +418,18 @@ class FeatureList(Dataset):
         blank=True,
         max_length=256)
 
+    @classmethod
+    def usable(cls, user):
+        # must be owned by user and validated
+        return cls.objects.filter(owner=user, validated=True)
+
+    @classmethod
+    def usable_json(cls, user):
+        return json.dumps(list(
+            cls.usable(user)
+               .values('id', 'name', 'genome_assembly')
+        ))
+
     def get_absolute_url(self):
         return reverse('analysis:feature_list', args=[self.pk, ])
 
@@ -361,12 +439,37 @@ class FeatureList(Dataset):
     def get_delete_url(self):
         return reverse('analysis:feature_list_delete', args=[self.pk, ])
 
+    def validate_and_save(self):
+        size_file = self.get_chromosome_size_file(self.genome_assembly)
+        validator = validation.FeatureListValidator(
+            self.dataset.path, size_file)
+        validator.validate()
+
+        # intentionally omit post_save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                validated=validator.is_valid,
+                validation_notes=validator.display_errors())
+
 
 class SortVector(Dataset):
     feature_list = models.ForeignKey(
         FeatureList)
     vector = models.FileField(
         max_length=256)
+
+    @classmethod
+    def usable(cls, user):
+        # must be owned by user and validated
+        return cls.objects.filter(owner=user, validated=True)
+
+    @classmethod
+    def usable_json(cls, user):
+        return json.dumps(list(
+            cls.usable(user)
+               .values('id', 'name', 'feature_list_id')
+        ))
 
     def get_absolute_url(self):
         return reverse('analysis:sort_vector', args=[self.pk, ])
@@ -376,6 +479,19 @@ class SortVector(Dataset):
 
     def get_delete_url(self):
         return reverse('analysis:sort_vector_delete', args=[self.pk, ])
+
+    def validate_and_save(self):
+        validator = validation.SortVectorValidator(
+            self.feature_list.dataset.path,
+            self.vector.path)
+        validator.validate()
+
+        # intentionally omit post_save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                validated=validator.is_valid,
+                validation_notes=validator.display_errors())
 
 
 class AnalysisDatasets(models.Model):
@@ -447,6 +563,8 @@ class Analysis(GenomicBinSettings):
         null=True)
     validated = models.BooleanField(
         default=False)
+    validation_notes = models.TextField(
+        blank=True)
     start_time = models.DateTimeField(
         null=True)
     end_time = models.DateTimeField(
@@ -477,6 +595,24 @@ class Analysis(GenomicBinSettings):
     def complete(cls, owner):
         return cls.objects.filter(end_time__isnull=False, owner=owner)
 
+    def validate_and_save(self):
+        validator = validation.AnalysisValidator(
+            bin_anchor=self.get_anchor_display(),
+            bin_start=self.bin_start,
+            bin_number=self.bin_number,
+            bin_size=self.bin_size,
+            feature_bed=self.feature_list.dataset.path,
+            chrom_sizes=get_chromosome_size_file(self.genome_assembly),
+            stranded_bed=self.feature_list.stranded,
+        )
+        validator.validate()
+        # intentionally omit post_save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                validated=validator.is_valid,
+                validation_notes=validator.display_errors())
+
     def get_absolute_url(self):
         return reverse('analysis:analysis', args=[self.pk, ])
 
@@ -497,6 +633,9 @@ class Analysis(GenomicBinSettings):
 
     def get_delete_url(self):
         return reverse('analysis:analysis_delete', args=[self.pk, ])
+
+    def get_zip_url(self):
+        return reverse('analysis:analysis_zip', args=[self.pk, ])
 
     @property
     def user_datasets(self):
@@ -603,6 +742,8 @@ class Analysis(GenomicBinSettings):
             'feature_clusters': output['feature_clusters'],
             'feature_vectors': output['feature_vectors'],
             'feature_columns': output['feature_columns'],
+            'feature_names': output['feature_names'],
+            'feature_cluster_members': output['feature_cluster_members'],
         }
 
     def get_ks(self, id_):

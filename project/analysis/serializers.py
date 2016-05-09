@@ -11,7 +11,10 @@ class UserDatasetSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserDataset
         fields = '__all__'
-        read_only_fields = ('validated', 'expiration_date', 'owner', 'borrowers')
+        read_only_fields = (
+            'validated', 'validation_notes',
+            'expiration_date', 'owner', 'borrowers'
+        )
 
 
 class FeatureListSerializer(serializers.ModelSerializer):
@@ -20,7 +23,8 @@ class FeatureListSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FeatureList
         fields = '__all__'
-        read_only_fields = ('validated', 'owner', 'borrowers')
+        read_only_fields = (
+            'validated', 'validation_notes', 'owner', 'borrowers')
 
 
 class SortVectorSerializer(serializers.ModelSerializer):
@@ -28,7 +32,8 @@ class SortVectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.SortVector
         fields = '__all__'
-        read_only_fields = ('validated', 'owner', 'borrowers')
+        read_only_fields = (
+            'validated', 'validation_notes', 'owner', 'borrowers')
 
 
 class EncodeDatasetSerializer(serializers.ModelSerializer):
@@ -36,7 +41,7 @@ class EncodeDatasetSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.EncodeDataset
         exclude = (
-           'public', 'validated', 'owner',
+           'public', 'validated', 'validation_notes', 'owner',
            'borrowers', 'created', 'last_updated',
            'data_plus', 'data_minus', 'data_ambiguous',
            'uuid',
@@ -61,7 +66,8 @@ class AnalysisSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Analysis
         exclude = ('output', )
-        read_only_fields = ('validated', 'start_time', 'end_time', 'owner')
+        read_only_fields = (
+            'validated', 'validation_notes', 'start_time', 'end_time', 'owner')
 
     def create_analysis_datasets(self, analysis, datasets):
         objects = [

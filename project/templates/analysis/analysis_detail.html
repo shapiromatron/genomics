@@ -11,7 +11,24 @@
 
 {% block mid_content %}
 
-{% include "analysis/detail_action.html" %}
+<!-- Overridden analysis/detail_action.html -->
+<h2>
+    <span>{{object.name}}</span>
+    <div class='dropdown pull-right'>
+        <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
+        Actions <span class="caret"></span>
+        </button>
+        <ul class='dropdown-menu'>
+            <li class="dropdown-header">Editing options</li>
+            <li><a href='{{object.get_update_url}}'>Update</a></li>
+            <li><a href='{{object.get_delete_url}}'>Delete</a></li>
+            <li class="dropdown-header">Viewing options</li>
+            <li><a href='{{object.get_visuals_url}}'>View visualization</a></li>
+            <li><a href='{{object.get_zip_url}}'>Download zip</a></li>
+        </ul>
+    </div>
+</h2>
+
 
 <table class='table table-condensed'>
     <tbody>
@@ -21,7 +38,7 @@
         </tr>
         <tr>
             <th>Anchor</th>
-            <td>{{object.anchor}}</td>
+            <td>{{object.get_anchor_display}}</td>
         </tr>
         <tr>
             <th>Bin start</th>
@@ -43,6 +60,9 @@
             <th>Validated</th>
             <td>{{object.validated|fabool}}</td>
         </tr>
+        {% if object.validation_notes %}
+            {% include 'analysis/_validation_notes.html' %}
+        {% endif %}
         <tr>
             <th>Genome assembly</th>
             <td>{{object.get_genome_assembly_display}}</td>

@@ -17,7 +17,7 @@ let startup = function(){
             // create instances for visualization
             let overview = new AnalysisOverview($('#visual_panel_1'), data),
                 individual_overview = new IndividualOverview($('#visual_panel_2'), data),
-                feature_clust_overview = new FeatureClusteringOverview($('#visual_panel_1'), data);
+                feature_clust_overview = new FeatureClusteringOverview($('#visual_panel_1'), $('#visual_panel_2'), data);
                 //feature_clust_individual = new IndividualFeatureClusteringOverview($('#visual_panel_2'), data);
 
             // add buttons for visualization selection
