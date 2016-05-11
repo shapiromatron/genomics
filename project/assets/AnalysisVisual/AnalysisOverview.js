@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import d3 from 'd3';
 
+import ScatterplotModal from './ScatterplotModal';
+
 
 class AnalysisOverview{
 
@@ -65,6 +67,7 @@ class AnalysisOverview{
             .attr('width', function(d) { return cell_width; })
             .attr('height', function(d) { return cell_height; })
             .style('fill', function(d) { return colorScale(d); })
+            .style('cursor', 'pointer')
             .on('mouseover', function (d, i, j) {
                 d3.select(this)
                     .style('stroke', 'black')
@@ -91,8 +94,31 @@ class AnalysisOverview{
 
             })
             .on('mouseout', function () {
+                $(this)
+                    .tooltip('destroy');
                 d3.select(this)
                     .style('stroke', 'none');
+            })
+            .on('click', function(d, i, j){
+
+                var idx = (cluster_members[i].length === 1) ?
+                        cluster_members[i][0] :
+                        '(' + cluster_members[i].length + ') ' + cluster_medoids[i],
+                    idy = (cluster_members[j].length === 1) ?
+                        cluster_members[j][0] :
+                        '(' + cluster_members[j].length + ') ' + cluster_medoids[j],
+                    modalTitle = $('#ind_heatmap_modal_title'),
+                    modalBody = $('#ind_heatmap_modal_body');
+
+                $('#flcModal')
+                    .one('show.bs.modal', function(){
+                        modalTitle.html('');
+                        modalBody.html('');
+                    })
+                    .one('shown.bs.modal', function(){
+                        var modal = new ScatterplotModal(idx, idy, modalTitle, modalBody);
+                        modal.render();
+                    }).modal('show');
             });
 
         $('[data-toggle="tooltip"]').tooltip();
