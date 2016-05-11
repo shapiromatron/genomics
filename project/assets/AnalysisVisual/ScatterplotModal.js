@@ -42,7 +42,6 @@ class ScatterplotModal {
                         <label>Select bin</label>
                         <select className="form-control" id="selector">
                         </select>
-                        <button id="submitter" className='btn btn-primary'>Update</button>
                     </div>
                     <div id="visual">
                         <Loading />
@@ -65,9 +64,8 @@ class ScatterplotModal {
                 .html(data.map((d)=>`<option value="${d}">${d}</option>`))
                 .val(data[0]);
         });
-        this.modal_body
-            .find('#submitter')
-            .on('click', this.getScatterplotData.bind(this));
+        this.selector
+            .on('change', this.getScatterplotData.bind(this));
     }
 
     getScatterplotData(){
