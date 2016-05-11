@@ -806,7 +806,13 @@ class Analysis(GenomicBinSettings):
 
         return so
 
-    def get_scatterplot_data(self, idx, idy):
+    def get_bin_names(self):
+        flcm = FeatureListCountMatrix.objects\
+            .filter(dataset__analysis=self.id)\
+            .first()
+        return list(flcm.df.columns)
+
+    def get_scatterplot_data(self, idx, idy, column):
         x = AnalysisDatasets.objects\
             .filter(analysis_id=self.id, count_matrix=idx)\
             .select_related('count_matrix')\
@@ -817,11 +823,15 @@ class Analysis(GenomicBinSettings):
             .first()
 
         xDf = x.count_matrix.df
-        xDf.rename(columns={'0:99': 'x'}, inplace=True)
-        xDf = xDf[['x']]
-
         yDf = y.count_matrix.df
-        yDf.rename(columns={'0:99': 'y'}, inplace=True)
+
+        if column not in xDf.columns:
+            column = FeatureListCountMatrix.ALL_BINS
+
+        xDf.rename(columns={column: 'x'}, inplace=True)
+        yDf.rename(columns={column: 'y'}, inplace=True)
+
+        xDf = xDf[['x']]
         yDf = yDf[['y']]
 
         return xDf.join(yDf).to_csv()
@@ -897,6 +907,8 @@ class FeatureListCountMatrix(GenomicBinSettings):
     class Meta:
         verbose_name_plural = 'Feature list count matrices'
 
+    ALL_BINS = 'All bins'
+
     @property
     def df(self):
         # get formatted pandas data frame
@@ -906,9 +918,11 @@ class FeatureListCountMatrix(GenomicBinSettings):
             df = pd.read_csv(self.matrix.path, sep='\t')
             df.rename(columns={'Unnamed: 0': 'label'}, inplace=True)
             df.set_index('label', inplace=True, drop=True)
-            cache.set(key, df, 300)
+            df.insert(0, self.ALL_BINS, df.sum(axis=1))
             size = round(df.memory_usage(index=True).sum()/(1024*1024), 2)
             logger.info('Setting cache: {} ({}mb)'.format(key, size))
+            cache.set(key, df, 300)
+
         return df
 
     @classmethod

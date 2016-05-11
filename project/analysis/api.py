@@ -140,10 +140,11 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
         # TODO: check permissions
         idx = tryParseInt(self.request.GET.get('idx'))
         idy = tryParseInt(self.request.GET.get('idy'))
+        column = self.request.GET.get('column')
         if idx is None or idy is None:
             raise NotAcceptable("Parameters `idx` and `idy` are required")
         an = get_object_or_404(models.Analysis, pk=int(pk))
-        return Response(an.get_scatterplot_data(idx, idy))
+        return Response(an.get_scatterplot_data(idx, idy, column))
 
     def get_serializer_class(self):
         return serializers.AnalysisSerializer
