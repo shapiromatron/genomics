@@ -128,10 +128,11 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
 
     @detail_route(methods=['get'])
     def sort_vector(self, request, pk=None):
+        # TODO: check permissions
         sort_vector_id = tryParseInt(self.request.GET.get('id'), -1)
         if sort_vector_id == -1:
             raise NotAcceptable("Sort vector `id` parameter required")
-        an = get_object_or_404(models.Analysis, pk=int(pk))  # todo: check permissions
+        an = get_object_or_404(models.Analysis, pk=int(pk))
         return Response(an.get_sort_vector(sort_vector_id))
 
     def get_serializer_class(self):
@@ -149,6 +150,7 @@ class FeatureListCountMatrixViewset(SiteMixin, viewsets.ReadOnlyModelViewSet):
 
     @detail_route(methods=['get'], renderer_classes=(PlainTextRenderer,))
     def plot(self, request, pk=None):
+        # TODO: check permissions
         flcm = get_object_or_404(models.FeatureListCountMatrix, pk=int(pk))
         return Response(flcm.get_dataset())
 
