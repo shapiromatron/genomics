@@ -89,7 +89,9 @@ class ScatterplotModal {
     }
 
     renderScatterplot(data) {
-
+        /*
+        Render scatterplot. Note logscale; values of 0 are rendered to 1.
+        */
         var $parent = this.modal_body,
             $form = this.modal_body.find('#inputForm'),
             $visual = this.modal_body.find('#visual');
@@ -97,8 +99,16 @@ class ScatterplotModal {
         var margin = {top: 20, right: 10, bottom: 50, left: 70},
             width = $visual.width() - margin.left - margin.right,
             height = $parent.height() - $form.height() - margin.top - margin.bottom,
-            x = d3.scale.log().range([0, width]),
-            y = d3.scale.log().range([height, 0]),
+            x = d3.scale.log()
+                  .range([0, width])
+                  .domain([1, d3.max(data, (d) => d.x)])
+                  .clamp(true)
+                  .nice(),
+            y = d3.scale.log()
+                    .range([height, 0])
+                    .domain([1, d3.max(data, (d) => d.y)])
+                    .clamp(true)
+                    .nice(),
             xAxis, yAxis, svg;
 
         // clear body and set resize handler
@@ -118,9 +128,6 @@ class ScatterplotModal {
             .attr('height', height + margin.top + margin.bottom)
             .append('g')
             .attr('transform', `translate(${ margin.left}, ${margin.top})`);
-
-        x.domain(d3.extent(data, function(d) { return d.x; })).nice();
-        y.domain(d3.extent(data, function(d) { return d.y; })).nice();
 
         svg.append('g')
             .attr('class', 'x axis')
