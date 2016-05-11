@@ -149,7 +149,11 @@ class ScatterplotModal {
                 .style('text-anchor', 'end')
                 .text(this.idy);
 
-            dots = svg.selectAll('.dot')
+            svg.append('g')
+                .attr('class', 'gdot');
+
+            svg.select('.gdot')
+                .selectAll('.dot')
                 .data(data)
                 .enter().append('circle')
                 .attr('class', 'dot')
@@ -186,21 +190,20 @@ class ScatterplotModal {
                .duration(axisDuration)
                .call(xAxis.scale(x));
 
-            let dotDuration = 300,
-                dotsPerBlock = 75,
-                dotWaitInMs = 15;
-
-            svg.selectAll('circle')
-               .data(data)
+            svg.selectAll('.gdot')
                .transition()
-               .delay((d, i)=>axisDuration * 1.1 + Math.floor(i/dotsPerBlock) * dotWaitInMs)
-               .each(function(d, i){
-                   d3.select(this)
-                    .transition()
-                    .duration(dotDuration)
-                    .attr('cx', (d) => x(d.x))
-                    .attr('cy', (d) => y(d.y));
-               });
+               .delay(axisDuration * 0.8)
+               .duration(500)
+               .style('opacity', 0)
+               .each('end', function(){
+                    svg.selectAll('circle')
+                        .data(data)
+                        .attr('cx', (d) => x(d.x))
+                        .attr('cy', (d) => y(d.y));
+               })
+               .transition()
+               .duration(2000)
+               .style('opacity', 1);
 
         }
 
