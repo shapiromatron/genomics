@@ -94,7 +94,7 @@ class ScatterplotModal {
             $form = this.modal_body.find('#inputForm'),
             $visual = this.modal_body.find('#visual');
 
-        var margin = {top: 20, right: 10, bottom: 50, left: 70},
+        var margin = {top: 20, right: 40, bottom: 50, left: 80},
             width = $visual.width() - margin.left - margin.right,
             height = $parent.height() - $form.height() - margin.top - margin.bottom,
             x = d3.scale.log()
@@ -115,11 +115,15 @@ class ScatterplotModal {
         // build scatterplot
         xAxis = d3.svg.axis()
             .scale(x)
-            .orient('bottom');
+            .orient('bottom')
+            .ticks(Math.ceil(Math.log10(x.domain()[1])), ',d')
+            .tickSize(6, 0);
 
         yAxis = d3.svg.axis()
             .scale(y)
-            .orient('left');
+            .orient('left')
+            .ticks(Math.ceil(Math.log10(y.domain()[1])), ',d')
+            .tickSize(6, 0);
 
         svg = d3.select($visual[0]).append('svg')
             .attr('width', width + margin.left + margin.right)
