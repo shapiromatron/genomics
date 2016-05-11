@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import $ from 'jquery';
 import d3 from 'd3';
 import React from 'react';
@@ -43,9 +44,7 @@ class ScatterplotModal {
                         <select className="form-control" id="selector">
                         </select>
                     </div>
-                    <div id="visual">
-                        <Loading />
-                    </div>
+                    <div id="visual"></div>
                 </div>
             );
         };
@@ -69,16 +68,7 @@ class ScatterplotModal {
     }
 
     getScatterplotData(){
-        let column = this.selector.val(),
-            $visual = this.modal_body.find('#visual');
-
-        $visual.empty();
-        ReactDOM.render(
-            <Loading />,
-            $visual.get(0)
-        );
-
-
+        let column = this.selector.val();
         d3.csv(
             this.datasetUrl(column),
             this.dataConversion,
@@ -90,29 +80,35 @@ class ScatterplotModal {
         /*
         Render scatterplot. Note logscale; values of 0 are rendered to 1.
         */
+
+        // DOM objects
         var $parent = this.modal_body,
             $form = this.modal_body.find('#inputForm'),
             $visual = this.modal_body.find('#visual');
 
+        // constants
         var margin = {top: 20, right: 40, bottom: 50, left: 80},
             width = $visual.width() - margin.left - margin.right,
-            height = $parent.height() - $form.height() - margin.top - margin.bottom,
-            x = d3.scale.log()
-                  .range([0, width])
-                  .domain([1, d3.max(data, (d) => d.x)])
-                  .clamp(true)
-                  .nice(),
-            y = d3.scale.log()
-                    .range([height, 0])
-                    .domain([1, d3.max(data, (d) => d.y)])
-                    .clamp(true)
-                    .nice(),
-            xAxis, yAxis, svg;
+            height = $parent.height() - $form.height() - margin.top - margin.bottom;
 
-        // clear body and set resize handler
-        $visual.empty();
+        // (optionally) existing d3 components
+        var isNew = (_.isUndefined(this.pltSvg)),
+            svg = this.pltSvg || null,
+            x = this.pltXScale || d3.scale.log().range([0, width]),
+            y = this.pltYScale || d3.scale.log().range([height, 0]),
+            xAxis = this.pltXAxis || null,
+            yAxis = this.pltYAxis || null,
+            dots = this.pltDots || null;
 
         // build scatterplot
+        x.domain([1, d3.max(data, (d) => d.x)])
+          .clamp(true)
+          .nice();
+
+        y.domain([1, d3.max(data, (d) => d.y)])
+            .clamp(true)
+            .nice();
+
         xAxis = d3.svg.axis()
             .scale(x)
             .orient('bottom')
@@ -125,55 +121,85 @@ class ScatterplotModal {
             .ticks(Math.ceil(Math.log10(y.domain()[1])), ',d')
             .tickSize(6, 0);
 
-        svg = d3.select($visual[0]).append('svg')
-            .attr('width', width + margin.left + margin.right)
-            .attr('height', height + margin.top + margin.bottom)
-            .append('g')
-            .attr('transform', `translate(${ margin.left}, ${margin.top})`);
+        if (isNew){
+            svg = d3.select($visual[0]).append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${ margin.left}, ${margin.top})`);
 
-        svg.append('g')
-            .attr('class', 'x axis')
-            .attr('transform', 'translate(0,' + height + ')')
-            .call(xAxis)
-            .append('text')
-            .attr('class', 'label')
-            .attr('x', width)
-            .attr('y', -6)
-            .style('text-anchor', 'end')
-            .text(this.idx);
+            svg.append('g')
+                .attr('class', 'x axis')
+                .attr('transform', 'translate(0,' + height + ')')
+                .call(xAxis)
+                .append('text')
+                .attr('class', 'label')
+                .attr('x', width)
+                .attr('y', -6)
+                .style('text-anchor', 'end')
+                .text(this.idx);
 
-        svg.append('g')
-            .attr('class', 'y axis')
-            .call(yAxis)
-            .append('text')
-            .attr('class', 'label')
-            .attr('transform', 'rotate(-90)')
-            .attr('y', 6)
-            .attr('dy', '.71em')
-            .style('text-anchor', 'end')
-            .text(this.idy);
+            svg.append('g')
+                .attr('class', 'y axis')
+                .call(yAxis)
+                .append('text')
+                .attr('class', 'label')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 6)
+                .attr('dy', '.71em')
+                .style('text-anchor', 'end')
+                .text(this.idy);
 
-        svg.selectAll('.dot')
-            .data(data)
-            .enter().append('circle')
-            .attr('class', 'dot')
-            .attr('r', 3.5)
-            .attr('cx', (d) => x(d.x))
-            .attr('cy', (d) => y(d.y))
-            .style('fill', '#4682B4')
-            .style('fill-opacity', 0.5)
-            .on('mouseover', function(d){
-                let txt = `${d.label}<br>x: ${d.x}<br>y: ${d.y}`;
-                $(this).tooltip({
-                    container: 'body',
-                    title: txt,
-                    html: true,
-                    animation: false,
-                }).tooltip('show');
-            })
-            .on('mouseoff', function(d){
-                $(this).tooltip('destroy');
-            });
+            dots = svg.selectAll('.dot')
+                .data(data)
+                .enter().append('circle')
+                .attr('class', 'dot')
+                .attr('r', 3.5)
+                .attr('cx', (d) => x(d.x))
+                .attr('cy', (d) => y(d.y))
+                .style('fill', '#4682B4')
+                .style('fill-opacity', 0.5)
+                .on('mouseover', function(d){
+                    let txt = `${d.label}<br>x: ${d.x}<br>y: ${d.y}`;
+                    $(this).tooltip({
+                        container: 'body',
+                        title: txt,
+                        html: true,
+                        animation: false,
+                    }).tooltip('show');
+                })
+                .on('mouseoff', function(d){
+                    $(this).tooltip('destroy');
+                });
+
+        } else {
+            //update
+            svg.selectAll('.y')
+               .transition().duration(1000)
+               .call(yAxis.scale(y));
+
+            svg.selectAll('.x')
+               .transition().duration(1000)
+               .call(xAxis.scale(x));
+
+            svg.selectAll('circle')
+               .data(data)
+               .transition()
+               .delay(2000)
+               .duration(1000)
+               .delay((d,i) => i / data.length * 500)
+               .attr('cx', (d) => x(d.x))
+               .attr('cy', (d) => y(d.y));
+        }
+
+        _.extend(this, {
+            pltSvg: svg,
+            pltXScale: x,
+            pltYScale: y,
+            pltXAxis: xAxis,
+            pltYAxis: yAxis,
+            pltDots: dots,
+        });
     }
 
     dataConversion(d) {
