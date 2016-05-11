@@ -8,6 +8,7 @@ from rest_framework.decorators import detail_route
 from rest_framework.exceptions import NotAcceptable
 
 from utils.api import SiteMixin, OwnedButShareableMixin, NoPagination, PlainTextRenderer
+from utils.base import tryParseInt
 
 from . import models, serializers
 
@@ -114,10 +115,7 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
 
     @detail_route(methods=['get'])
     def ks(self, request, pk=None):
-        try:
-            sort_vector_id = int(self.request.GET.get('id', -1))
-        except:
-            sort_vector_id = -1
+        sort_vector_id = tryParseInt(self.request.GET.get('id'), -1)
         if sort_vector_id == -1:
             raise NotAcceptable("Sort vector `id` parameter required")
         an = get_object_or_404(models.Analysis, pk=int(pk))
@@ -130,10 +128,7 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
 
     @detail_route(methods=['get'])
     def sort_vector(self, request, pk=None):
-        try:
-            sort_vector_id = int(self.request.GET.get('id', -1))
-        except:
-            sort_vector_id = -1
+        sort_vector_id = tryParseInt(self.request.GET.get('id'), -1)
         if sort_vector_id == -1:
             raise NotAcceptable("Sort vector `id` parameter required")
         an = get_object_or_404(models.Analysis, pk=int(pk))  # todo: check permissions
