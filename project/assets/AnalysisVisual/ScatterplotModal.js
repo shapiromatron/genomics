@@ -97,8 +97,7 @@ class ScatterplotModal {
             x = this.pltXScale || d3.scale.log().range([0, width]),
             y = this.pltYScale || d3.scale.log().range([height, 0]),
             xAxis = this.pltXAxis || null,
-            yAxis = this.pltYAxis || null,
-            dots = this.pltDots || null;
+            yAxis = this.pltYAxis || null;
 
         // build scatterplot
         x.domain([1, d3.max(data, (d) => d.x)])
@@ -174,22 +173,35 @@ class ScatterplotModal {
 
         } else {
             //update
+
+            let axisDuration = 800;
+
             svg.selectAll('.y')
-               .transition().duration(1000)
+               .transition()
+               .duration(axisDuration)
                .call(yAxis.scale(y));
 
             svg.selectAll('.x')
-               .transition().duration(1000)
+               .transition()
+               .duration(axisDuration)
                .call(xAxis.scale(x));
+
+            let dotDuration = 300,
+                dotsPerBlock = 75,
+                dotWaitInMs = 15;
 
             svg.selectAll('circle')
                .data(data)
                .transition()
-               .delay(2000)
-               .duration(1000)
-               .delay((d,i) => i / data.length * 500)
-               .attr('cx', (d) => x(d.x))
-               .attr('cy', (d) => y(d.y));
+               .delay((d, i)=>axisDuration * 1.1 + Math.floor(i/dotsPerBlock) * dotWaitInMs)
+               .each(function(d, i){
+                   d3.select(this)
+                    .transition()
+                    .duration(dotDuration)
+                    .attr('cx', (d) => x(d.x))
+                    .attr('cy', (d) => y(d.y));
+               });
+
         }
 
         _.extend(this, {
@@ -198,7 +210,6 @@ class ScatterplotModal {
             pltYScale: y,
             pltXAxis: xAxis,
             pltYAxis: yAxis,
-            pltDots: dots,
         });
     }
 
