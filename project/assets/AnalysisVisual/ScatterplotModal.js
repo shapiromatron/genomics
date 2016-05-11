@@ -15,8 +15,12 @@ class ScatterplotModal {
         this.modal_body = modal_body;
     }
 
-    url() {
-        return `${window.scatterplotURL}?idx=${this.idx}&idy=${this.idy}`;
+    binNamesUrl() {
+        return window.binNamesUrl;
+    }
+
+    datasetUrl(column) {
+        return `${window.scatterplotURL}?idx=${this.idx}&idy=${this.idy}&column=${column}`;
     }
 
     renderHeader(){
@@ -29,24 +33,76 @@ class ScatterplotModal {
         );
     }
 
-    renderLoading(data){
+    renderBody(data){
+
+        var Body = function(){
+            return (
+                <div>
+                    <div id="inputForm" className="form-group">
+                        <label>Select bin</label>
+                        <select className="form-control" id="selector">
+                        </select>
+                        <button id="submitter" className='btn btn-primary'>Update</button>
+                    </div>
+                    <div id="visual">
+                        <Loading />
+                    </div>
+                </div>
+            );
+        };
+
         ReactDOM.render(
-            <Loading />,
+            <Body />,
             this.modal_body.get(0)
         );
     }
-    renderContent(data) {
 
-        var $el = this.modal_body,
-            margin = {top: 20, right: 10, bottom: 50, left: 70},
-            width = $el.width() - margin.left - margin.right,
-            height = $el.height() - margin.top - margin.bottom,
-            x = d3.scale.sqrt().range([0, width]),
-            y = d3.scale.sqrt().range([height, 0]),
+    renderBinSelector(){
+        this.selector = this.modal_body.find('#selector');
+        d3.json(this.binNamesUrl(), (err, data) => {
+            this.selector
+                .empty()
+                .html(data.map((d)=>`<option value="${d}">${d}</option>`))
+                .val(data[0]);
+        });
+        this.modal_body
+            .find('#submitter')
+            .on('click', this.getScatterplotData.bind(this));
+    }
+
+    getScatterplotData(){
+        let column = this.selector.val(),
+            $visual = this.modal_body.find('#visual');
+
+        $visual.empty();
+        ReactDOM.render(
+            <Loading />,
+            $visual.get(0)
+        );
+
+
+        d3.csv(
+            this.datasetUrl(column),
+            this.dataConversion,
+            (err, data) => this.renderScatterplot(data)
+        );
+    }
+
+    renderScatterplot(data) {
+
+        var $parent = this.modal_body,
+            $form = this.modal_body.find('#inputForm'),
+            $visual = this.modal_body.find('#visual');
+
+        var margin = {top: 20, right: 10, bottom: 50, left: 70},
+            width = $visual.width() - margin.left - margin.right,
+            height = $parent.height() - $form.height() - margin.top - margin.bottom,
+            x = d3.scale.log().range([0, width]),
+            y = d3.scale.log().range([height, 0]),
             xAxis, yAxis, svg;
 
         // clear body and set resize handler
-        $el.empty();
+        $visual.empty();
 
         // build scatterplot
         xAxis = d3.svg.axis()
@@ -57,7 +113,7 @@ class ScatterplotModal {
             .scale(y)
             .orient('left');
 
-        svg = d3.select($el[0]).append('svg')
+        svg = d3.select($visual[0]).append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
             .append('g')
@@ -121,13 +177,9 @@ class ScatterplotModal {
 
     render() {
         this.renderHeader();
-        this.renderLoading();
-
-        d3.csv(
-            this.url(),
-            this.dataConversion,
-            (err, data) => this.renderContent(data)
-        );
+        this.renderBody();
+        this.renderBinSelector();
+        this.getScatterplotData();
     }
 
 }

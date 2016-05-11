@@ -146,6 +146,12 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
         an = get_object_or_404(models.Analysis, pk=int(pk))
         return Response(an.get_scatterplot_data(idx, idy, column))
 
+    @detail_route(methods=['get'])
+    def bin_names(self, request, pk=None):
+        # TODO: check permissions
+        an = get_object_or_404(models.Analysis, pk=int(pk))
+        return Response(an.get_bin_names())
+
     def get_serializer_class(self):
         return serializers.AnalysisSerializer
 
