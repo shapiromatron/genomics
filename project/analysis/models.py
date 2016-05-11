@@ -7,6 +7,7 @@ import io
 import requests
 import zipfile
 import itertools
+import pandas as pd
 
 from django.db import models
 from django.conf import settings
@@ -805,6 +806,26 @@ class Analysis(GenomicBinSettings):
 
         return so
 
+    def get_scatterplot_data(self, idx, idy):
+        x = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=idx)\
+            .select_related('count_matrix')\
+            .first()
+        y = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=idy)\
+            .select_related('count_matrix')\
+            .first()
+
+        xDf = x.count_matrix.df
+        xDf.rename(columns={'0:99': 'x'}, inplace=True)
+        xDf = xDf[['x']]
+
+        yDf = y.count_matrix.df
+        yDf.rename(columns={'0:99': 'y'}, inplace=True)
+        yDf = yDf[['y']]
+
+        return xDf.join(yDf).to_csv()
+
     def create_zip(self):
         """
         Create a zip file of output, specifically designed to recreate analysis,
@@ -875,6 +896,20 @@ class FeatureListCountMatrix(GenomicBinSettings):
 
     class Meta:
         verbose_name_plural = 'Feature list count matrices'
+
+    @property
+    def df(self):
+        # get formatted pandas data frame
+        key = 'flcm-%s' % self.id
+        df = cache.get(key)
+        if df is None:
+            df = pd.read_csv(self.matrix.path, sep='\t')
+            df.rename(columns={'Unnamed: 0': 'label'}, inplace=True)
+            df.set_index('label', inplace=True, drop=True)
+            cache.set(key, df, 300)
+            size = round(df.memory_usage(index=True).sum()/(1024*1024), 2)
+            logger.info('Setting cache: {} ({}mb)'.format(key, size))
+        return df
 
     @classmethod
     def execute(cls, analysis, dataset):

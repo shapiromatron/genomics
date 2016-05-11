@@ -135,6 +135,16 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
         an = get_object_or_404(models.Analysis, pk=int(pk))
         return Response(an.get_sort_vector(sort_vector_id))
 
+    @detail_route(methods=['get'], renderer_classes=(PlainTextRenderer,))
+    def scatterplot(self, request, pk=None):
+        # TODO: check permissions
+        idx = tryParseInt(self.request.GET.get('idx'))
+        idy = tryParseInt(self.request.GET.get('idy'))
+        if idx is None or idy is None:
+            raise NotAcceptable("Parameters `idx` and `idy` are required")
+        an = get_object_or_404(models.Analysis, pk=int(pk))
+        return Response(an.get_scatterplot_data(idx, idy))
+
     def get_serializer_class(self):
         return serializers.AnalysisSerializer
 
