@@ -51,7 +51,6 @@ def reset_analysis_startup(analysis_id):
     analysis.start_time = timezone.now()
     analysis.end_time = None
     analysis.save()
-    analysis.init_execution_status()
 
 
 @task()
@@ -66,7 +65,6 @@ def execute_count_matrix(analysis_id, ads_id, isEncode, dataset_id):
     FeatureListCountMatrix = apps.get_model('analysis', 'FeatureListCountMatrix')
     ads.count_matrix = FeatureListCountMatrix.execute(analysis, dataset)
     ads.save()
-    analysis.increment_execution_status()
 
 
 @task()
@@ -74,10 +72,8 @@ def execute_matrix_combination(analysis_id):
     # save results from matrix combination
     analysis = apps.get_model('analysis', 'Analysis').objects.get(id=analysis_id)
     analysis.output = analysis.execute_mat2mat()
-    analysis.increment_execution_status()
     analysis.end_time = timezone.now()
     analysis.save()
-    analysis.reset_execution_status()
 
 
 @task()

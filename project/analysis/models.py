@@ -861,31 +861,6 @@ class Analysis(GenomicBinSettings):
 
         return f
 
-    @property
-    def cache_key_total(self):
-        return 'analysis-{}-total'.format(self.id)
-
-    @property
-    def cache_key_complete(self):
-        return 'analysis-{}-complete'.format(self.id)
-
-    def init_execution_status(self):
-        cache.set(self.cache_key_complete, 0)
-        cache.set(self.cache_key_total, self.datasets.count() + 1)
-
-    def increment_execution_status(self):
-        current = cache.get(self.cache_key_complete)
-        cache.set(self.cache_key_complete, current + 1)
-
-    def get_execution_status(self):
-        complete = cache.get(self.cache_key_complete)
-        ofTotal = float(cache.get(self.cache_key_total))
-        return complete / ofTotal
-
-    def reset_execution_status(self):
-        cache.delete(self.cache_key_complete)
-        cache.delete(self.cache_key_total)
-
 
 class FeatureListCountMatrix(GenomicBinSettings):
     UPLOAD_TO = 'fcm/'

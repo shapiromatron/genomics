@@ -29,21 +29,9 @@
 {% block extra_js %}
 <script type="text/javascript">
 $(document).ready(function(){
-    var redirectToVisual = function(){
-            window.location.href = '{{object.get_visuals_url}}';
-        },
-        pingStatus = function(){
-            $.get('.', updateStatus);
-        }, updateStatus = function(d){
-            var percent = parseInt(d.fractionComplete * 100);
-
-            if (percent >= 100) window.setTimeout(redirectToVisual, 1000);
-
-            var style = 'width: ' + percent + '%';
-            $('#bar').attr('style', style);
-            $('#status_text').text(percent + "% complete...");
-        };
-    window.setInterval(pingStatus, 1000);
+    window.setTimeout(function(){
+        window.location.href = '{{object.get_visuals_url}}';
+    }, 1000);
 });
 </script>
 {% endblock extra_js %}
