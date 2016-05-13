@@ -724,11 +724,31 @@ class Analysis(GenomicBinSettings):
         return list(self.analysisdatasets_set.values_list('count_matrix', flat=True))
 
     @property
+    def is_ready_to_run(self):
+        return self.validated and not self.is_running and not self.is_complete
+
+    @property
+    def is_running(self):
+        return self.start_time and not self.end_time
+
+    @property
     def is_complete(self):
-        return True if self.start_time and self.end_time else False
+        return self.start_time and self.end_time
+
+    @property
+    def execute_task_id(self):
+        return 'analysis-execute-{}'.format(self.id)
 
     def execute(self):
-        tasks.execute_analysis.delay(self.id)
+        # intentionally don't fire save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                start_time=now(),
+                end_time=None,
+            )
+        tasks.execute_analysis.apply_async(
+            args=[self.id], task_id=self.execute_task_id)
 
     def create_matrix_list(self):
         return [

@@ -186,7 +186,10 @@ class AnalysisExecute(OwnerOrStaff, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.execute()
+
+        if self.object.is_ready_to_run:
+            self.object.execute()
+
         return super().get(request, *args, **kwargs)
 
 
