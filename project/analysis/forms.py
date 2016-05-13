@@ -1,3 +1,4 @@
+import logging
 import itertools
 import json
 from django import forms
@@ -5,6 +6,8 @@ from django import forms
 from utils.forms import BaseFormHelper
 
 from . import models
+
+logger = logging.getLogger(__name__)
 
 
 class BaseFormMixin(object):
@@ -255,10 +258,16 @@ class AnalysisForm(BaseFormMixin, forms.ModelForm):
         if commit:
             dsIds = self.fields['datasets_json']\
                 .get_dataset_ids(self.cleaned_data['datasets_json'])
-            self.instance.reset_if_needed(dsIds)
+            self.execute_reset_required = self.instance.is_reset_required(dsIds)
+            if self.execute_reset_required:
+                self.instance.reset_analysis_object()
         return super().save(commit=commit)
 
     def _save_m2m(self):
+        if not self.execute_reset_required:
+            return
+
+        logger.info("Resetting analysis m2m relations")
         ds = self.fields['datasets_json']\
                 .get_datasets(self.cleaned_data['datasets_json'])
 

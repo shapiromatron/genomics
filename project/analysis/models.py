@@ -641,7 +641,7 @@ class Analysis(GenomicBinSettings):
     def get_zip_url(self):
         return reverse('analysis:analysis_zip', args=[self.pk, ])
 
-    def reset_if_needed(self, dsIds):
+    def is_reset_required(self, dsIds):
         """
         If certain settings have changed, reset validation and output results.
         This method should be called from a changed form-instance, before
@@ -671,16 +671,16 @@ class Analysis(GenomicBinSettings):
             formIds = set(dsIds)
             if dbIds != formIds:
                 reset = True
+        logger.info('Analysis reset required: %s' % reset)
+        return reset
 
-        if reset:
-            logger.info('Analysis reset required %s' % id_)
-            formObj.validated = False
-            formObj.validation_notes = ''
-            formObj.output = None
-            formObj.start_time = None
-            formObj.end_time = None
-        else:
-            logger.info('Analysis reset not required %s' % id_)
+    def reset_analysis_object(self):
+        formObj = self
+        formObj.validated = False
+        formObj.validation_notes = ''
+        formObj.output = None
+        formObj.start_time = None
+        formObj.end_time = None
 
     @property
     def user_datasets(self):
