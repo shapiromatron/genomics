@@ -12,10 +12,13 @@ import pandas as pd
 from django.db import models
 from django.conf import settings
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.urlresolvers import reverse
+from django.contrib.sites.models import Site
 from django.contrib.postgres.fields import JSONField
 from django.utils.timezone import now
+from django.template.loader import render_to_string
 
 from utils.models import ReadOnlyFileSystemStorage, get_random_filename
 
@@ -860,6 +863,21 @@ class Analysis(GenomicBinSettings):
                 z.write(ds.count_matrix.matrix.path, 'count_matrix/{}.txt'.format(ds.display_name))
 
         return f
+
+    def send_completion_email(self):
+        context = {
+            'object': self,
+            'domain': Site.objects.get_current().domain
+        }
+        send_mail(
+            subject='Genomics: analysis complete',
+            message=render_to_string(
+                'analysis/analysis_complete_email.txt', context),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[self.owner.email],
+            html_message=render_to_string(
+                'analysis/analysis_complete_email.html', context)
+        )
 
 
 class FeatureListCountMatrix(GenomicBinSettings):

@@ -74,6 +74,7 @@ def execute_matrix_combination(analysis_id):
     analysis.output = analysis.execute_mat2mat()
     analysis.end_time = timezone.now()
     analysis.save()
+    analysis.send_completion_email()
 
 
 @task()

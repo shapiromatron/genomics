@@ -1,0 +1,17 @@
+Hi {{object.owner}},
+
+Your analysis "{{object}}" on http://{{domain}} is now complete!
+
+To view your analysis, click here:
+
+- Detail: http://{{domain}}{{object.get_absolute_url}}
+- Visual: http://{{domain}}{{object.get_visuals_url}}
+- Zip download: http://{{domain}}{{object.get_zip_url}}
+
+Please remember that unless you choose to make your Analysis public, you must
+be logged-in to view this content. You can make your analysis public in the
+future if you wish by updating the analysis.
+
+We hope you find something :)
+
+The http://{{domain}} team.
