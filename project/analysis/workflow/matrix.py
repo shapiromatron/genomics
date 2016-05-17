@@ -249,6 +249,32 @@ class BedMatrix(object):
         else:
             self.make_unstranded_matrix()
 
+    def readIntersectionFile(self, input_file):
+        row_dict = dict()
+
+        for feature in self.feature_order:
+            row_dict[feature] = []
+            for i in range(self.bin_number):
+                row_dict[feature].append('0')
+
+        for line in input_file:
+            tab_name, size, covered, bed_sum, bed_mean_zero, bed_mean = \
+                line.strip().split()
+            bed_sum = self.checkInt(bed_sum)
+            feature_name = self.readTabName(tab_name)
+            feature_index = self.readFeatureIndex(tab_name)
+            row_dict[feature_name][feature_index] = str(abs(bed_sum))
+
+        return row_dict
+
+    def parseIntersectionAsLines(self, intersection_dict):
+        lines = dict()
+        for feature in intersection_dict:
+            lines[feature] = ''
+            for i in range(len(intersection_dict[feature])):
+                lines[feature] += '\t' + intersection_dict[feature][i]
+        return lines
+
     def make_unstranded_matrix(self):
         # Create output matrix for unstranded bigwig
         with open(self._unstranded_filename, 'r') as f, \
@@ -264,28 +290,8 @@ class BedMatrix(object):
             OUTPUT.write("\n")
 
             # Make features, add to dictionary
-            row_dict = dict()
-
-            for feature in self.feature_order:
-                row_dict[feature] = []
-                for i in range(self.bin_number):
-                    row_dict[feature].append('0')
-
-            for line in f:
-                tab_name, size, covered, bed_sum, bed_mean_zero, bed_mean = \
-                    line.strip().split()
-                bed_sum = self.checkInt(bed_sum)
-                feature_name = self.readTabName(tab_name)
-                feature_index = self.readFeatureIndex(tab_name)
-                # if feature_name not in row_dict:
-                #     row_dict[feature_name] = ""
-                row_dict[feature_name][feature_index] = str(bed_sum)
-
-            lines = dict()
-            for feature in row_dict:
-                lines[feature] = ''
-                for i in range(len(row_dict[feature])):
-                    lines[feature] += '\t' + row_dict[feature][i]
+            row_dict = self.readIntersectionFile(f)
+            lines = self.parseIntersectionAsLines(row_dict)
 
             # Write to output based on order in feature list
             for feature_name in self.feature_order:
@@ -320,62 +326,39 @@ class BedMatrix(object):
             if OPPOSITE:
                 OPPOSITE.write("\n")
 
-            same_dict = dict()
-            opposite_dict = dict()
-            for plus_line, minus_line in zip(plus_file, minus_file):
+            plus_row_dict = self.readIntersectionFile(plus_file)
+            minus_row_dict = self.readIntersectionFile(minus_file)
 
-                plus_tab_name, size, plus_covered, \
-                    plus_sum, plus_mean_zero, plus_mean = \
-                    plus_line.strip().split()
+            plus_lines = self.parseIntersectionAsLines(plus_row_dict)
+            minus_lines = self.parseIntersectionAsLines(minus_row_dict)
 
-                minus_tab_name, size, minus_covered, \
-                    minus_sum, minus_mean_zero, minus_mean = \
-                    minus_line.strip().split()
+            if not self.stranded_bed:
+                combined_lines = dict()
+                for feature in plus_row_dict:
+                    combined_lines[feature] = ''
+                    for i in range(len(plus_row_dict[feature])):
+                        combined_lines[feature] += '\t' + str(self.checkInt(
+                                float(plus_row_dict[feature][i]) +
+                                float(minus_row_dict[feature][i])))
 
-                plus_feature_name = self.readTabName(plus_tab_name)
-                minus_feature_name = self.readTabName(minus_tab_name)
-                plus_sum = str(self.checkInt(plus_sum))
-                plus_mean_zero = str(self.checkInt(plus_mean_zero))
-                plus_mean = str(self.checkInt(plus_mean))
-
-                # Minus values are commonly reported as negative values
-                # Change to absolute value
-                minus_sum = str(abs(self.checkInt(minus_sum)))
-                minus_mean_zero = str(abs(self.checkInt(minus_mean_zero)))
-                minus_mean = str(abs(self.checkInt(minus_mean)))
-
-                # Double check tab names
-                if plus_feature_name != minus_feature_name:
-                    raise ValueError("Stranded feature names in intersection files do not agree by line")
-
-                if plus_feature_name not in same_dict:
-                    same_dict[plus_feature_name] = ""
+            for feature in self.feature_order:
+                OUTPUT.write(feature)
                 if OPPOSITE:
-                    if plus_feature_name not in opposite_dict:
-                        opposite_dict[plus_feature_name] = ""
-
-                # Write values, observing strandedness if specified
+                    OPPOSITE.write(feature)
                 if self.stranded_bed:
-                    if self.feature_info[plus_feature_name]["strand"] == "+":
-                        # same_value = plus_sum
-                        # opposite_value = minus_sum
-                        same_dict[plus_feature_name] += "\t" + plus_sum
+                    if self.feature_info[feature]["strand"] == "+":
+                        OUTPUT.write(plus_lines[feature] + '\n')
                         if OPPOSITE:
-                            opposite_dict[plus_feature_name] += "\t" + minus_sum
-                    elif self.feature_info[plus_feature_name]["strand"] == "-":
-                        # same_value = minus_sum
-                        # opposite_value = plus_sum
-                        same_dict[plus_feature_name] += "\t" + minus_sum
+                            OPPOSITE.write(minus_lines[feature] + '\n')
+                    elif self.feature_info[feature]["strand"] == "-":
+                        OUTPUT.write(minus_lines[feature] + '\n')
                         if OPPOSITE:
-                            opposite_dict[plus_feature_name] += "\t" + plus_sum
+                            OPPOSITE.write(plus_lines[feature] + '\n')
                 else:
-                    same_dict[plus_feature_name] += "\t{}".format(
-                        self.checkInt(float(plus_sum)+float(minus_sum)))
+                    OUTPUT.write(combined_lines[feature] + '\n')
 
-            for feature_name in self.feature_order:
-                OUTPUT.write(feature_name + same_dict[feature_name] + "\n")
-                if OPPOSITE:
-                    OPPOSITE.write(feature_name + opposite_dict[feature_name] + "\n")
+        if OPPOSITE:
+            OPPOSITE.close()
 
 
 @click.command()
