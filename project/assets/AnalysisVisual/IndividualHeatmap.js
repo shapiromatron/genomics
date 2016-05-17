@@ -26,8 +26,18 @@ class IndividualHeatmap {
     }
 
     getSortVector(vector_id){
+        var self = this;
         $.get(this.sortVectorUrl(this.id, vector_id), function(d){
-            console.log(d);
+            $.get(self.url(self.id), function(data){
+                var display_data = d3.tsv.parseRows(data);
+                // self.drawHeatmapHeader(display_data);
+                self.drawHeatmap(display_data, d);
+                // self.drawMetaPlot(display_data);
+                // self.drawQuartiles(display_data);
+                // self.createResortOptions();
+                // console.log(display_data);
+                // console.log(d);
+            });
         });
     }
 
@@ -60,6 +70,10 @@ class IndividualHeatmap {
             })
             .appendTo(this.modal_body);
 
+        select_list.append($('<option>', {
+            text: 'Feature list order'
+        }));
+
         d3.select(select_list.get(0))
             .selectAll('option')
             .data(this.matrices)
@@ -84,8 +98,13 @@ class IndividualHeatmap {
             })
             .appendTo(this.modal_body)
             .click(function(){
-                var vector_id = select_list.val();
-                self.getSortVector(vector_id);
+                if (select_list.val() == 'Feature list order') {
+                    console.log(select_list.val());
+                } else {
+                    var vector_id = select_list.val();
+                    var sort_order = self.getSortVector(vector_id);
+                    console.log(sort_order);
+                }
             });
     }
 
@@ -417,7 +436,8 @@ class IndividualHeatmap {
             .style('text-anchor', 'middle');
     }
 
-    drawHeatmap(display_data) {
+    drawHeatmap(display_data, sort_order) {
+        console.log(sort_order);
         var modal_body = this.modal_body;
 
         modal_body.find('#heatmap_canvas').remove();
@@ -470,8 +490,10 @@ class IndividualHeatmap {
         context.scale(scale_x, scale_y);
 
         for (i = 0; i < display_data.length; i++) {
-            for (j = 0; j < display_data[i].length; j++) {
-                context.fillStyle=colorScale(display_data[i][j]);
+            var row_index = (sort_order) ? sort_order[i] : i;
+            console.log(row_index);
+            for (j = 0; j < display_data[row_index].length; j++) {
+                context.fillStyle=colorScale(display_data[row_index][j]);
                 context.fillRect(j,i,1,1);
             }
         }
@@ -483,7 +505,7 @@ class IndividualHeatmap {
         $.get(this.url(this.id), function(data){
             var display_data = d3.tsv.parseRows(data);
             self.drawHeatmapHeader(display_data);
-            self.drawHeatmap(display_data);
+            self.drawHeatmap(display_data, null);
             self.drawMetaPlot(display_data);
             self.drawQuartiles(display_data);
             self.createResortOptions();
