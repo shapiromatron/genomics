@@ -30,14 +30,18 @@ class IndividualHeatmap {
         $.get(this.sortVectorUrl(this.id, vector_id), function(d){
             $.get(self.url(self.id), function(data){
                 var display_data = d3.tsv.parseRows(data);
-                // self.drawHeatmapHeader(display_data);
                 self.drawHeatmap(display_data, d);
-                // self.drawMetaPlot(display_data);
-                // self.drawQuartiles(display_data);
-                // self.createResortOptions();
-                // console.log(display_data);
-                // console.log(d);
+                self.drawQuartiles(display_data, d);
             });
+        });
+    }
+
+    renderUnsorted() {
+        var self = this;
+        $.get(this.url(this.id), function(data){
+            var display_data = d3.tsv.parseRows(data);
+            self.drawHeatmap(display_data, null);
+            self.drawQuartiles(display_data, null);
         });
     }
 
@@ -99,16 +103,15 @@ class IndividualHeatmap {
             .appendTo(this.modal_body)
             .click(function(){
                 if (select_list.val() == 'Feature list order') {
-                    console.log(select_list.val());
+                    self.renderUnsorted();
                 } else {
                     var vector_id = select_list.val();
                     var sort_order = self.getSortVector(vector_id);
-                    console.log(sort_order);
                 }
             });
     }
 
-    drawQuartiles(display_data) {
+    drawQuartiles(display_data, sort_order) {
 
         this.modal_body.find('#quartile_plot').remove();
         var quartile_plot = $('<div id="quartile_plot"></div>')
@@ -189,8 +192,8 @@ class IndividualHeatmap {
             .attr('fill', 'black')
             .style('text-anchor', 'left');
 
-        var row_number = display_data.length-1,
-            window_values = [];
+        var row_number = display_data.length-1;
+        var window_values = [];
 
         for (var i = 1; i < display_data[0].length; i++) {
             var val_1 = parseInt(display_data[0][i].split(':')[0]),
@@ -209,9 +212,10 @@ class IndividualHeatmap {
 
         for (i = 1; i < display_data.length; i++) {
             var index = Math.floor((i-1) / (row_number/4));
+            var row_index = (sort_order) ? sort_order[i-1] : i;
             quartile_count[index]++;
-            for (var j = 1; j < display_data[i].length; j++) {
-                quartiles[index][j-1] = quartiles[index][j-1] + parseFloat(display_data[i][j]);
+            for (var j = 1; j < display_data[row_index].length; j++) {
+                quartiles[index][j-1] = quartiles[index][j-1] + parseFloat(display_data[row_index][j]);
             }
         }
 
@@ -361,7 +365,6 @@ class IndividualHeatmap {
 
     drawHeatmapHeader(display_data) {
         var modal_body = this.modal_body;
-        //var self = this;
 
         modal_body.find('#heatmap_header').remove();
 
@@ -437,7 +440,6 @@ class IndividualHeatmap {
     }
 
     drawHeatmap(display_data, sort_order) {
-        console.log(sort_order);
         var modal_body = this.modal_body;
 
         modal_body.find('#heatmap_canvas').remove();
@@ -491,7 +493,6 @@ class IndividualHeatmap {
 
         for (i = 0; i < display_data.length; i++) {
             var row_index = (sort_order) ? sort_order[i] : i;
-            console.log(row_index);
             for (j = 0; j < display_data[row_index].length; j++) {
                 context.fillStyle=colorScale(display_data[row_index][j]);
                 context.fillRect(j,i,1,1);
@@ -507,7 +508,7 @@ class IndividualHeatmap {
             self.drawHeatmapHeader(display_data);
             self.drawHeatmap(display_data, null);
             self.drawMetaPlot(display_data);
-            self.drawQuartiles(display_data);
+            self.drawQuartiles(display_data, null);
             self.createResortOptions();
         });
     }
