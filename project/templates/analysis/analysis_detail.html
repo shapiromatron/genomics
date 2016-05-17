@@ -15,6 +15,10 @@
 <h2>
     <span>{{object.name}}</span>
     <div class='dropdown pull-right'>
+        {% if object.is_complete %}
+            <a class='btn btn-primary' href="{{object.get_visuals_url}}" >View visualization</a>
+        {% endif %}
+
         <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
         Actions <span class="caret"></span>
         </button>
@@ -112,13 +116,10 @@
     </tbody>
 </table>
 
+{% if object.is_ready_to_run %}
 <div class="well well-sm">
-    {% if object.is_complete %}
-        <a class='btn btn-primary' href="{{object.get_visuals_url}}">Visualization</a>
-    {% else %}
-        <a class='btn btn-primary' href="{{object.get_execute_url}}">Execute</a>
-    {% endif %}
+    <a class='btn btn-primary' href="{{object.get_execute_url}}">Execute</a>
 </div>
-
+{% endif %}
 
 {% endblock %}

@@ -12,10 +12,13 @@ import pandas as pd
 from django.db import models
 from django.conf import settings
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.urlresolvers import reverse
+from django.contrib.sites.models import Site
 from django.contrib.postgres.fields import JSONField
 from django.utils.timezone import now
+from django.template.loader import render_to_string
 
 from utils.models import ReadOnlyFileSystemStorage, get_random_filename
 
@@ -638,7 +641,7 @@ class Analysis(GenomicBinSettings):
     def get_zip_url(self):
         return reverse('analysis:analysis_zip', args=[self.pk, ])
 
-    def reset_if_needed(self, dsIds):
+    def is_reset_required(self, dsIds):
         """
         If certain settings have changed, reset validation and output results.
         This method should be called from a changed form-instance, before
@@ -668,16 +671,16 @@ class Analysis(GenomicBinSettings):
             formIds = set(dsIds)
             if dbIds != formIds:
                 reset = True
+        logger.info('Analysis reset required: %s' % reset)
+        return reset
 
-        if reset:
-            logger.info('Analysis reset required %s' % id_)
-            formObj.validated = False
-            formObj.validation_notes = ''
-            formObj.output = None
-            formObj.start_time = None
-            formObj.end_time = None
-        else:
-            logger.info('Analysis reset not required %s' % id_)
+    def reset_analysis_object(self):
+        formObj = self
+        formObj.validated = False
+        formObj.validation_notes = ''
+        formObj.output = None
+        formObj.start_time = None
+        formObj.end_time = None
 
     @property
     def user_datasets(self):
@@ -721,11 +724,31 @@ class Analysis(GenomicBinSettings):
         return list(self.analysisdatasets_set.values_list('count_matrix', flat=True))
 
     @property
+    def is_ready_to_run(self):
+        return self.validated and not self.is_running and not self.is_complete
+
+    @property
+    def is_running(self):
+        return self.start_time and not self.end_time
+
+    @property
     def is_complete(self):
-        return True if self.start_time and self.end_time else False
+        return self.start_time and self.end_time
+
+    @property
+    def execute_task_id(self):
+        return 'analysis-execute-{}'.format(self.id)
 
     def execute(self):
-        tasks.execute_analysis.delay(self.id)
+        # intentionally don't fire save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                start_time=now(),
+                end_time=None,
+            )
+        tasks.execute_analysis.apply_async(
+            args=[self.id], task_id=self.execute_task_id)
 
     def create_matrix_list(self):
         return [
@@ -861,30 +884,20 @@ class Analysis(GenomicBinSettings):
 
         return f
 
-    @property
-    def cache_key_total(self):
-        return 'analysis-{}-total'.format(self.id)
-
-    @property
-    def cache_key_complete(self):
-        return 'analysis-{}-complete'.format(self.id)
-
-    def init_execution_status(self):
-        cache.set(self.cache_key_complete, 0)
-        cache.set(self.cache_key_total, self.datasets.count() + 1)
-
-    def increment_execution_status(self):
-        current = cache.get(self.cache_key_complete)
-        cache.set(self.cache_key_complete, current + 1)
-
-    def get_execution_status(self):
-        complete = cache.get(self.cache_key_complete)
-        ofTotal = float(cache.get(self.cache_key_total))
-        return complete / ofTotal
-
-    def reset_execution_status(self):
-        cache.delete(self.cache_key_complete)
-        cache.delete(self.cache_key_total)
+    def send_completion_email(self):
+        context = {
+            'object': self,
+            'domain': Site.objects.get_current().domain
+        }
+        send_mail(
+            subject='Genomics: analysis complete',
+            message=render_to_string(
+                'analysis/analysis_complete_email.txt', context),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[self.owner.email],
+            html_message=render_to_string(
+                'analysis/analysis_complete_email.html', context)
+        )
 
 
 class FeatureListCountMatrix(GenomicBinSettings):

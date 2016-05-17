@@ -187,11 +187,9 @@ class AnalysisExecute(OwnerOrStaff, DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        if request.is_ajax():
-            complete = self.object.get_execution_status()
-            return JsonResponse({'fractionComplete': complete})
+        if self.object.is_ready_to_run:
+            self.object.execute()
 
-        self.object.execute()
         return super().get(request, *args, **kwargs)
 
 
