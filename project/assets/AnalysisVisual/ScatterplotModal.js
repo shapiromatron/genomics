@@ -4,8 +4,6 @@ import d3 from 'd3';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Loading from '../AnalysisForm/components/Loading';
-
 
 class ScatterplotModal {
 
@@ -178,7 +176,7 @@ class ScatterplotModal {
         } else {
             //update
 
-            let axisDuration = 800;
+            let axisDuration = 500;
 
             svg.selectAll('.y')
                .transition()
@@ -193,7 +191,7 @@ class ScatterplotModal {
             svg.selectAll('.gdot')
                .transition()
                .delay(axisDuration * 0.8)
-               .duration(500)
+               .duration(300)
                .style('opacity', 0)
                .each('end', function(){
                     svg.selectAll('circle')
@@ -202,7 +200,7 @@ class ScatterplotModal {
                         .attr('cy', (d) => y(d.y));
                })
                .transition()
-               .duration(2000)
+               .duration(800)
                .style('opacity', 1);
 
         }
