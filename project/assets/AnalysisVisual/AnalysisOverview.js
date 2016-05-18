@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import $ from 'jquery';
 import d3 from 'd3';
 
@@ -15,9 +16,12 @@ class AnalysisOverview{
         this.matrix_names = data['matrix_names'];
         this.cluster_medoids = data['cluster_medoids'];
         this.matrix_ids = data['matrix_ids'];
+        this.matrix = _.object(data['matrix_ids'], data['matrix_names']);
     }
 
     drawHeatmap() {
+        var self = this;
+
         // remove existing heatmap
         this.el.find('#heatmap').remove();
 
@@ -116,7 +120,11 @@ class AnalysisOverview{
                         modalBody.html('');
                     })
                     .one('shown.bs.modal', function(){
-                        var modal = new ScatterplotModal(idx, idy, modalTitle, modalBody);
+                        var modal = new ScatterplotModal(
+                            idx, idy,
+                            self.matrix[idx], self.matrix[idy],
+                            modalTitle, modalBody
+                        );
                         modal.render();
                     }).modal('show');
             });

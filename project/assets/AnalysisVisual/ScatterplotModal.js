@@ -7,9 +7,11 @@ import ReactDOM from 'react-dom';
 
 class ScatterplotModal {
 
-    constructor (idx, idy, modal_title, modal_body) {
+    constructor (idx, idy, namex, namey, modal_title, modal_body) {
         this.idx = idx;
         this.idy = idy;
+        this.namex = namex;
+        this.namey = namey;
         this.modal_title = modal_title;
         this.modal_body = modal_body;
     }
@@ -134,7 +136,7 @@ class ScatterplotModal {
                 .attr('x', width)
                 .attr('y', -6)
                 .style('text-anchor', 'end')
-                .text(this.idx);
+                .text(this.namex);
 
             svg.append('g')
                 .attr('class', 'y axis')
@@ -145,7 +147,7 @@ class ScatterplotModal {
                 .attr('y', 6)
                 .attr('dy', '.71em')
                 .style('text-anchor', 'end')
-                .text(this.idy);
+                .text(this.namey);
 
             svg.append('g')
                 .attr('class', 'gdot');
