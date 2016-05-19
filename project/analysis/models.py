@@ -419,7 +419,6 @@ class FeatureList(Dataset):
     stranded = models.BooleanField(
         default=True)
     dataset = models.FileField(
-        blank=True,
         max_length=256)
 
     @classmethod
