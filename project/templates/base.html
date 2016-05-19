@@ -3,7 +3,6 @@
 <head>
     <meta charset="utf-8">
     <title>{% block title %}Genomics{% endblock %}</title>
-    <link rel="icon" type="image/png" href="#">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{% block meta-description %}{% endblock %}">
     <meta name="author" content="{% block meta-author %}{% endblock %}">
@@ -14,11 +13,15 @@
               href='//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css'>
         <link rel="stylesheet" type="text/css"
               href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css"
+              href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.2/toastr.css">
     {% else %}
         <link rel='stylesheet' type='text/css'
               href='{{STATIC_URL}}lib/css/bootstrap.min.css'>
         <link rel="stylesheet" type="text/css"
               href="{{STATIC_URL}}lib/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css"
+              href="{{STATIC_URL}}lib/css/toastr.css">
     {% endif %}
     <link rel="stylesheet" type="text/css" media="all" href="{{STATIC_URL}}css/site.css">
     {% block extra_css %}{% endblock extra_css %}
@@ -33,18 +36,6 @@
 
         {% block content-outer %}
         <div id="content" class="container-fluid">
-            <div class="row">
-                {% block messages-outer %}
-                <div id="messages" class="span12">
-                    {% block messages %}
-                    {% for msg in messages %}
-                        {% include "includes/message.html" with msg=msg %}
-                    {% endfor %}
-                    {% endblock messages %}
-                </div>
-                {% endblock messages-outer %}
-            </div>
-
             {% block content %}
                 <div id="mainContent" class="container">
                     {% block crumbs %}{% endblock crumbs %}
@@ -66,15 +57,20 @@
                 src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
             <script charset="utf-8"
                 src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+            <script charset="utf-8"
+                src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.2/toastr.min.js"></script>
         {% else %}
             <script charset="utf-8"
                 src="{{ STATIC_URL}}lib/js/jquery.min.js"></script>
             <script charset="utf-8"
                 src="{{ STATIC_URL}}lib/js/bootstrap.min.js"></script>
+            <script charset="utf-8"
+                src="{{ STATIC_URL}}lib/js/toastr.min.js"></script>
         {% endif %}
         <script charset="utf-8" src="{{STATIC_URL}}js/site.js"></script>
     {% endblock js %}
 
     {% block extra_js %}{% endblock extra_js %}
+    {% include "includes/messages.js" %}
 </body>
 </html>

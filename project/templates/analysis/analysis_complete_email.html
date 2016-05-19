@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+
+<p>
+Hi {{object.owner}},
+<br><br>
+Your analysis "{{object}}" on <a href="http://{{domain}}">http://{{domain}}</a> is now complete! To view your analysis, click here:
+</p>
+
+<ul>
+    <li><a href="http://{{domain}}{{object.get_absolute_url}}">Analysis details</a></li>
+    <li><a href="http://{{domain}}{{object.get_visuals_url}}">Visualizations</a></li>
+    <li><a href="http://{{domain}}{{object.get_zip_url}}">Zip download</a></li>
+</ul>
+
+<p>
+Please remember that unless you choose   to make your Analysis public, you must
+be logged-in to view this content. You can make your analysis public in the
+future if you wish by updating the analysis.
+<br><br>
+We hope you find something :)
+<br><br>
+The <a href="http://{{domain}}">http://{{domain}}</a> team.
+</p>
+
+</body>
+</html>

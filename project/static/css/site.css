@@ -76,6 +76,16 @@ body {
 }
 
 
+/* toastr notification overrides */
+.toast-top-right {
+  top: 65px;
+  right: 12px;
+}
+#toast-container > div {
+  width: 400px;
+}
+
+
 /* add exit link for any external links */
 a[href^="http"], a[href^="https"] {
     background-image: url("/static/img/exit.gif");

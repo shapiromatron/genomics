@@ -1,5 +1,8 @@
+import _ from 'underscore';
 import $ from 'jquery';
 import d3 from 'd3';
+
+import ScatterplotModal from './ScatterplotModal';
 
 
 class AnalysisOverview{
@@ -13,6 +16,7 @@ class AnalysisOverview{
         this.matrix_names = data['matrix_names'];
         this.cluster_medoids = data['cluster_medoids'];
         this.matrix_ids = data['matrix_ids'];
+        this.matrix = _.object(data['matrix_ids'], data['matrix_names']);
     }
 
     drawHeatmap() {
@@ -29,7 +33,6 @@ class AnalysisOverview{
                 'top': '20%',
             }).appendTo(this.el);
 
-        // Draw SVGs
         var height = heatmap.height(),
             width = heatmap.width(),
             col_number = this.cluster_display[0].length,
@@ -38,67 +41,87 @@ class AnalysisOverview{
             cell_width = width/col_number,
             cluster_members = this.cluster_members,
             cluster_medoids = this.cluster_medoids,
-            matrix_names = this.matrix_names,
-            matrix_ids = this.matrix_ids;
+            matrix = this.matrix,
+            getIndex = function(idx){
+                return (cluster_members[idx].length === 1) ?
+                    cluster_members[idx][0] :
+                    `(${cluster_members[idx].length}) ${cluster_medoids[idx]}`;
+            },
+            showTooltip = function (d, i, j) {
+                d3.select(this)
+                    .style('stroke', 'black')
+                    .style('stroke-width', '1');
 
-        var colorScale = d3.scale.linear()
-            .domain([-1, 0, 1])
-            .range(['blue', 'white', 'red']);
+                var idx = getIndex(i),
+                    idy = getIndex(j);
 
-        var svg = d3.select(heatmap.get(0))
+                $(this).tooltip({
+                    container: 'body',
+                    title: `${matrix[idx]}<br/>${matrix[idy]}<br/>${d.toFixed(2)}`,
+                    html: true,
+                    animation: false,
+                }).tooltip('show');
+
+            },
+            hideTooltip = function () {
+                $(this)
+                    .tooltip('destroy');
+                d3.select(this)
+                    .style('stroke', 'none');
+            },
+            showScatterplot = function(d, i, j){
+
+                var idx = getIndex(i),
+                    idy = getIndex(j),
+                    modalTitle = $('#ind_heatmap_modal_title'),
+                    modalBody = $('#ind_heatmap_modal_body');
+
+                $('#flcModal')
+                    .one('show.bs.modal', function(){
+                        modalTitle.html('');
+                        modalBody.html('');
+                    })
+                    .one('shown.bs.modal', function(){
+                        var modal = new ScatterplotModal(
+                            idx, idy,
+                            matrix[idx], matrix[idy],
+                            modalTitle, modalBody
+                        );
+                        modal.render();
+                    }).modal('show');
+            },
+            colorScale = d3.scale.linear()
+                .domain([-1, 0, 1])
+                .range(['blue', 'white', 'red']);
+
+        d3.select(heatmap.get(0))
             .append('svg')
             .attr('height', height)
-            .attr('width', width);
-
-        svg.append('g')
+            .attr('width', width)
+            .append('g')
             .selectAll('g')
             .data(this.cluster_display)
             .enter()
             .append('g')
             .selectAll('rect')
-            .data( function(d,i,j) { return d; } )
+            .data((d)=>d)
             .enter()
             .append('rect')
-            .text( function(d,i,j) { return d; } )
-            .attr('x', function(d,i,j) { return (i * cell_width); })
-            .attr('y', function(d,i,j) { return (j * cell_height); })
-            .attr('width', function(d) { return cell_width; })
-            .attr('height', function(d) { return cell_height; })
-            .style('fill', function(d) { return colorScale(d); })
-            .on('mouseover', function (d, i, j) {
-                d3.select(this)
-                    .style('stroke', 'black')
-                    .style('stroke-width', '1');
-
-                var clust_1 = (cluster_members[i].length === 1) ?
-                        cluster_members[i][0] :
-                        '(' + cluster_members[i].length + ') ' + cluster_medoids[i],
-                    clust_2 = (cluster_members[j].length === 1) ?
-                        cluster_members[j][0] :
-                        '(' + cluster_members[j].length + ') ' + cluster_medoids[j];
-
-                clust_1 = matrix_names[matrix_ids.indexOf(clust_1)]
-                clust_2 = matrix_names[matrix_ids.indexOf(clust_2)]
-
-                var content = (clust_1 + '<br/>' + clust_2 + '<br/>' + d.toFixed(2));
-
-                $(this).tooltip({
-                    container: 'body',
-                    title: content,
-                    html: true,
-                    animation: false,
-                }).tooltip('show');
-
-            })
-            .on('mouseout', function () {
-                d3.select(this)
-                    .style('stroke', 'none');
-            });
+            .text((d)=>d)
+            .attr('x', (d,i,j)=>i * cell_width)
+            .attr('y', (d,i,j)=>j * cell_height)
+            .attr('width', cell_width)
+            .attr('height', cell_height)
+            .style('fill', (d)=>colorScale(d))
+            .style('cursor', 'pointer')
+            .on('mouseover', showTooltip)
+            .on('mouseout', hideTooltip)
+            .on('click', showScatterplot);
 
         $('[data-toggle="tooltip"]').tooltip();
     }
 
-    writeVertNames() {
+    writeColNames() {
         // remove existing
         this.el.find('#vert_names').remove();
 
@@ -116,7 +139,7 @@ class AnalysisOverview{
         //Draw SVGs
         var height = vert.height(),
             width = vert.width(),
-            row_number = this.cluster_members.length,
+            nrows = this.cluster_members.length,
             cluster_medoids = this.cluster_medoids,
             matrix_names = this.matrix_names;
 
@@ -125,25 +148,26 @@ class AnalysisOverview{
             .attr('height', height)
             .attr('width', width);
 
+        var data = _.map(this.cluster_members, function(d, i){
+            let name = (d.length > 1)?
+                    `(${d.length}) ${cluster_medoids[i]}`:
+                    matrix_names[i],
+                x = (((0.5 / nrows) * width) + i * (width / nrows)),
+                transform = `rotate(90 ${(((0.5/nrows)*width) + i*(width/nrows))},0)`;
+
+            return {name, x, transform};
+        });
+
         svg.append('g')
             .selectAll('text')
-            .data(this.cluster_members)
+            .data(data)
             .enter()
             .append('text')
             .attr('class', 'heatmapLabelText')
-            .text(function(d,i) {
-                return (d.length > 1) ?
-                    '(' + d.length + ') ' + cluster_medoids[i]:
-                    matrix_names[i];
-            })
-            .attr('x', function(d,i) {
-                return (((0.5 / row_number) * width) + i * (width / row_number));
-            })
+            .text((d)=>d.name)
+            .attr('x', (d)=>d.x)
             .attr('y', 0)
-            .attr('transform', function(d,i) {
-                var rot = (((0.5/row_number)*width) + i*(width/row_number));
-                return 'rotate(90 ' + rot + ',0)';
-            });
+            .attr('transform', (d)=>d.transform);
     }
 
     writeRowNames() {
@@ -172,21 +196,23 @@ class AnalysisOverview{
             .attr('height', height)
             .attr('width', width);
 
+        var data = _.map(this.cluster_members, function(d, i){
+            let name = (d.length > 1)?
+                    `(${d.length}) ${cluster_medoids[i]}`:
+                    matrix_names[i],
+                y = (((0.5 / row_number) * height) + i * (height / row_number));
+            return {name, y};
+        });
+
         svg.append('g')
             .selectAll('text')
-            .data(this.cluster_members)
+            .data(data)
             .enter()
             .append('text')
             .attr('class', 'heatmapLabelText')
-            .text(function(d,i) {
-                return (d.length > 1)?
-                    '(' + d.length + ') ' + cluster_medoids[i]:
-                    matrix_names[i];
-            })
+            .text((d)=>d.name)
             .attr('x', 0)
-            .attr('y', function(d, i) {
-                return (((0.5 / row_number) * height) + i * (height / row_number));
-            });
+            .attr('y', (d)=>d.y);
     }
 
     writeDendrogram() {
@@ -204,27 +230,35 @@ class AnalysisOverview{
             }).appendTo(this.el);
 
         var line_coords = [],
-            x_max = parseFloat(Math.max(...[].concat.apply([], this.dendrogram['dcoord']))),
-            y_max = parseFloat(Math.max(...[].concat.apply([], this.dendrogram['icoord']))),
-            x_min = parseFloat(Math.min(...[].concat.apply([], this.dendrogram['dcoord']))),
-            y_min = parseFloat(Math.min(...[].concat.apply([], this.dendrogram['icoord']))),
-            height = dendro.height(),
-            width = dendro.width(),
-            leaf_num = this.dendrogram['leaves'].length,
             icoords = this.dendrogram['icoord'],
             dcoords = this.dendrogram['dcoord'],
-            leafHeight = ((0.5/leaf_num)*height);
+            x_max = d3.max(_.flatten(dcoords)),
+            y_max = d3.max(_.flatten(icoords)),
+            x_min = d3.min(_.flatten(dcoords)),
+            y_min = d3.min(_.flatten(icoords)),
+            x_rng = x_max - x_min,
+            y_rng = y_max - y_min,
+            height = dendro.height(),
+            width = dendro.width(),
+            nleaves = this.dendrogram['leaves'].length,
+            leafHeight = ((0.5/nleaves)*height),
+            totHeight = height*((nleaves-1)/nleaves);
 
-        for(var i=0; i<icoords.length; i++){
-            for(var j=0; j<3; j++){
-                line_coords.push({
-                    y1: leafHeight+((parseFloat(icoords[i][j])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
-                    y2: leafHeight+((parseFloat(icoords[i][parseInt(j)+1])-y_min)/(y_max-y_min))*(height*((leaf_num-1)/leaf_num)),
-                    x1: width-((parseFloat(dcoords[i][j])-x_min)/(x_max-x_min))*width,
-                    x2: width-((parseFloat(dcoords[i][parseInt(j)+1])-x_min)/(x_max-x_min))*width,
+
+        line_coords = _.chain(icoords)
+            .map(function(ic, i){
+                let dc = dcoords[i];
+                return _.map([0, 1, 2], function(j){
+                    return {
+                        y1: leafHeight+((ic[j]-y_min)/y_rng)*totHeight,
+                        y2: leafHeight+((ic[j+1]-y_min)/y_rng)*totHeight,
+                        x1: width-((dc[j]-x_min)/x_rng)*width,
+                        x2: width-((dc[j+1]-x_min)/x_rng)*width,
+                    };
                 });
-            }
-        }
+            })
+            .flatten()
+            .value();
 
         var svg = d3.select(dendro.get(0))
             .append('svg')
@@ -238,10 +272,10 @@ class AnalysisOverview{
             .enter()
             .append('line')
             .attr('class', 'dendroLine')
-            .attr('x1', function(d) { return d.x1; })
-            .attr('x2', function(d) { return d.x2; })
-            .attr('y1', function(d) { return d.y1; })
-            .attr('y2', function(d) { return d.y2; });
+            .attr('x1', (d)=>d.x1)
+            .attr('x2', (d)=>d.x2)
+            .attr('y1', (d)=>d.y1)
+            .attr('y2', (d)=>d.y2);
     }
 
     drawLegend() {
@@ -312,8 +346,8 @@ class AnalysisOverview{
             .data(legend_lines)
             .enter()
             .append('line')
-            .attr('x1', function(d) {return d.position;})
-            .attr('x2', function(d) {return d.position;})
+            .attr('x1', (d)=>d.position)
+            .attr('x2', (d)=>d.position)
             .attr('y1', 0.3 * height)
             .attr('y2', 0.5 * height)
             .style('stroke', 'black')
@@ -324,8 +358,8 @@ class AnalysisOverview{
             .data(legend_lines)
             .enter()
             .append('text')
-            .text(function(d) { return d.text;})
-            .attr('x', function(d) {return d.position;})
+            .text((d)=>d.text)
+            .attr('x', (d)=>d.position)
             .attr('y', 0.25*height)
             .attr('font-family', 'sans-serif')
             .attr('font-size', '12px')
@@ -336,7 +370,7 @@ class AnalysisOverview{
     render() {
         this.drawHeatmap();
         this.writeRowNames();
-        this.writeVertNames();
+        this.writeColNames();
         this.writeDendrogram();
         this.drawLegend();
     }

@@ -21,6 +21,10 @@ urlpatterns = [
         views.Dashboard.as_view(),
         name='dashboard'),
 
+    url(r'^poll-messages/$',
+        views.ShortPollMessages.as_view(),
+        name='poll_messages'),
+
     url(r'^manage-data/$',
         views.ManageData.as_view(),
         name='manage_data'),

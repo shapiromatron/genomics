@@ -1,3 +1,4 @@
+import json
 from rest_framework import authentication, permissions, pagination
 from rest_framework import renderers
 
@@ -27,23 +28,18 @@ class SiteMixin(object):
     )
 
 
-class OwnedButSharablePermission(permissions.BasePermission):
+class AnalysisObjectMixin(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
-
-        if request.method in permissions.SAFE_METHODS and obj.public:
-            return True
-
-        if request.user.is_anonymous():
-            return False
-
-        return obj.owner == request.user
+        if request.method in permissions.SAFE_METHODS:
+            return obj.user_can_view(request.user)
+        return obj.user_can_edit()
 
 
-class OwnedButShareableMixin(SiteMixin):
+class AnalysisObjectMixin(SiteMixin):
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
-        OwnedButSharablePermission,
+        AnalysisObjectMixin,
     )
 
 
@@ -52,4 +48,7 @@ class PlainTextRenderer(renderers.BaseRenderer):
     format = 'txt'
 
     def render(self, data, media_type=None, renderer_context=None):
+        # permissions errors are dict; render as such.
+        if isinstance(data, dict):
+            return json.dumps(data)
         return data.encode(self.charset)

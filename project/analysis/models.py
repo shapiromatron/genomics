@@ -7,22 +7,29 @@ import io
 import requests
 import zipfile
 import itertools
+import pandas as pd
+import math
+from scipy import stats
 
 from django.db import models
 from django.conf import settings
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.urlresolvers import reverse
+from django.contrib.sites.models import Site
 from django.contrib.postgres.fields import JSONField
 from django.utils.timezone import now
+from django.template.loader import render_to_string
 
 from utils.models import ReadOnlyFileSystemStorage, get_random_filename
+from async_messages import messages
 
 from .import tasks
 
 from .workflow.matrix import BedMatrix
 from .workflow.matrixByMatrix import MatrixByMatrix
-from .workflow import validation
+from .workflow import validators
 
 
 logger = logging.getLogger(__name__)
@@ -71,6 +78,12 @@ class Dataset(models.Model):
         else:
             return reverse('analysis:manage_data')
 
+    def user_can_view(self, user):
+        return self.public or self.owner == user or user.is_staff
+
+    def user_can_edit(self, user):
+        return self.owner == user or user.is_staff
+
 
 HG19 = 1
 MM9 = 2
@@ -82,9 +95,38 @@ GENOME_ASSEMBLY_CHOICES = (
 
 def get_chromosome_size_file(genome_assembly):
     if genome_assembly == HG19:
-        return validation.get_chromosome_size_path('hg19')
+        return validators.get_chromosome_size_path('hg19')
     elif genome_assembly == MM9:
-        return validation.get_chromosome_size_path('mm9')
+        return validators.get_chromosome_size_path('mm9')
+
+
+def validation_save_and_message(object, is_valid, notes):
+
+    # remove any path information from outputs
+    user_home = object.owner.path
+    media_path = settings.MEDIA_ROOT
+    notes = notes\
+        .replace(user_home, '/***')\
+        .replace(media_path, '/***')\
+
+    # remove extra whitespace from all lines
+    notes = '\n'.join([l.strip() for l in notes.splitlines()])
+
+    # intentionally omit post_save signal
+    object.__class__.objects\
+        .filter(id=object.id)\
+        .update(
+            validated=is_valid,
+            validation_notes=notes)
+
+    msg = '{} {}: '.format(object._meta.verbose_name.title(), object)
+    if is_valid:
+        msg += 'validation complete!'
+        messages.success(object.owner, msg)
+    else:
+        msg += "<a href='{}'>validation failed (view errors)</a>"\
+            .format(object.get_absolute_url())
+        messages.warning(object.owner, msg)
 
 
 class DatasetDownload(models.Model):
@@ -168,6 +210,7 @@ class DatasetDownload(models.Model):
         return self.status_code == self.FINISHED_ERROR
 
     def download(self):
+        related_ds = list(self.related_datasets())
         fn = self.data.path
         self.reset()
         try:
@@ -180,12 +223,20 @@ class DatasetDownload(models.Model):
             self.status_code = self.FINISHED_SUCCESS
             self.md5 = self.get_md5()
             self.filesize = os.path.getsize(fn)
+            for ds in related_ds:
+                msg = 'Download complete (will validate next): {}'.format(self.url)
+                messages.success(ds.owner, msg)
         except Exception as e:
             self.start_time = None
             self.status_code = self.FINISHED_ERROR
             self.status = str(e)
+            for ds in related_ds:
+                msg = 'Download failed: {}'.format(self.url)
+                messages.warning(ds.owner, msg)
+
         self.save()
-        for ds in self.related_datasets():
+
+        for ds in related_ds:
             ds.validate_and_save()
 
     def get_md5(self):
@@ -311,11 +362,11 @@ class UserDataset(GenomicDataset):
 
         size_file = get_chromosome_size_file(self.genome_assembly)
         if self.is_stranded:
-            validatorA = validation.BigWigValidator(
+            validatorA = validators.BigWigValidator(
                 self.plus.data.path, size_file)
             validatorA.validate()
 
-            validatorB = validation.BigWigValidator(
+            validatorB = validators.BigWigValidator(
                 self.minus.data.path, size_file)
             validatorB.validate()
 
@@ -326,19 +377,14 @@ class UserDataset(GenomicDataset):
             ]).strip()
 
         else:
-            validator = validation.BigWigValidator(
+            validator = validators.BigWigValidator(
                 self.ambiguous.data.path, size_file)
             validator.validate()
 
             is_valid = validator.is_valid
             notes = validator.display_errors()
 
-        # intentionally omit post_save signal
-        self.__class__.objects\
-            .filter(id=self.id)\
-            .update(
-                validated=is_valid,
-                validation_notes=notes)
+        validation_save_and_message(self, is_valid, notes)
 
 
 class EncodeDataset(GenomicDataset):
@@ -415,7 +461,6 @@ class FeatureList(Dataset):
     stranded = models.BooleanField(
         default=True)
     dataset = models.FileField(
-        blank=True,
         max_length=256)
 
     @classmethod
@@ -440,17 +485,13 @@ class FeatureList(Dataset):
         return reverse('analysis:feature_list_delete', args=[self.pk, ])
 
     def validate_and_save(self):
-        size_file = self.get_chromosome_size_file(self.genome_assembly)
-        validator = validation.FeatureListValidator(
+        size_file = get_chromosome_size_file(self.genome_assembly)
+        validator = validators.FeatureListValidator(
             self.dataset.path, size_file)
         validator.validate()
-
-        # intentionally omit post_save signal
-        self.__class__.objects\
-            .filter(id=self.id)\
-            .update(
-                validated=validator.is_valid,
-                validation_notes=validator.display_errors())
+        validation_save_and_message(
+            self, validator.is_valid,
+            validator.display_errors())
 
 
 class SortVector(Dataset):
@@ -481,17 +522,13 @@ class SortVector(Dataset):
         return reverse('analysis:sort_vector_delete', args=[self.pk, ])
 
     def validate_and_save(self):
-        validator = validation.SortVectorValidator(
+        validator = validators.SortVectorValidator(
             self.feature_list.dataset.path,
             self.vector.path)
         validator.validate()
-
-        # intentionally omit post_save signal
-        self.__class__.objects\
-            .filter(id=self.id)\
-            .update(
-                validated=validator.is_valid,
-                validation_notes=validator.display_errors())
+        validation_save_and_message(
+            self, validator.is_valid,
+            validator.display_errors())
 
 
 class AnalysisDatasets(models.Model):
@@ -596,7 +633,7 @@ class Analysis(GenomicBinSettings):
         return cls.objects.filter(end_time__isnull=False, owner=owner)
 
     def validate_and_save(self):
-        validator = validation.AnalysisValidator(
+        validator = validators.AnalysisValidator(
             bin_anchor=self.get_anchor_display(),
             bin_start=self.bin_start,
             bin_number=self.bin_number,
@@ -606,12 +643,9 @@ class Analysis(GenomicBinSettings):
             stranded_bed=self.feature_list.stranded,
         )
         validator.validate()
-        # intentionally omit post_save signal
-        self.__class__.objects\
-            .filter(id=self.id)\
-            .update(
-                validated=validator.is_valid,
-                validation_notes=validator.display_errors())
+        validation_save_and_message(
+            self, validator.is_valid,
+            validator.display_errors())
 
     def get_absolute_url(self):
         return reverse('analysis:analysis', args=[self.pk, ])
@@ -637,7 +671,7 @@ class Analysis(GenomicBinSettings):
     def get_zip_url(self):
         return reverse('analysis:analysis_zip', args=[self.pk, ])
 
-    def reset_if_needed(self, dsIds):
+    def is_reset_required(self, dsIds):
         """
         If certain settings have changed, reset validation and output results.
         This method should be called from a changed form-instance, before
@@ -667,16 +701,17 @@ class Analysis(GenomicBinSettings):
             formIds = set(dsIds)
             if dbIds != formIds:
                 reset = True
+        logger.info('Analysis reset required: %s' % reset)
+        return reset
 
-        if reset:
-            logger.info('Analysis reset required %s' % id_)
-            formObj.validated = False
-            formObj.validation_notes = ''
-            formObj.output = None
-            formObj.start_time = None
-            formObj.end_time = None
-        else:
-            logger.info('Analysis reset not required %s' % id_)
+    def reset_analysis_object(self):
+        formObj = self
+        formObj.validated = False
+        formObj.validation_notes = ''
+        formObj.output = None
+        formObj.start_time = None
+        formObj.end_time = None
+        cache.delete(self.output_cache_key)
 
     @property
     def user_datasets(self):
@@ -711,20 +746,40 @@ class Analysis(GenomicBinSettings):
         verbose_name_plural = 'Analyses'
 
     def user_can_view(self, user):
-        if self.public:
-            return True
-        if self.owner == user:
-            return True
+        return self.public or self.owner == user or user.is_staff
+
+    def user_can_edit(self, user):
+        return self.owner == user or user.is_staff
 
     def get_flcm_ids(self):
         return list(self.analysisdatasets_set.values_list('count_matrix', flat=True))
 
     @property
+    def is_ready_to_run(self):
+        return self.validated and not self.is_running and not self.is_complete
+
+    @property
+    def is_running(self):
+        return self.start_time and not self.end_time
+
+    @property
     def is_complete(self):
-        return True if self.start_time and self.end_time else False
+        return self.start_time and self.end_time
+
+    @property
+    def execute_task_id(self):
+        return 'analysis-execute-{}'.format(self.id)
 
     def execute(self):
-        tasks.execute_analysis.delay(self.id)
+        # intentionally don't fire save signal
+        self.__class__.objects\
+            .filter(id=self.id)\
+            .update(
+                start_time=now(),
+                end_time=None,
+            )
+        tasks.execute_analysis.apply_async(
+            args=[self.id], task_id=self.execute_task_id)
 
     def create_matrix_list(self):
         return [
@@ -753,9 +808,14 @@ class Analysis(GenomicBinSettings):
         return os.path.join(self.UPLOAD_TO, os.path.basename(fn))
 
     @property
+    def output_cache_key(self):
+        return 'analysis-%s' % self.id
+
+    @property
     def output_json(self):
-        # TODO: cache using redis
-        if not hasattr(self, '_output_json'):
+        key = self.output_cache_key
+        obj = cache.get(key)
+        if not obj:
             with open(self.output.path, 'r') as f:
                 output = json.loads(f.read())
 
@@ -764,9 +824,10 @@ class Analysis(GenomicBinSettings):
             for k, v in sort_orders.items():
                 sort_orders[int(k)] = sort_orders.pop(k)
 
-            self._output_json = output
+            obj = output
+            cache.set(key, obj)
 
-        return self._output_json
+        return obj
 
     def get_summary_plot(self):
         if not self.output:
@@ -787,11 +848,47 @@ class Analysis(GenomicBinSettings):
             'feature_cluster_members': output['feature_cluster_members'],
         }
 
-    def get_ks(self, id_):
+    def get_ks(self, vector_id, matrix_id):
         if not self.output:
             return False
+
         output = self.output_json
-        return {'p-value': str(id_) + ': 0.05'}
+        sort_order = output['sort_orders'].get(vector_id)
+        flcm = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=matrix_id)\
+            .select_related('count_matrix')\
+            .first()
+
+        n = len(sort_order)
+        values = list(flcm.count_matrix.df['All bins'])
+        quartiles = [[], [], [], []]
+        for i, index in enumerate(sort_order):
+            quartiles[math.floor(4*i/n)].append(values[index])
+
+        stat, cv, sig = stats.anderson_ksamp(quartiles)
+        return {
+            'statistic': stat,
+            'critical_values': cv,
+            'significance': sig,
+        }
+
+    def get_unsorted_ks(self, matrix_id):
+        flcm = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=matrix_id)\
+            .select_related('count_matrix')\
+            .first()
+
+        n = len(flcm.count_matrix.df['All bins'])
+        quartiles = [[], [], [], []]
+        for i, value in enumerate(flcm.count_matrix.df['All bins']):
+            quartiles[math.floor(4*i/n)].append(value)
+
+        stat, cv, sig = stats.anderson_ksamp(quartiles)
+        return {
+            'statistic': stat,
+            'critical_values': cv,
+            'significance': sig,
+        }
 
     def get_sort_vector(self, id_):
         if not self.output:
@@ -804,6 +901,36 @@ class Analysis(GenomicBinSettings):
             raise ValueError('Invalid id')
 
         return so
+
+    def get_bin_names(self):
+        flcm = FeatureListCountMatrix.objects\
+            .filter(dataset__analysis=self.id)\
+            .first()
+        return list(flcm.df.columns)
+
+    def get_scatterplot_data(self, idx, idy, column):
+        x = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=idx)\
+            .select_related('count_matrix')\
+            .first()
+        y = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=idy)\
+            .select_related('count_matrix')\
+            .first()
+
+        xDf = x.count_matrix.df
+        yDf = y.count_matrix.df
+
+        if column not in xDf.columns:
+            column = FeatureListCountMatrix.ALL_BINS
+
+        xDf.rename(columns={column: 'x'}, inplace=True)
+        yDf.rename(columns={column: 'y'}, inplace=True)
+
+        xDf = xDf[['x']]
+        yDf = yDf[['y']]
+
+        return xDf.join(yDf).to_csv()
 
     def create_zip(self):
         """
@@ -830,30 +957,20 @@ class Analysis(GenomicBinSettings):
 
         return f
 
-    @property
-    def cache_key_total(self):
-        return 'analysis-{}-total'.format(self.id)
-
-    @property
-    def cache_key_complete(self):
-        return 'analysis-{}-complete'.format(self.id)
-
-    def init_execution_status(self):
-        cache.set(self.cache_key_complete, 0)
-        cache.set(self.cache_key_total, self.datasets.count() + 1)
-
-    def increment_execution_status(self):
-        current = cache.get(self.cache_key_complete)
-        cache.set(self.cache_key_complete, current + 1)
-
-    def get_execution_status(self):
-        complete = cache.get(self.cache_key_complete)
-        ofTotal = float(cache.get(self.cache_key_total))
-        return complete / ofTotal
-
-    def reset_execution_status(self):
-        cache.delete(self.cache_key_complete)
-        cache.delete(self.cache_key_total)
+    def send_completion_email(self):
+        context = {
+            'object': self,
+            'domain': Site.objects.get_current().domain
+        }
+        send_mail(
+            subject='Genomics: analysis complete',
+            message=render_to_string(
+                'analysis/analysis_complete_email.txt', context),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[self.owner.email],
+            html_message=render_to_string(
+                'analysis/analysis_complete_email.html', context)
+        )
 
 
 class FeatureListCountMatrix(GenomicBinSettings):
@@ -875,6 +992,24 @@ class FeatureListCountMatrix(GenomicBinSettings):
 
     class Meta:
         verbose_name_plural = 'Feature list count matrices'
+
+    ALL_BINS = 'All bins'
+
+    @property
+    def df(self):
+        # get formatted pandas data frame
+        key = 'flcm-%s' % self.id
+        df = cache.get(key)
+        if df is None:
+            df = pd.read_csv(self.matrix.path, sep='\t')
+            df.rename(columns={'Unnamed: 0': 'label'}, inplace=True)
+            df.set_index('label', inplace=True, drop=True)
+            df.insert(0, self.ALL_BINS, df.sum(axis=1))
+            size = round(df.memory_usage(index=True).sum()/(1024*1024), 2)
+            logger.info('Setting cache: {} ({}mb)'.format(key, size))
+            cache.set(key, df)
+
+        return df
 
     @classmethod
     def execute(cls, analysis, dataset):
@@ -924,7 +1059,23 @@ class FeatureListCountMatrix(GenomicBinSettings):
             matrix=os.path.join(cls.UPLOAD_TO, os.path.basename(fn))
         )
 
+    def user_can_view(self, user):
+        analyses = self.analysisdatasets_set\
+            .values('analysis__owner_id', 'analysis__public')
+        return user.is_staff or \
+            any([d['analysis__public'] for d in analyses]) or \
+            user.id in [d['analysis__owner_id'] for d in analyses]
+
+    def user_can_edit(self, user):
+        return user.is_staff or \
+            user.id in self.analysisdatasets_set.objects\
+                .values_list('analysis__owner_id', flat=True)
+
     def get_dataset(self):
-        # todo: cache matrix read
-        with open(self.matrix.path, 'r') as f:
-            return f.read()
+        key = 'flcm-%s' % self.id
+        obj = cache.get(key)
+        if not obj:
+            with open(self.matrix.path, 'r') as f:
+                obj = f.read()
+            cache.set(key, obj)
+        return obj

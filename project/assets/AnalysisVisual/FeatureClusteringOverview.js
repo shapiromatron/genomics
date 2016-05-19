@@ -52,23 +52,13 @@ class FeatureClusteringOverview{
             })
             .appendTo(this.el_1);
 
-        // get values to draw heatmap
-        // var column_order = [];
-        // for(var i=0; i<this.cluster_members.length; i++){
-        //     column_order.push(this.matrix_ids.indexOf(this.cluster_members[i][0]))
-        // }
-
         var k_values = [];
         for(var i=0; i<k; i++){
             k_values.push([]);
         }
-        for(var i=0; i<this.feature_clusters[k]['labels'].length; i++){
+        for(i=0; i<this.feature_clusters[k]['labels'].length; i++){
             var label = this.feature_clusters[k]['labels'][i];
-            // k_values[label].push(this.feature_vectors[i]);
-            k_values[label].push(this.feature_vectors[i])
-            // for(var j=0; j<column_order.length; j++){
-            //     k_values[label][k_values[label].length-1].push(this.feature_vectors[i][column_order[j]]);
-            // }
+            k_values[label].push(this.feature_vectors[i]);
         }
 
         // draw heatmap
@@ -89,7 +79,7 @@ class FeatureClusteringOverview{
 
         var row_count = 0;
         for (var cluster = 0; cluster < k_values.length; cluster++) {
-            for (var i = 0; i < k_values[cluster].length; i++) {
+            for (i = 0; i < k_values[cluster].length; i++) {
                 for (var j = 0; j < k_values[cluster][i].length; j++) {
                     context.fillStyle=colorScale(k_values[cluster][i][j]);
                     context.fillRect(j,row_count,1,1);
@@ -110,11 +100,11 @@ class FeatureClusteringOverview{
                 'top': '20%',
             }).appendTo(this.el_1);
 
-        var height = heatmap_col_tooltips.height(),
-            width = heatmap_col_tooltips.width(),
-            col_number = this.feature_columns.length,
-            cell_width = width/col_number;
+        height = heatmap_col_tooltips.height();
+        width = heatmap_col_tooltips.width();
+        col_number = this.feature_columns.length;
 
+        var cell_width = width/col_number;
         var svg = d3.select(heatmap_col_tooltips.get(0))
             .append('svg')
             .attr('height', height)
@@ -163,17 +153,16 @@ class FeatureClusteringOverview{
                 'top': '20%',
             }).appendTo(this.el_1);
 
-        var colors = this.colors;
         var cluster_sizes = [];
         var total_entries = this.feature_clusters[k]['labels'].length;
         var entry_count = 0;
 
-        for (var cluster = 0; cluster < k_values.length; cluster++) {
-            cluster_sizes.push({'entry':k_values[cluster].length, 'cume':entry_count});
-            entry_count += k_values[cluster].length;
+        for (i = 0; i < k_values.length; i++) {
+            cluster_sizes.push({'entry':k_values[i].length, 'cume':entry_count});
+            entry_count += k_values[i].length;
         }
 
-        var svg = d3.select(heatmap_clusters.get(0))
+        svg = d3.select(heatmap_clusters.get(0))
             .append('svg')
             .attr('height', heatmap_clusters.height())
             .attr('width', heatmap_clusters.width());

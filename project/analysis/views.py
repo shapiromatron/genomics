@@ -1,12 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages import get_messages
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import HttpResponse, get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView, CreateView, UpdateView, \
-        DetailView, DeleteView, ListView
+        DetailView, DeleteView, ListView, View
 
-from utils.views import OwnerOrStaff, AddUserToFormMixin
+from utils.views import UserCanEdit, UserCanView, AddUserToFormMixin, MessageMixin
 from . import models, forms, tasks
 
 
@@ -17,6 +18,16 @@ class Home(TemplateView):
         if request.user.is_authenticated():
             return HttpResponseRedirect(reverse_lazy('analysis:dashboard'))
         return super(Home, self).get(request, *args, **kwargs)
+
+
+class ShortPollMessages(View):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({
+            'messages': [
+                {'status': m.tags, 'message': m.message}
+                for m in get_messages(request)
+            ]
+        })
 
 
 class CeleryTester(Home):
@@ -48,29 +59,32 @@ class ManageData(LoginRequiredMixin, TemplateView):
 
 
 # User dataset CRUD
-class UserDatasetDetail(OwnerOrStaff, DetailView):
+class UserDatasetDetail(UserCanView, DetailView):
     model = models.UserDataset
 
 
-class UserDatasetCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
-    model = models.UserDataset
-    form_class = forms.UserDatasetForm
-    success_url = reverse_lazy('analysis:manage_data')
-
-
-class UserDatasetUpdate(OwnerOrStaff, UpdateView):
+class UserDatasetCreate(MessageMixin, AddUserToFormMixin, LoginRequiredMixin, CreateView):
     model = models.UserDataset
     form_class = forms.UserDatasetForm
     success_url = reverse_lazy('analysis:manage_data')
+    success_message = 'User dataset created; datasets will begin downloading.'
 
 
-class UserDatasetDelete(OwnerOrStaff, DeleteView):
+class UserDatasetUpdate(MessageMixin, UserCanEdit, UpdateView):
+    model = models.UserDataset
+    form_class = forms.UserDatasetForm
+    success_url = reverse_lazy('analysis:manage_data')
+    success_message = 'User dataset updated; datasets will begin downloading.'
+
+
+class UserDatasetDelete(MessageMixin, UserCanEdit, DeleteView):
     model = models.UserDataset
     success_url = reverse_lazy('analysis:manage_data')
+    success_message = 'User dataset deleted.'
 
 
 # User dataset CRUD
-class DatasetDownloadRetry(OwnerOrStaff, DetailView):
+class DatasetDownloadRetry(UserCanEdit, DetailView):
     model = models.UserDataset
 
     def render_to_response(self, context, **response_kwargs):
@@ -85,58 +99,65 @@ class DatasetDownloadRetry(OwnerOrStaff, DetailView):
 
 
 # Feature list CRUD
-class FeatureListDetail(OwnerOrStaff, DetailView):
+class FeatureListDetail(UserCanView, DetailView):
     model = models.FeatureList
 
 
-class FeatureListCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
-    model = models.FeatureList
-    form_class = forms.FeatureListForm
-    success_url = reverse_lazy('analysis:manage_data')
-
-
-class FeatureListUpdate(OwnerOrStaff, UpdateView):
+class FeatureListCreate(MessageMixin, AddUserToFormMixin, LoginRequiredMixin, CreateView):
     model = models.FeatureList
     form_class = forms.FeatureListForm
     success_url = reverse_lazy('analysis:manage_data')
+    success_message = 'Feature-list created.'
 
 
-class FeatureListDelete(OwnerOrStaff, DeleteView):
+class FeatureListUpdate(MessageMixin, UserCanEdit, UpdateView):
+    model = models.FeatureList
+    form_class = forms.FeatureListForm
+    success_url = reverse_lazy('analysis:manage_data')
+    success_message = 'Feature-list updated.'
+
+
+class FeatureListDelete(MessageMixin, UserCanEdit, DeleteView):
     model = models.FeatureList
     success_url = reverse_lazy('analysis:manage_data')
+    success_message = 'Feature-list deleted.'
 
 
 # Sort vector CRUD
-class SortVectorDetail(OwnerOrStaff, DetailView):
+class SortVectorDetail(UserCanView, DetailView):
     model = models.SortVector
 
 
-class SortVectorCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
-    model = models.SortVector
-    form_class = forms.SortVectorForm
-    success_url = reverse_lazy('analysis:manage_data')
-
-
-class SortVectorUpdate(OwnerOrStaff, UpdateView):
+class SortVectorCreate(MessageMixin, AddUserToFormMixin, LoginRequiredMixin, CreateView):
     model = models.SortVector
     form_class = forms.SortVectorForm
     success_url = reverse_lazy('analysis:manage_data')
+    success_message = 'Sort-vector created.'
 
 
-class SortVectorDelete(OwnerOrStaff, DeleteView):
+class SortVectorUpdate(MessageMixin, UserCanEdit, UpdateView):
+    model = models.SortVector
+    form_class = forms.SortVectorForm
+    success_url = reverse_lazy('analysis:manage_data')
+    success_message = 'Sort-vector updated.'
+
+
+class SortVectorDelete(MessageMixin, UserCanEdit, DeleteView):
     model = models.SortVector
     success_url = reverse_lazy('analysis:manage_data')
+    success_message = 'Sort-vector deleted.'
 
 
 # Analysis CRUD
-class AnalysisDetail(OwnerOrStaff, DetailView):
+class AnalysisDetail(UserCanView, DetailView):
     model = models.Analysis
 
 
-class AnalysisCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
+class AnalysisCreate(MessageMixin, AddUserToFormMixin, LoginRequiredMixin, CreateView):
     model = models.Analysis
     form_class = forms.AnalysisForm
     success_url = reverse_lazy('analysis:dashboard')
+    success_message = 'Analysis created.'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -145,9 +166,10 @@ class AnalysisCreate(AddUserToFormMixin, LoginRequiredMixin, CreateView):
         return context
 
 
-class AnalysisUpdate(OwnerOrStaff, UpdateView):
+class AnalysisUpdate(MessageMixin, UserCanEdit, UpdateView):
     model = models.Analysis
     form_class = forms.AnalysisForm
+    success_message = 'Analysis updated.'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -156,23 +178,14 @@ class AnalysisUpdate(OwnerOrStaff, UpdateView):
         return context
 
 
-class AnalysisDelete(OwnerOrStaff, DeleteView):
+class AnalysisDelete(MessageMixin, UserCanEdit, DeleteView):
     model = models.Analysis
     success_url = reverse_lazy('analysis:dashboard')
+    success_message = 'Analysis deleted.'
 
 
 # analysis non-CRUD
-class AnalysisReadOnlyMixin(object):
-
-    # TODO - standardize permissions checks - use this or OwnerOrStaff mixin?
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        if not obj.user_can_view(self.request.user):
-            raise PermissionDenied()
-        return obj
-
-
-class AnalysisVisual(AnalysisReadOnlyMixin, DetailView):
+class AnalysisVisual(UserCanView, DetailView):
     """
     Temporary view used for visual testing
     """
@@ -180,22 +193,20 @@ class AnalysisVisual(AnalysisReadOnlyMixin, DetailView):
     template_name = 'analysis/analysis_visual.html'
 
 
-class AnalysisExecute(OwnerOrStaff, DetailView):
+class AnalysisExecute(UserCanEdit, DetailView):
     model = models.Analysis
     template_name = 'analysis/analysis_execute.html'
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        if request.is_ajax():
-            complete = self.object.get_execution_status()
-            return JsonResponse({'fractionComplete': complete})
+        if self.object.is_ready_to_run:
+            self.object.execute()
 
-        self.object.execute()
         return super().get(request, *args, **kwargs)
 
 
-class AnalysisZip(AnalysisReadOnlyMixin, DetailView):
+class AnalysisZip(UserCanView, DetailView):
     model = models.Analysis
 
     def get(self, context, **response_kwargs):

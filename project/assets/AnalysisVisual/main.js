@@ -14,11 +14,12 @@ let startup = function(){
 
         // render plots
         $.get(window.plotURL, function(data){
+
             // create instances for visualization
             let overview = new AnalysisOverview($('#visual_panel_1'), data),
                 individual_overview = new IndividualOverview($('#visual_panel_2'), data),
-                feature_clust_overview = new FeatureClusteringOverview($('#visual_panel_1'), $('#visual_panel_2'), data);
-                //feature_clust_individual = new IndividualFeatureClusteringOverview($('#visual_panel_2'), data);
+                feature_clust_overview = new FeatureClusteringOverview(
+                    $('#visual_panel_1'), $('#visual_panel_2'), data);
 
             // add buttons for visualization selection
             $('<button>Data set clustering</button>')
@@ -31,9 +32,6 @@ let startup = function(){
                     'left': '0%',
                     'top': '0%',
                     'width': '30%',
-                // }).click( function() {
-                //     overview.render();
-                //     individual_overview.render();
                 }).appendTo('#analysis_selection_panel');
             $('<button>Feature clustering</button>')
                 .attr({
@@ -45,16 +43,14 @@ let startup = function(){
                     'left': '31%',
                     'top': '0%',
                     'width': '30%',
-                // }).click( function() {
-                //     console.log('Feature clusters');
                 }).appendTo('#analysis_selection_panel');
 
             $('#data_clust_button').click( function() {
                 $('#data_clust_button').attr({
-                    'class': 'btn btn-primary'
+                    'class': 'btn btn-primary',
                 });
                 $('#feature_clust_button').attr({
-                    'class': 'btn btn-default'
+                    'class': 'btn btn-default',
                 });
 
                 $('#visual_panel_1').empty();
@@ -66,10 +62,10 @@ let startup = function(){
 
             $('#feature_clust_button').click( function() {
                 $('#feature_clust_button').attr({
-                    'class': 'btn btn-primary'
+                    'class': 'btn btn-primary',
                 });
                 $('#data_clust_button').attr({
-                    'class': 'btn btn-default'
+                    'class': 'btn btn-default',
                 });
 
                 $('#visual_panel_1').empty();
@@ -80,10 +76,6 @@ let startup = function(){
 
             overview.render();
             individual_overview.render();
-        });
-
-        $.get(window.ksURL + '?id=123', function(d){
-            console.log(d);
         });
     });
 };

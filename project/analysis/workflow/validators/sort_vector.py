@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-import click
 import os
-import sys
 
 from .base import Validator
 
@@ -64,19 +61,3 @@ class SortVectorValidator(Validator):
     def validate(self):
         self.check_columns()
         self.check_ids()
-
-
-@click.command()
-@click.argument('feature_bed')
-@click.argument('sort_vector')
-def cli(feature_bed, sort_vector):
-    """
-    Validate sort vector against feature bed file.
-    """
-    validator = SortVectorValidator(feature_bed, sort_vector)
-    validator.validate()
-    sys.stdout.write(validator.display_errors())
-
-
-if __name__ == '__main__':
-    cli()

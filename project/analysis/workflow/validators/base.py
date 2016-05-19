@@ -22,7 +22,7 @@ class Validator(object):
         self.validation_errors.extend(lst)
 
     def display_errors(self):
-        return '\n'.join(self.validation_errors)
+        return '\n'.join(set(self.validation_errors))
 
 
 def get_validateFiles_path():
