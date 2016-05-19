@@ -172,7 +172,6 @@ class FeatureListForm(BaseFormMixin, forms.ModelForm):
 
 class SortVectorForm(BaseFormMixin, forms.ModelForm):
     CREATE_LEGEND = 'Create sort vector'
-    CREATE_HELP_TEXT = 'Help text...'
 
     class Meta:
         model = models.SortVector
