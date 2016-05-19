@@ -94,9 +94,12 @@ class IndividualHeatmap {
             })
             .appendTo(this.modal_body);
 
-        select_list.append($('<option>', {
-            text: 'Feature list order'
-        }));
+        // select_list.append($('<option>', {
+        //     text: 'Feature list order'
+        // }));
+
+        var options = this.matrices;
+        options.unshift(['Feature list order', 'Feature list order']);
 
         d3.select(select_list.get(0))
             .selectAll('option')
