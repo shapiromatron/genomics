@@ -703,6 +703,7 @@ class Analysis(GenomicBinSettings):
         formObj.output = None
         formObj.start_time = None
         formObj.end_time = None
+        cache.delete(self.output_cache_key)
 
     @property
     def user_datasets(self):
@@ -799,9 +800,14 @@ class Analysis(GenomicBinSettings):
         return os.path.join(self.UPLOAD_TO, os.path.basename(fn))
 
     @property
+    def output_cache_key(self):
+        return 'analysis-%s' % self.id
+
+    @property
     def output_json(self):
-        # TODO: cache using redis
-        if not hasattr(self, '_output_json'):
+        key = self.output_cache_key
+        obj = cache.get(key)
+        if not obj:
             with open(self.output.path, 'r') as f:
                 output = json.loads(f.read())
 
@@ -810,9 +816,10 @@ class Analysis(GenomicBinSettings):
             for k, v in sort_orders.items():
                 sort_orders[int(k)] = sort_orders.pop(k)
 
-            self._output_json = output
+            obj = output
+            cache.set(key, obj)
 
-        return self._output_json
+        return obj
 
     def get_summary_plot(self):
         if not self.output:
@@ -956,7 +963,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
             df.insert(0, self.ALL_BINS, df.sum(axis=1))
             size = round(df.memory_usage(index=True).sum()/(1024*1024), 2)
             logger.info('Setting cache: {} ({}mb)'.format(key, size))
-            cache.set(key, df, 300)
+            cache.set(key, df)
 
         return df
 
@@ -1009,6 +1016,10 @@ class FeatureListCountMatrix(GenomicBinSettings):
         )
 
     def get_dataset(self):
-        # todo: cache matrix read
-        with open(self.matrix.path, 'r') as f:
-            return f.read()
+        key = 'flcm-%s' % self.id
+        obj = cache.get(key)
+        if not obj:
+            with open(self.matrix.path, 'r') as f:
+                obj = f.read()
+            cache.set(key, obj)
+        return obj
