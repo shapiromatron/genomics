@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-import click
 import os
-import sys
 
 from .base import Validator
 
@@ -125,42 +122,19 @@ class AnalysisValidator(Validator):
                     elif strand == '-':
                         window_end = window_start - window_size
 
-                    if strand == '+' or strand == 'AMBIG':
+                    chrome_size = chrom_sizes.get(chromosome)
+                    if chrome_size is None:
+                        self.add_error(
+                            'Chromosome not found {}'.format(chromosome))
+                    elif strand == '+' or strand == 'AMBIG':
                         if window_start < 1 or \
-                                window_end > chrom_sizes[chromosome]:
+                                window_end > chrome_size:
                             self.add_error(
                                 'Feature window extends outside chromosome {}'
                                 .format(chromosome))
-
-                    if strand == '-':
+                    elif strand == '-':
                         if window_end < 1 or \
-                                window_start > chrom_sizes[chromosome]:
+                                window_start > chrome_size:
                             self.add_error(
                                 'Feature window extends outside chromosome {}'
                                 .format(chromosome))
-
-
-@click.command()
-@click.argument('bin_anchor', type=click.Choice(AnalysisValidator.ANCHOR_OPTIONS))
-@click.argument('bin_start', type=int)
-@click.argument('bin_number', type=int)
-@click.argument('bin_size', type=int)
-@click.argument('feature_bed', type=str)
-@click.argument('chrom_sizes', type=str)
-@click.option('--stranded_bed', is_flag=True, help='Expect stranded bed')
-def cli(bin_anchor, bin_start, bin_number,
-        bin_size, feature_bed, chrom_sizes,
-        stranded_bed):
-    """
-    Check and validate window parameters for analysis.
-    """
-    validator = AnalysisValidator(
-        bin_anchor, bin_start, bin_number,
-        bin_size, feature_bed, chrom_sizes,
-        stranded_bed)
-    validator.validate()
-    sys.stdout.write(validator.display_errors())
-
-
-if __name__ == '__main__':
-    cli()

@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-import sys
 import os
-import click
 import subprocess
 
 from .base import Validator, get_validateFiles_path
@@ -79,19 +76,3 @@ class FeatureListValidator(Validator):
         self.set_number_columns()
         self.run_validate_file()
         self.check_unique_feature_names()
-
-
-@click.command()
-@click.argument('feature_list')
-@click.argument('chrom_sizes_file')
-def cli(feature_list, chrom_sizes_file):
-    """
-    Validate feature_list file.
-    """
-    validator = FeatureListValidator(feature_list, chrom_sizes_file)
-    validator.validate()
-    sys.stdout.write(validator.display_errors())
-
-
-if __name__ == '__main__':
-    cli()

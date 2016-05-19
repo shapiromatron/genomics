@@ -1,7 +1,4 @@
-#!/usr/bin/env python
 import os
-import sys
-import click
 import subprocess
 
 from .base import Validator, get_validateFiles_path
@@ -39,19 +36,3 @@ class BigWigValidator(Validator):
         if errors:
             errors = errors.splitlines()
             self.add_errors(errors)
-
-
-@click.command()
-@click.argument('bigwig')
-@click.argument('chrom_sizes_file')
-def cli(bigwig, chrom_sizes_file):
-    """
-    Validate bigwig file.
-    """
-    validator = BigWigValidator(bigwig, chrom_sizes_file)
-    validator.validate()
-    sys.stdout.write(validator.display_errors())
-
-
-if __name__ == '__main__':
-    cli()

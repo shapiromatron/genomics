@@ -27,7 +27,7 @@ from .import tasks
 
 from .workflow.matrix import BedMatrix
 from .workflow.matrixByMatrix import MatrixByMatrix
-from .workflow import validation
+from .workflow import validators
 
 
 logger = logging.getLogger(__name__)
@@ -93,9 +93,9 @@ GENOME_ASSEMBLY_CHOICES = (
 
 def get_chromosome_size_file(genome_assembly):
     if genome_assembly == HG19:
-        return validation.get_chromosome_size_path('hg19')
+        return validators.get_chromosome_size_path('hg19')
     elif genome_assembly == MM9:
-        return validation.get_chromosome_size_path('mm9')
+        return validators.get_chromosome_size_path('mm9')
 
 
 def validation_save_and_message(object, is_valid, notes):
@@ -360,11 +360,11 @@ class UserDataset(GenomicDataset):
 
         size_file = get_chromosome_size_file(self.genome_assembly)
         if self.is_stranded:
-            validatorA = validation.BigWigValidator(
+            validatorA = validators.BigWigValidator(
                 self.plus.data.path, size_file)
             validatorA.validate()
 
-            validatorB = validation.BigWigValidator(
+            validatorB = validators.BigWigValidator(
                 self.minus.data.path, size_file)
             validatorB.validate()
 
@@ -375,7 +375,7 @@ class UserDataset(GenomicDataset):
             ]).strip()
 
         else:
-            validator = validation.BigWigValidator(
+            validator = validators.BigWigValidator(
                 self.ambiguous.data.path, size_file)
             validator.validate()
 
@@ -484,7 +484,7 @@ class FeatureList(Dataset):
 
     def validate_and_save(self):
         size_file = get_chromosome_size_file(self.genome_assembly)
-        validator = validation.FeatureListValidator(
+        validator = validators.FeatureListValidator(
             self.dataset.path, size_file)
         validator.validate()
         validation_save_and_message(
@@ -520,7 +520,7 @@ class SortVector(Dataset):
         return reverse('analysis:sort_vector_delete', args=[self.pk, ])
 
     def validate_and_save(self):
-        validator = validation.SortVectorValidator(
+        validator = validators.SortVectorValidator(
             self.feature_list.dataset.path,
             self.vector.path)
         validator.validate()
@@ -631,7 +631,7 @@ class Analysis(GenomicBinSettings):
         return cls.objects.filter(end_time__isnull=False, owner=owner)
 
     def validate_and_save(self):
-        validator = validation.AnalysisValidator(
+        validator = validators.AnalysisValidator(
             bin_anchor=self.get_anchor_display(),
             bin_start=self.bin_start,
             bin_number=self.bin_number,
