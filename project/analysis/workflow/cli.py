@@ -1,34 +1,29 @@
 #!/usr/bin/env python
-import click
-
-import validators
-
 
 """
-python cli.py feature_list \
-    ../../../public/media/unt1hr.obsTSS.bed \
-    ./validators/data/hg19.chromSizes.txt
+Command-line interface for data validation:
+
 
 python cli.py feature_list \
     ../../../public/media/unt1hr.obsTSS.bed \
     ./validators/data/hg19.chromSizes.txt
 
+python cli.py sort_vector \
+    ../../../public/media/unt1hr.obsTSS.bed \
+    ../../../public/media/wgEncodeBroadHistoneA549CtcfEtoh02Sig.sortVector.txt
 
 python cli.py bigwig \
     ../../../data/encode/hg19/wgEncodeBroadHistone/wgEncodeBroadHistoneK562Cbpsc369Sig.bigWig \
-    ./validators/data/mm9.chromSizes.txt
-
-
-python cli.py analysis \
-    start
-    ../../../data/encode/hg19/wgEncodeBroadHistone/wgEncodeBroadHistoneK562Cbpsc369Sig.bigWig \
-    ./validators/data/mm9.chromSizes.txt
+    ./validators/data/hg19.chromSizes.txt
 
 python cli.py analysis \
     start -- -2500 50 100 \
     ../../../public/media/unt1hr.obsTSS.bed \
     ./validators/data/hg19.chromSizes.txt
 """
+
+import click
+import validators
 
 
 def write_errs(errs):
@@ -37,11 +32,11 @@ def write_errs(errs):
 
 
 @click.group()
-def validation():
+def validate():
     pass
 
 
-@validation.command()
+@validate.command()
 @click.argument('feature_list')
 @click.argument('chrom_sizes_file')
 def feature_list(feature_list, chrom_sizes_file):
@@ -50,7 +45,7 @@ def feature_list(feature_list, chrom_sizes_file):
     write_errs(validator.display_errors())
 
 
-@validation.command()
+@validate.command()
 @click.argument('feature_bed')
 @click.argument('sort_vector')
 def sort_vector(feature_bed, sort_vector):
@@ -59,7 +54,7 @@ def sort_vector(feature_bed, sort_vector):
     write_errs(validator.display_errors())
 
 
-@validation.command()
+@validate.command()
 @click.argument('bigwig')
 @click.argument('chrom_sizes_file')
 def bigwig(bigwig, chrom_sizes_file):
@@ -68,7 +63,7 @@ def bigwig(bigwig, chrom_sizes_file):
     write_errs(validator.display_errors())
 
 
-@validation.command()
+@validate.command()
 @click.argument('bin_anchor',
                 type=click.Choice(validators.AnalysisValidator.ANCHOR_OPTIONS))
 @click.argument('bin_start', type=int)
@@ -87,9 +82,6 @@ def analysis(bin_anchor, bin_start, bin_number,
     validator.validate()
     write_errs(validator.display_errors())
 
-"""
-python cli.py analysis start -- -2500 50 100 ../../../public/media/unt1hr.obsTSS.bed ./validators/data/hg19.chromSizes.txt
-"""
 
 if __name__ == '__main__':
-    validation()
+    validate()
