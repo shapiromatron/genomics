@@ -15,14 +15,13 @@ from django.core.cache import cache
 from django.core.mail import send_mail
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.urlresolvers import reverse
-from django.contrib.messages import constants as msg_constants
 from django.contrib.sites.models import Site
 from django.contrib.postgres.fields import JSONField
 from django.utils.timezone import now
 from django.template.loader import render_to_string
 
 from utils.models import ReadOnlyFileSystemStorage, get_random_filename
-from async_messages import message_user
+from async_messages import messages
 
 from .import tasks
 
@@ -104,11 +103,11 @@ def validation_save_and_message(object, is_valid, notes):
     msg = '{} {}: '.format(object._meta.verbose_name.title(), object)
     if is_valid:
         msg += 'validation passed!'
-        message_user(object.owner, msg, msg_constants.SUCCESS)
+        messages.success(object.owner, msg)
     else:
         msg += "validation failed (<a href='{}'>View errors</a>) !"\
             .format(object.get_absolute_url())
-        message_user(object.owner, msg, msg_constants.WARNING)
+        messages.warning(object.owner, msg)
 
 
 class DatasetDownload(models.Model):
