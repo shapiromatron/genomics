@@ -9,7 +9,7 @@
         onclick: null,
         showDuration: 500,
         hideDuration: 500,
-        timeOut: 1500,
+        timeOut: 0,
         extendedTimeOut: 1000,
         showEasing: 'swing',
         hideEasing: 'linear',
