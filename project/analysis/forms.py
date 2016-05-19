@@ -160,7 +160,8 @@ class FeatureListForm(BaseFormMixin, forms.ModelForm):
 
     class Meta:
         model = models.FeatureList
-        exclude = ('owner', 'borrowers', 'validated', 'validation_notes')
+        exclude = ('owner', 'public', 'borrowers',
+                   'validated', 'validation_notes')
 
     def save(self, commit=True):
         if commit:
@@ -175,7 +176,8 @@ class SortVectorForm(BaseFormMixin, forms.ModelForm):
 
     class Meta:
         model = models.SortVector
-        exclude = ('owner', 'borrowers', 'validated', 'validation_notes')
+        exclude = ('owner', 'public', 'borrowers',
+                   'validated', 'validation_notes')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
