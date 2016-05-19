@@ -16,6 +16,10 @@ python cli.py bigwig \
     ../../../data/encode/hg19/wgEncodeBroadHistone/wgEncodeBroadHistoneK562Cbpsc369Sig.bigWig \
     ./validators/data/hg19.chromSizes.txt
 
+
+To pass negative values, you must specify as below, specify as an option; you'd
+write -- -100 for example [docs](http://click.pocoo.org/6/arguments/#option-like-arguments).
+
 python cli.py analysis \
     start -- -2500 50 100 \
     ../../../public/media/unt1hr.obsTSS.bed \
