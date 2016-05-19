@@ -15,10 +15,10 @@ LOGGING['loggers']['']['handlers'] = ['console']
 
 USE_CELERY_IN_DEV = os.environ.get('USE_CELERY_IN_DEV', 'False') == 'True'
 if USE_CELERY_IN_DEV:
-    # swap cache to filebased so multiple workers can use
+    # use db cache for persistence
     CACHES['default'] = {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': os.path.join(PROJECT_ROOT, 'django_cache'),
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
     }
 else:
     # use simpler cache

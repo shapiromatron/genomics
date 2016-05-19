@@ -15,12 +15,14 @@ from django.core.cache import cache
 from django.core.mail import send_mail
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.urlresolvers import reverse
+from django.contrib.messages import constants as msg_constants
 from django.contrib.sites.models import Site
 from django.contrib.postgres.fields import JSONField
 from django.utils.timezone import now
 from django.template.loader import render_to_string
 
 from utils.models import ReadOnlyFileSystemStorage, get_random_filename
+from async_messages import message_user
 
 from .import tasks
 
@@ -89,6 +91,24 @@ def get_chromosome_size_file(genome_assembly):
         return validation.get_chromosome_size_path('hg19')
     elif genome_assembly == MM9:
         return validation.get_chromosome_size_path('mm9')
+
+
+def validation_save_and_message(object, is_valid, notes):
+    # intentionally omit post_save signal
+    object.__class__.objects\
+        .filter(id=object.id)\
+        .update(
+            validated=is_valid,
+            validation_notes=notes)
+
+    msg = '{} {}: '.format(object._meta.verbose_name.title(), object)
+    if is_valid:
+        msg += 'validation passed!'
+        message_user(object.owner, msg, msg_constants.SUCCESS)
+    else:
+        msg += "validation failed (<a href='{}'>View errors</a>) !"\
+            .format(object.get_absolute_url())
+        message_user(object.owner, msg, msg_constants.WARNING)
 
 
 class DatasetDownload(models.Model):
@@ -337,12 +357,7 @@ class UserDataset(GenomicDataset):
             is_valid = validator.is_valid
             notes = validator.display_errors()
 
-        # intentionally omit post_save signal
-        self.__class__.objects\
-            .filter(id=self.id)\
-            .update(
-                validated=is_valid,
-                validation_notes=notes)
+        validation_save_and_message(self, is_valid, notes)
 
 
 class EncodeDataset(GenomicDataset):
@@ -443,17 +458,13 @@ class FeatureList(Dataset):
         return reverse('analysis:feature_list_delete', args=[self.pk, ])
 
     def validate_and_save(self):
-        size_file = self.get_chromosome_size_file(self.genome_assembly)
+        size_file = get_chromosome_size_file(self.genome_assembly)
         validator = validation.FeatureListValidator(
             self.dataset.path, size_file)
         validator.validate()
-
-        # intentionally omit post_save signal
-        self.__class__.objects\
-            .filter(id=self.id)\
-            .update(
-                validated=validator.is_valid,
-                validation_notes=validator.display_errors())
+        validation_save_and_message(
+            self, validator.is_valid,
+            validator.display_errors())
 
 
 class SortVector(Dataset):
@@ -488,13 +499,9 @@ class SortVector(Dataset):
             self.feature_list.dataset.path,
             self.vector.path)
         validator.validate()
-
-        # intentionally omit post_save signal
-        self.__class__.objects\
-            .filter(id=self.id)\
-            .update(
-                validated=validator.is_valid,
-                validation_notes=validator.display_errors())
+        validation_save_and_message(
+            self, validator.is_valid,
+            validator.display_errors())
 
 
 class AnalysisDatasets(models.Model):
@@ -609,12 +616,9 @@ class Analysis(GenomicBinSettings):
             stranded_bed=self.feature_list.stranded,
         )
         validator.validate()
-        # intentionally omit post_save signal
-        self.__class__.objects\
-            .filter(id=self.id)\
-            .update(
-                validated=validator.is_valid,
-                validation_notes=validator.display_errors())
+        validation_save_and_message(
+            self, validator.is_valid,
+            validator.display_errors())
 
     def get_absolute_url(self):
         return reverse('analysis:analysis', args=[self.pk, ])
