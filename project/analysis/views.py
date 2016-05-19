@@ -1,10 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages import get_messages
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import HttpResponse, get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView, CreateView, UpdateView, \
-        DetailView, DeleteView, ListView
+        DetailView, DeleteView, ListView, View
 
 from utils.views import OwnerOrStaff, AddUserToFormMixin
 from . import models, forms, tasks
@@ -17,6 +18,16 @@ class Home(TemplateView):
         if request.user.is_authenticated():
             return HttpResponseRedirect(reverse_lazy('analysis:dashboard'))
         return super(Home, self).get(request, *args, **kwargs)
+
+
+class ShortPollMessages(View):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({
+            'messages': [
+                {'status': m.tags, 'message': m.message}
+                for m in get_messages(request)
+            ]
+        })
 
 
 class CeleryTester(Home):
