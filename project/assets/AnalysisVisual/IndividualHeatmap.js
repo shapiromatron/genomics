@@ -34,6 +34,9 @@ class IndividualHeatmap {
                 self.drawQuartiles(display_data, d);
             });
         });
+        $.get(window.ksURL + '?vector_id=' + vector_id + '&matrix_id=' + this.id, function(d){
+            self.displayQuartilePValue(d['significance']);
+        });
     }
 
     renderUnsorted() {
@@ -43,6 +46,23 @@ class IndividualHeatmap {
             self.drawHeatmap(display_data, null);
             self.drawQuartiles(display_data, null);
         });
+        $.get(window.unsortedKsURL + '?matrix_id=' + this.id, function(d){
+            self.displayQuartilePValue(d['significance']);
+        });
+    }
+
+    displayQuartilePValue(p) {
+        this.modal_body.find('#quartile_pval').remove();
+        var quartile_plot = $('<p id="quartile_pval">p-value = ' + p.toExponential(2) + '</p>')
+            .css({
+                'position': 'absolute',
+                'left': '11%',
+                'top': '37%',
+                'height': '25%',
+                'width': '40%',
+            })
+            .appendTo(this.modal_body);
+
     }
 
     createResortOptions() {
@@ -510,6 +530,9 @@ class IndividualHeatmap {
             self.drawMetaPlot(display_data);
             self.drawQuartiles(display_data, null);
             self.createResortOptions();
+        });
+        $.get(window.unsortedKsURL + '?matrix_id=' + this.id, function(d){
+            self.displayQuartilePValue(d['significance']);
         });
     }
 
