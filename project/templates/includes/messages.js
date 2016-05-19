@@ -1,30 +1,25 @@
 <script type="text/javascript">
-    var opts = {
+    toastr.options = {
         closeButton: true,
-        debug: false,
-        newestOnTop: false,
-        progressBar: false,
+        newestOnTop: true,
         positionClass: 'toast-top-right',
-        preventDuplicates: false,
-        onclick: null,
         showDuration: 500,
         hideDuration: 500,
         timeOut: 0,
-        extendedTimeOut: 1000,
-        showEasing: 'swing',
-        hideEasing: 'linear',
-        showMethod: 'fadeIn',
-        hideMethod: 'fadeOut'
+        extendedTimeOut: 0,
     };
 
     {% for message in messages %}
-        toastr["{{message.tags}}"]("{{ message|safe }}", opts)
+        toastr["{{message.tags}}"]("{{ message|safe }}");
     {% endfor %}
 
     window.setInterval(function(){
         $.get('{% url "analysis:poll_messages" %}', function(d){
+            if(d.messages.length>0){
+                toastr.clear();
+            }
             d.messages.forEach(function(resp){
-                toastr[resp.status](resp.message, opts);
+                toastr[resp.status](resp.message);
             });
         });
     }, 5000);
