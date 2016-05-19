@@ -1,3 +1,5 @@
+from django.contrib import messages
+
 from django.core.exceptions import PermissionDenied
 
 
@@ -16,3 +18,19 @@ class AddUserToFormMixin(object):
         kwargs = super().get_form_kwargs()
         kwargs['owner'] = self.request.user
         return kwargs
+
+
+class MessageMixin(object):
+
+    def send_message(self):
+        if self.success_message:
+            messages.success(
+                self.request, self.success_message)
+
+    def delete(self, request, *args, **kwargs):
+        self.send_message()
+        return super(MessageMixin, self).delete(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.send_message()
+        return super(MessageMixin, self).form_valid(form)
