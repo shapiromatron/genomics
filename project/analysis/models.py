@@ -100,7 +100,9 @@ def validation_save_and_message(object, is_valid, notes):
     notes = notes\
         .replace(user_home, '/***')\
         .replace(media_path, '/***')\
-        .strip()
+
+    # remove extra whitespace from all lines
+    notes = '\n'.join([l.strip() for l in notes.splitlines()])
 
     # intentionally omit post_save signal
     object.__class__.objects\
