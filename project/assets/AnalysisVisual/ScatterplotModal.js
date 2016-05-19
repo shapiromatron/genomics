@@ -4,14 +4,14 @@ import d3 from 'd3';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Loading from '../AnalysisForm/components/Loading';
-
 
 class ScatterplotModal {
 
-    constructor (idx, idy, modal_title, modal_body) {
+    constructor (idx, idy, namex, namey, modal_title, modal_body) {
         this.idx = idx;
         this.idy = idy;
+        this.namex = namex;
+        this.namey = namey;
         this.modal_title = modal_title;
         this.modal_body = modal_body;
     }
@@ -136,7 +136,7 @@ class ScatterplotModal {
                 .attr('x', width)
                 .attr('y', -6)
                 .style('text-anchor', 'end')
-                .text(this.idx);
+                .text(this.namex);
 
             svg.append('g')
                 .attr('class', 'y axis')
@@ -147,7 +147,7 @@ class ScatterplotModal {
                 .attr('y', 6)
                 .attr('dy', '.71em')
                 .style('text-anchor', 'end')
-                .text(this.idy);
+                .text(this.namey);
 
             svg.append('g')
                 .attr('class', 'gdot');
@@ -178,7 +178,7 @@ class ScatterplotModal {
         } else {
             //update
 
-            let axisDuration = 800;
+            let axisDuration = 500;
 
             svg.selectAll('.y')
                .transition()
@@ -193,7 +193,7 @@ class ScatterplotModal {
             svg.selectAll('.gdot')
                .transition()
                .delay(axisDuration * 0.8)
-               .duration(500)
+               .duration(300)
                .style('opacity', 0)
                .each('end', function(){
                     svg.selectAll('circle')
@@ -202,7 +202,7 @@ class ScatterplotModal {
                         .attr('cy', (d) => y(d.y));
                })
                .transition()
-               .duration(2000)
+               .duration(800)
                .style('opacity', 1);
 
         }
