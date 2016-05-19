@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import NotAcceptable
 
-from utils.api import SiteMixin, OwnedButShareableMixin, NoPagination, PlainTextRenderer
+from utils.api import SiteMixin, AnalysisObjectMixin, \
+        NoPagination, PlainTextRenderer
 from utils.base import tryParseInt
 
 from . import models, serializers
@@ -69,7 +70,7 @@ class EncodeDatasetViewset(SiteMixin, viewsets.ReadOnlyModelViewSet):
         return models.EncodeDataset.objects.filter(filters)
 
 
-class UserDatasetViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
+class UserDatasetViewset(AnalysisObjectMixin, viewsets.ModelViewSet):
     pagination_class = NoPagination
 
     def get_serializer_class(self):
@@ -82,7 +83,7 @@ class UserDatasetViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class FeatureListViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
+class FeatureListViewset(AnalysisObjectMixin, viewsets.ModelViewSet):
     pagination_class = NoPagination
 
     def get_serializer_class(self):
@@ -96,7 +97,7 @@ class FeatureListViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class SortVectorViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
+class SortVectorViewset(AnalysisObjectMixin, viewsets.ModelViewSet):
     pagination_class = NoPagination
 
     def get_serializer_class(self):
@@ -110,7 +111,7 @@ class SortVectorViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
+class AnalysisViewset(AnalysisObjectMixin, viewsets.ModelViewSet):
     pagination_class = NoPagination
 
     @detail_route(methods=['get'])
@@ -119,37 +120,39 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
         if sort_vector_id == -1:
             raise NotAcceptable("Sort vector `id` parameter required")
         an = get_object_or_404(models.Analysis, pk=int(pk))
+        self.check_object_permissions(request, an)
         return Response(an.get_ks(sort_vector_id))
 
     @detail_route(methods=['get'])
     def plot(self, request, pk=None):
         an = get_object_or_404(models.Analysis, pk=int(pk))
+        self.check_object_permissions(request, an)
         return Response(an.get_summary_plot())
 
     @detail_route(methods=['get'])
     def sort_vector(self, request, pk=None):
-        # TODO: check permissions
         sort_vector_id = tryParseInt(self.request.GET.get('id'), -1)
         if sort_vector_id == -1:
             raise NotAcceptable("Sort vector `id` parameter required")
         an = get_object_or_404(models.Analysis, pk=int(pk))
+        self.check_object_permissions(request, an)
         return Response(an.get_sort_vector(sort_vector_id))
 
     @detail_route(methods=['get'], renderer_classes=(PlainTextRenderer,))
     def scatterplot(self, request, pk=None):
-        # TODO: check permissions
         idx = tryParseInt(self.request.GET.get('idx'))
         idy = tryParseInt(self.request.GET.get('idy'))
         column = self.request.GET.get('column')
         if idx is None or idy is None:
             raise NotAcceptable("Parameters `idx` and `idy` are required")
         an = get_object_or_404(models.Analysis, pk=int(pk))
+        self.check_object_permissions(request, an)
         return Response(an.get_scatterplot_data(idx, idy, column))
 
     @detail_route(methods=['get'])
     def bin_names(self, request, pk=None):
-        # TODO: check permissions
         an = get_object_or_404(models.Analysis, pk=int(pk))
+        self.check_object_permissions(request, an)
         return Response(an.get_bin_names())
 
     def get_serializer_class(self):
@@ -163,12 +166,12 @@ class AnalysisViewset(OwnedButShareableMixin, viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class FeatureListCountMatrixViewset(SiteMixin, viewsets.ReadOnlyModelViewSet):
+class FeatureListCountMatrixViewset(AnalysisObjectMixin, viewsets.ReadOnlyModelViewSet):
 
     @detail_route(methods=['get'], renderer_classes=(PlainTextRenderer,))
     def plot(self, request, pk=None):
-        # TODO: check permissions
         flcm = get_object_or_404(models.FeatureListCountMatrix, pk=int(pk))
+        self.check_object_permissions(request, flcm)
         return Response(flcm.get_dataset())
 
     def get_serializer_class(self):

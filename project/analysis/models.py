@@ -1021,6 +1021,18 @@ class FeatureListCountMatrix(GenomicBinSettings):
             matrix=os.path.join(cls.UPLOAD_TO, os.path.basename(fn))
         )
 
+    def user_can_view(self, user):
+        analyses = self.analysisdatasets_set\
+            .values('analysis__owner_id', 'analysis__public')
+        return user.is_staff or \
+            any([d['analysis__public'] for d in analyses]) or \
+            user.id in [d['analysis__owner_id'] for d in analyses]
+
+    def user_can_edit(self, user):
+        return user.is_staff or \
+            user.id in self.analysisdatasets_set.objects\
+                .values_list('analysis__owner_id', flat=True)
+
     def get_dataset(self):
         key = 'flcm-%s' % self.id
         obj = cache.get(key)
