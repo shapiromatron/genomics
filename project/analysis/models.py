@@ -8,6 +8,8 @@ import requests
 import zipfile
 import itertools
 import pandas as pd
+import math
+from scipy import stats
 
 from django.db import models
 from django.conf import settings
@@ -846,11 +848,47 @@ class Analysis(GenomicBinSettings):
             'feature_cluster_members': output['feature_cluster_members'],
         }
 
-    def get_ks(self, id_):
+    def get_ks(self, vector_id, matrix_id):
         if not self.output:
             return False
+
         output = self.output_json
-        return {'p-value': str(id_) + ': 0.05'}
+        sort_order = output['sort_orders'].get(vector_id)
+        flcm = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=matrix_id)\
+            .select_related('count_matrix')\
+            .first()
+
+        n = len(sort_order)
+        values = list(flcm.count_matrix.df['All bins'])
+        quartiles = [[], [], [], []]
+        for i, index in enumerate(sort_order):
+            quartiles[math.floor(4*i/n)].append(values[index])
+
+        stat, cv, sig = stats.anderson_ksamp(quartiles)
+        return {
+            'statistic': stat,
+            'critical_values': cv,
+            'significance': sig,
+        }
+
+    def get_unsorted_ks(self, matrix_id):
+        flcm = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=matrix_id)\
+            .select_related('count_matrix')\
+            .first()
+
+        n = len(flcm.count_matrix.df['All bins'])
+        quartiles = [[], [], [], []]
+        for i, value in enumerate(flcm.count_matrix.df['All bins']):
+            quartiles[math.floor(4*i/n)].append(value)
+
+        stat, cv, sig = stats.anderson_ksamp(quartiles)
+        return {
+            'statistic': stat,
+            'critical_values': cv,
+            'significance': sig,
+        }
 
     def get_sort_vector(self, id_):
         if not self.output:

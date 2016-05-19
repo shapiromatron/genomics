@@ -116,12 +116,24 @@ class AnalysisViewset(AnalysisObjectMixin, viewsets.ModelViewSet):
 
     @detail_route(methods=['get'])
     def ks(self, request, pk=None):
-        sort_vector_id = tryParseInt(self.request.GET.get('id'), -1)
-        if sort_vector_id == -1:
-            raise NotAcceptable("Sort vector `id` parameter required")
+        vector_id = tryParseInt(self.request.GET.get('vector_id'), -1)
+        matrix_id = tryParseInt(self.request.GET.get('matrix_id'), -1)
+        if vector_id == -1:
+            raise NotAcceptable("Vector `id` parameter required")
+        if matrix_id == -1:
+            raise NotAcceptable("Matrix `id` parameter required")
         an = get_object_or_404(models.Analysis, pk=int(pk))
         self.check_object_permissions(request, an)
-        return Response(an.get_ks(sort_vector_id))
+        return Response(an.get_ks(vector_id, matrix_id))
+
+    @detail_route(methods=['get'])
+    def unsorted_ks(self, request, pk=None):
+        matrix_id = tryParseInt(self.request.GET.get('matrix_id'), -1)
+        if matrix_id == -1:
+            raise NotAcceptable("Matrix `id` parameter required")
+        an = get_object_or_404(models.Analysis, pk=int(pk))
+        self.check_object_permissions(request, an)
+        return Response(an.get_unsorted_ks(matrix_id))
 
     @detail_route(methods=['get'])
     def plot(self, request, pk=None):

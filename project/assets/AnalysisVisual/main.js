@@ -77,10 +77,6 @@ let startup = function(){
             overview.render();
             individual_overview.render();
         });
-
-        $.get(window.ksURL + '?id=123', function(d){
-            console.log(d);
-        });
     });
 };
 
