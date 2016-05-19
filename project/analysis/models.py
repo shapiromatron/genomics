@@ -110,10 +110,10 @@ def validation_save_and_message(object, is_valid, notes):
 
     msg = '{} {}: '.format(object._meta.verbose_name.title(), object)
     if is_valid:
-        msg += 'validation passed!'
+        msg += 'validation complete!'
         messages.success(object.owner, msg)
     else:
-        msg += "validation failed (<a href='{}'>View errors</a>) !"\
+        msg += "<a href='{}'>validation failed (view errors)</a>"\
             .format(object.get_absolute_url())
         messages.warning(object.owner, msg)
 
@@ -199,6 +199,7 @@ class DatasetDownload(models.Model):
         return self.status_code == self.FINISHED_ERROR
 
     def download(self):
+        related_ds = list(self.related_datasets())
         fn = self.data.path
         self.reset()
         try:
@@ -211,12 +212,20 @@ class DatasetDownload(models.Model):
             self.status_code = self.FINISHED_SUCCESS
             self.md5 = self.get_md5()
             self.filesize = os.path.getsize(fn)
+            for ds in related_ds:
+                msg = 'Download complete (will validate next): {}'.format(self.url)
+                messages.success(ds.owner, msg)
         except Exception as e:
             self.start_time = None
             self.status_code = self.FINISHED_ERROR
             self.status = str(e)
+            for ds in related_ds:
+                msg = 'Download failed: {}'.format(self.url)
+                messages.warning(ds.owner, msg)
+
         self.save()
-        for ds in self.related_datasets():
+
+        for ds in related_ds:
             ds.validate_and_save()
 
     def get_md5(self):
