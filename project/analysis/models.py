@@ -93,6 +93,14 @@ def get_chromosome_size_file(genome_assembly):
 
 
 def validation_save_and_message(object, is_valid, notes):
+
+    # remove any path information from outputs
+    user_home = object.owner.path
+    media_path = settings.MEDIA_ROOT
+    notes = notes\
+        .replace(user_home, '/***')\
+        .replace(media_path, '/***')
+
     # intentionally omit post_save signal
     object.__class__.objects\
         .filter(id=object.id)\
