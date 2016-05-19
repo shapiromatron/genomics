@@ -76,6 +76,12 @@ class Dataset(models.Model):
         else:
             return reverse('analysis:manage_data')
 
+    def user_can_view(self, user):
+        return self.public or self.owner == user or user.is_staff
+
+    def user_can_edit(self, user):
+        return self.owner == user or user.is_staff
+
 
 HG19 = 1
 MM9 = 2
@@ -738,10 +744,10 @@ class Analysis(GenomicBinSettings):
         verbose_name_plural = 'Analyses'
 
     def user_can_view(self, user):
-        if self.public:
-            return True
-        if self.owner == user:
-            return True
+        return self.public or self.owner == user or user.is_staff
+
+    def user_can_edit(self, user):
+        return self.owner == user or user.is_staff
 
     def get_flcm_ids(self):
         return list(self.analysisdatasets_set.values_list('count_matrix', flat=True))

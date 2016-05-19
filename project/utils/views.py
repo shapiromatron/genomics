@@ -3,13 +3,27 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 
 
-class OwnerOrStaff(object):
+class UserCanEdit(object):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        if not self.request.user.is_staff and obj.owner != self.request.user:
+        if not obj.user_can_edit(self.request.user):
             raise PermissionDenied()
         return obj
+
+
+class UserCanView(object):
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if not obj.user_can_view(self.request.user):
+            raise PermissionDenied()
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super(UserCanView, self).get_context_data(**kwargs)
+        context['user_can_edit'] = self.object.user_can_edit(self.request.user)
+        return context
 
 
 class AddUserToFormMixin(object):

@@ -23,9 +23,11 @@
         Actions <span class="caret"></span>
         </button>
         <ul class='dropdown-menu'>
+            {% if user_can_edit %}
             <li class="dropdown-header">Editing options</li>
             <li><a href='{{object.get_update_url}}'>Update</a></li>
             <li><a href='{{object.get_delete_url}}'>Delete</a></li>
+            {% endif %}
             <li class="dropdown-header">Viewing options</li>
             <li><a href='{{object.get_visuals_url}}'>View visualization</a></li>
             <li><a href='{{object.get_zip_url}}'>Download zip</a></li>
