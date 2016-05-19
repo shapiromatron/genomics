@@ -99,7 +99,8 @@ def validation_save_and_message(object, is_valid, notes):
     media_path = settings.MEDIA_ROOT
     notes = notes\
         .replace(user_home, '/***')\
-        .replace(media_path, '/***')
+        .replace(media_path, '/***')\
+        .strip()
 
     # intentionally omit post_save signal
     object.__class__.objects\
