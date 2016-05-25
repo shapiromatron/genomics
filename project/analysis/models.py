@@ -998,7 +998,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
     @property
     def df(self):
         # get formatted pandas data frame
-        key = 'flcm-%s' % self.id
+        key = 'flcm-df-%s' % self.id
         df = cache.get(key)
         if df is None:
             df = pd.read_csv(self.matrix.path, sep='\t')
