@@ -70,6 +70,9 @@ class IndividualHeatmap {
             self.drawHeatmap(display_data, sort_order);
             self.drawQuartiles(display_data, sort_order);
         });
+        $.get(`${window.userSortKsURL}?matrix_id=${this.id}`, function(d){
+            self.displayQuartilePValue(d['significance']);
+        });
     }
 
     displayQuartilePValue(p) {

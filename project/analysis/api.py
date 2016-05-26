@@ -136,6 +136,15 @@ class AnalysisViewset(AnalysisObjectMixin, viewsets.ModelViewSet):
         return Response(an.get_unsorted_ks(matrix_id))
 
     @detail_route(methods=['get'])
+    def user_sort_ks(self, request, pk=None):
+        matrix_id = tryParseInt(self.request.GET.get('matrix_id'), -1)
+        if matrix_id == -1:
+            raise NotAcceptable("Matrix `id` parameter required")
+        an = get_object_or_404(models.Analysis, pk=int(pk))
+        self.check_object_permissions(request, an)
+        return Response(an.get_ks_by_user_vector(matrix_id))
+
+    @detail_route(methods=['get'])
     def plot(self, request, pk=None):
         an = get_object_or_404(models.Analysis, pk=int(pk))
         self.check_object_permissions(request, an)

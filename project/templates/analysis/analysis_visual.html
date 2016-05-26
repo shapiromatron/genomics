@@ -40,7 +40,8 @@
         "ksURL": "{% url 'analysis:api:analysis-ks' object.id %}",
         "unsortedKsURL": "{% url 'analysis:api:analysis-unsorted-ks' object.id %}",
         "scatterplotURL": "{% url 'analysis:api:analysis-scatterplot' object.id %}",
-        "binNamesUrl": "{% url 'analysis:api:analysis-bin-names' object.id %}"
+        "binNamesUrl": "{% url 'analysis:api:analysis-bin-names' object.id %}",
+        "userSortKsURL": "{% url 'analysis:api:analysis-user-sort-ks' object.id %}"
     }
 </script>
 {% render_bundle 'main' %}

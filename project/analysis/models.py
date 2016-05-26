@@ -9,6 +9,7 @@ import zipfile
 import itertools
 import pandas as pd
 import math
+import numpy
 from scipy import stats
 
 from django.db import models
@@ -884,6 +885,34 @@ class Analysis(GenomicBinSettings):
         quartiles = [[], [], [], []]
         for i, value in enumerate(flcm.count_matrix.df['All bins']):
             quartiles[math.floor(4*i/n)].append(value)
+
+        stat, cv, sig = stats.anderson_ksamp(quartiles)
+        return {
+            'statistic': stat,
+            'critical_values': cv,
+            'significance': sig,
+        }
+
+    def get_ks_by_user_vector(self, matrix_id):
+        output = self.output_json
+        sort_vector = output['sort_vector']
+
+        if not sort_vector:
+            return False
+
+        # descending sort order
+        sort_order = numpy.argsort(sort_vector)[::-1]
+
+        flcm = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=matrix_id)\
+            .select_related('count_matrix')\
+            .first()
+
+        n = len(sort_order)
+        values = list(flcm.count_matrix.df['All bins'])
+        quartiles = [[], [], [], []]
+        for i, index in enumerate(sort_order):
+            quartiles[math.floor(4*i/n)].append(values[index])
 
         stat, cv, sig = stats.anderson_ksamp(quartiles)
         return {
