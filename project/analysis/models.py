@@ -846,6 +846,8 @@ class Analysis(GenomicBinSettings):
             'feature_columns': output['feature_columns'],
             'feature_names': output['feature_names'],
             'feature_cluster_members': output['feature_cluster_members'],
+            'sort_vector': output['sort_vector'],
+            'bin_parameters': output['bin_parameters'],
         }
 
     def get_ks(self, vector_id, matrix_id):
