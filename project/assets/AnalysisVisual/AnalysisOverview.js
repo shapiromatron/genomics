@@ -20,7 +20,8 @@ class AnalysisOverview{
         this.sort_vector = data['sort_vector'];
         this.bin_parameters = data['bin_parameters'];
 
-        var matrix_names = this.matrix_names;
+        var matrix = this.matrix,
+            cluster_medoids = this.cluster_medoids;
         if (this.sort_vector) {
             this.col_names = [];
             var start = parseInt(this.bin_parameters['window_start']),
@@ -32,8 +33,8 @@ class AnalysisOverview{
         } else {
             this.col_names = _.map(this.cluster_members, function(d, i){
                 let name = (d.length > 1)?
-                        `(${d.length}) ${this.cluster_medoids[i]}`:
-                        matrix_names[i];
+                        `(${d.length}) ${cluster_medoids[i]}`:
+                        matrix[cluster_medoids[i]];
 
                 return name;
             });
