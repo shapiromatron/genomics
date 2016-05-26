@@ -5,7 +5,7 @@ import _ from 'underscore';
 
 class IndividualHeatmap {
 
-    constructor (id, matrix_names, matrix_ids, heatmap_name, modal_title, modal_body) {
+    constructor (id, matrix_names, matrix_ids, heatmap_name, modal_title, modal_body, sort_vector) {
         this.id = id;
         this.matrix_names = matrix_names;
         this.matrix_ids = matrix_ids;
@@ -13,6 +13,7 @@ class IndividualHeatmap {
         this.modal_title = modal_title;
         this.modal_body = modal_body;
         this.selected_sort = null;
+        this.sort_vector = sort_vector;
 
         this.matrices = _.zip(this.matrix_ids, this.matrix_names);
     }
@@ -48,6 +49,26 @@ class IndividualHeatmap {
         });
         $.get(`${window.unsortedKsURL}?matrix_id=${this.id}`, function(d){
             self.displayQuartilePValue(d['significance']);
+        });
+    }
+
+    renderBySortVector() {
+        var self = this,
+            w_index = [],
+            sort_order = [];
+        for (var i in this.sort_vector) {
+            w_index.push([this.sort_vector[i], i])
+        }
+        w_index.sort(function(x, y) {
+          return x[0] > y[0] ? -1 : 1;
+        });
+        for (var i in w_index) {
+            sort_order.push(w_index[i][1]);
+        }
+        $.get(this.url(this.id), function(data){
+            var display_data = d3.tsv.parseRows(data);
+            self.drawHeatmap(display_data, sort_order);
+            self.drawQuartiles(display_data, sort_order);
         });
     }
 
@@ -94,6 +115,9 @@ class IndividualHeatmap {
             .appendTo(this.modal_body);
 
         var options = this.matrices;
+        if (this.sort_vector) {
+            options.unshift(['Sort vector order','Sort vector order']);
+        }
         options.unshift(['Feature list order', 'Feature list order']);
 
         d3.select(select_list.get(0))
@@ -122,6 +146,8 @@ class IndividualHeatmap {
             .click(function(){
                 if (select_list.val() == 'Feature list order') {
                     self.renderUnsorted();
+                } else if (select_list.val() == 'Sort vector order') {
+                    self.renderBySortVector();
                 } else {
                     self.getSortVector(select_list.val());
                 }

@@ -434,7 +434,8 @@ class IndividualOverview {
             selected = names.indexOf(name),
             matrix_id = ids[selected],
             modalTitle = $('#ind_heatmap_modal_title'),
-            modalBody = $('#ind_heatmap_modal_body');
+            modalBody = $('#ind_heatmap_modal_body'),
+            sort_vector = this.sort_vector;
 
         $('#flcModal')
             .one('show.bs.modal', function(){
@@ -448,7 +449,8 @@ class IndividualOverview {
                     ids,
                     name,
                     modalTitle,
-                    modalBody
+                    modalBody,
+                    sort_vector,
                 );
                 individual_heatmap.render();
             }).modal('show');
