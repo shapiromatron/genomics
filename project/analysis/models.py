@@ -1062,10 +1062,16 @@ class FeatureListCountMatrix(GenomicBinSettings):
         # existing not found; create instead
         fn = get_random_filename(os.path.join(settings.MEDIA_ROOT, cls.UPLOAD_TO))
 
-        if dataset.is_stranded:
-            bigwigs = [dataset.data_plus.path, dataset.data_minus.path]
-        else:
-            bigwigs = [dataset.data_ambiguous.path]
+        if isinstance(dataset, EncodeDataset):
+            if dataset.is_stranded:
+                bigwigs = [dataset.data_plus.path, dataset.data_minus.path]
+            else:
+                bigwigs = [dataset.data_ambiguous.path]
+        elif isinstance(dataset, UserDataset):
+            if dataset.is_stranded:
+                bigwigs = [dataset.plus.data.path, dataset.minus.data.path]
+            else:
+                bigwigs = [dataset.ambiguous.data.path]
 
         BedMatrix(
             bigwigs=bigwigs,
