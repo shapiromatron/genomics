@@ -939,6 +939,23 @@ class Analysis(GenomicBinSettings):
             .first()
         return list(flcm.df.columns)
 
+    def get_sortvector_scatterplot_data(self, idy, column):
+        y = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=idy)\
+            .select_related('count_matrix')\
+            .first()
+
+        yDf = y.count_matrix.df
+
+        if column not in yDf.columns:
+            column = FeatureListCountMatrix.ALL_BINS
+
+        yDf.rename(columns={column: 'y'}, inplace=True)
+
+        yDf = yDf[['y']]
+
+        return yDf.to_csv()
+
     def get_scatterplot_data(self, idx, idy, column):
         x = AnalysisDatasets.objects\
             .filter(analysis_id=self.id, count_matrix=idx)\

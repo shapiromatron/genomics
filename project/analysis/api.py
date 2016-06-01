@@ -160,6 +160,16 @@ class AnalysisViewset(AnalysisObjectMixin, viewsets.ModelViewSet):
         return Response(an.get_sort_vector(sort_vector_id))
 
     @detail_route(methods=['get'], renderer_classes=(PlainTextRenderer,))
+    def sortvectorscatterplot(self, request, pk=None):
+        idy = tryParseInt(self.request.GET.get('idy'))
+        column = self.request.GET.get('column')
+        if idy is None:
+            raise NotAcceptable("Parameters `idx` and `idy` are required")
+        an = get_object_or_404(models.Analysis, pk=int(pk))
+        self.check_object_permissions(request, an)
+        return Response(an.get_sortvector_scatterplot_data(idy, column))
+
+    @detail_route(methods=['get'], renderer_classes=(PlainTextRenderer,))
     def scatterplot(self, request, pk=None):
         idx = tryParseInt(self.request.GET.get('idx'))
         idy = tryParseInt(self.request.GET.get('idy'))

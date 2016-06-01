@@ -3,6 +3,7 @@ import $ from 'jquery';
 import d3 from 'd3';
 
 import ScatterplotModal from './ScatterplotModal';
+import SortVectorScatterplotModal from './SortVectorScatterplotModal';
 
 
 class AnalysisOverview{
@@ -67,6 +68,7 @@ class AnalysisOverview{
             matrix_names = this.matrix_names,
             col_names = this.col_names,
             matrix = this.matrix,
+            sort_vector = this.sort_vector,
             getIndex = function(idx){
                 return (cluster_members[idx].length === 1) ?
                     cluster_members[idx][0] :
@@ -95,8 +97,7 @@ class AnalysisOverview{
             },
             showScatterplot = function(d, i, j){
 
-                var idx = getIndex(i),
-                    idy = getIndex(j),
+                var idy = getIndex(j),
                     modalTitle = $('#ind_heatmap_modal_title'),
                     modalBody = $('#ind_heatmap_modal_body');
 
@@ -106,9 +107,9 @@ class AnalysisOverview{
                         modalBody.html('');
                     })
                     .one('shown.bs.modal', function(){
-                        var modal = new ScatterplotModal(
-                            idx, idy,
-                            matrix[idx], matrix[idy],
+                        var modal = new SortVectorScatterplotModal(
+                            sort_vector, idy,
+                            matrix[idy],
                             modalTitle, modalBody
                         );
                         modal.render();
