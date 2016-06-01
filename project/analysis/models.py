@@ -350,6 +350,12 @@ class UserDataset(GenomicDataset):
     def get_absolute_url(self):
         return reverse('analysis:user_dataset', args=[self.pk, ])
 
+    def get_bigwig_paths(self):
+        if self.is_stranded:
+            return [self.plus.data.path, self.minus.data.path]
+        else:
+            return [self.ambiguous.data.path]
+
     def get_update_url(self):
         return reverse('analysis:user_dataset_update', args=[self.pk, ])
 
@@ -454,6 +460,12 @@ class EncodeDataset(GenomicDataset):
                     .distinct()\
                     .order_by(fld)
         return dicts
+
+    def get_bigwig_paths(self):
+        if self.is_stranded:
+            return[self.data_plus.path, self.data_minus.path]
+        else:
+            return [self.data_ambiguous.path]
 
 
 class FeatureList(Dataset):
@@ -1079,16 +1091,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
         # existing not found; create instead
         fn = get_random_filename(os.path.join(settings.MEDIA_ROOT, cls.UPLOAD_TO))
 
-        if isinstance(dataset, EncodeDataset):
-            if dataset.is_stranded:
-                bigwigs = [dataset.data_plus.path, dataset.data_minus.path]
-            else:
-                bigwigs = [dataset.data_ambiguous.path]
-        elif isinstance(dataset, UserDataset):
-            if dataset.is_stranded:
-                bigwigs = [dataset.plus.data.path, dataset.minus.data.path]
-            else:
-                bigwigs = [dataset.ambiguous.data.path]
+        bigwigs = dataset.get_bigwig_paths()
 
         BedMatrix(
             bigwigs=bigwigs,
