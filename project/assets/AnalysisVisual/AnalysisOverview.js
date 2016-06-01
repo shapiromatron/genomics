@@ -223,45 +223,6 @@ class AnalysisOverview{
                 'width': '60%',
             }).appendTo(this.el);
 
-        //Draw SVGs
-        // if (this.sort_vector != null) {
-        //     var col_names = [],
-        //         start = parseInt(this.bin_parameters['window_start']),
-        //         step = parseInt(this.bin_parameters['bin_size']);
-        //
-        //     for (var i = 0; i < parseInt(this.bin_parameters['bin_number']); i++) {
-        //         col_names.push((start + step*i) + ':' + (start + step*(i+1) - 1));
-        //     }
-        //
-        //     var height = vert.height(),
-        //         width = vert.width(),
-        //         ncols = col_names.length;
-        //
-        //     var data = _.map(col_names, function(d, i){
-        //         let name = col_names[i],
-        //             x = (((0.5 / ncols) * width) + i * (width / ncols)),
-        //             transform = `rotate(90 ${(((0.5/ncols)*width) + i*(width/ncols))},0)`;
-        //
-        //         return {name, x, transform};
-        //     });
-        // } else {
-        //     var height = vert.height(),
-        //         width = vert.width(),
-        //         ncols = this.cluster_members.length,
-        //         cluster_medoids = this.cluster_medoids,
-        //         matrix_names = this.matrix_names;
-        //
-        //     var data = _.map(this.cluster_members, function(d, i){
-        //         let name = (d.length > 1)?
-        //                 `(${d.length}) ${cluster_medoids[i]}`:
-        //                 matrix_names[i],
-        //             x = (((0.5 / ncols) * width) + i * (width / ncols)),
-        //             transform = `rotate(90 ${(((0.5/ncols)*width) + i*(width/ncols))},0)`;
-        //
-        //         return {name, x, transform};
-        //     });
-        // }
-
         if (this.sort_vector) {
             var height = vert.height(),
                 width = vert.width(),
