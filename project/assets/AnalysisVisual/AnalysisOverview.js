@@ -98,6 +98,7 @@ class AnalysisOverview{
             showScatterplot = function(d, i, j){
 
                 var idy = getIndex(j),
+                    bin = col_names[i],
                     modalTitle = $('#ind_heatmap_modal_title'),
                     modalBody = $('#ind_heatmap_modal_body');
 
@@ -108,7 +109,7 @@ class AnalysisOverview{
                     })
                     .one('shown.bs.modal', function(){
                         var modal = new SortVectorScatterplotModal(
-                            sort_vector, idy,
+                            sort_vector, bin, idy,
                             matrix[idy],
                             modalTitle, modalBody
                         );
