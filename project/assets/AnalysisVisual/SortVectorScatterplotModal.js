@@ -72,6 +72,9 @@ class SortVectorScatterplotModal {
 
     getScatterplotData(){
         let column = this.selector.val();
+        if (column == null) {
+            column = this.bin;
+        }
         d3.csv(
             this.datasetUrl(column),
             this.dataConversion,
