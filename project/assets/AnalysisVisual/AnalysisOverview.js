@@ -132,6 +132,8 @@ class AnalysisOverview{
             cluster_members = this.cluster_members,
             cluster_medoids = this.cluster_medoids,
             matrix = this.matrix,
+            col_names = this.col_names,
+            row_names = this.row_names,
             getIndex = function(idx){
                 return (cluster_members[idx].length === 1) ?
                     cluster_members[idx][0] :
@@ -142,12 +144,9 @@ class AnalysisOverview{
                     .style('stroke', 'black')
                     .style('stroke-width', '1');
 
-                var idx = getIndex(i),
-                    idy = getIndex(j);
-
                 $(this).tooltip({
                     container: 'body',
-                    title: `${matrix[idx]}<br/>${matrix[idy]}<br/>${d.toFixed(2)}`,
+                    title: `${col_names[i]}<br/>${row_names[j]}<br/>${d.toFixed(2)}`,
                     html: true,
                     animation: false,
                 }).tooltip('show');
@@ -160,9 +159,15 @@ class AnalysisOverview{
                     .style('stroke', 'none');
             },
             showScatterplot = function(d, i, j){
+                var getIndexFromName = function(name, idx) {
+                    if (cluster_members[idx].length > 1) {
+                        name = name.split(') ')[1];
+                    }
+                    return (_.invert(matrix))[name];
+                };
 
-                var idx = getIndex(i),
-                    idy = getIndex(j),
+                var idx = getIndexFromName(col_names[i], i),
+                    idy = getIndexFromName(row_names[j], j),
                     modalTitle = $('#ind_heatmap_modal_title'),
                     modalBody = $('#ind_heatmap_modal_body');
 
