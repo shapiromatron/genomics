@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import $ from 'jquery';
 import d3 from 'd3';
 
@@ -31,6 +32,16 @@ class FeatureClusteringOverview{
             '#fee090',
             '#313695',
         ];
+
+        var cluster_medoids = this.cluster_medoids,
+            matrix = _.object(data['matrix_ids'], data['matrix_names']);
+        this.col_names = _.map(this.cluster_members, function(d, i){
+            let name = (d.length > 1)?
+                    `(${d.length}) ${matrix[cluster_medoids[i]]}`:
+                    matrix[cluster_medoids[i]];
+
+            return name;
+        });
     }
 
     drawHeatmap(k) {
@@ -112,7 +123,7 @@ class FeatureClusteringOverview{
 
         svg.append('g')
             .selectAll('rect')
-            .data(this.feature_columns)
+            .data(this.col_names)
             .enter()
             .append('rect')
             .text( function(d) { return d; } )
@@ -281,15 +292,11 @@ class FeatureClusteringOverview{
 
         svg.append('g')
             .selectAll('text')
-            .data(this.cluster_members)
+            .data(this.col_names)
             .enter()
             .append('text')
             .attr('class', 'heatmapLabelText')
-            .text(function(d,i) {
-                return (d.length > 1) ?
-                    '(' + d.length + ') ' + cluster_medoids[i]:
-                    matrix_names[i];
-            })
+            .text(function(d) {return d;})
             .attr('x', function(d,i) {
                 return (((0.5 / row_number) * width) + i * (width / row_number));
             })
@@ -591,16 +598,16 @@ class FeatureClusteringOverview{
             .attr('height', this.el_2.find('#centroid_plot').height())
             .append('g');
 
-        var feature_columns = this.feature_columns;
+        var col_names = this.col_names;
         var y = d3.scale.linear()
             .domain([0,plot_max])
             .range([this.el_2.find('#centroid_plot').height() - offset.bottom, offset.top]);
         var x = d3.scale.ordinal()
-            .domain(this.feature_columns)
+            .domain(this.col_names)
             .rangePoints([offset.left,this.el_2.find('#centroid_plot').width() - offset.right], 1);
         var line = d3.svg.line()
             .x(function(d,i) {
-                return x(feature_columns[i]);
+                return x(col_names[i]);
             })
             .y(function(d) {
                 return y(d);
@@ -685,15 +692,11 @@ class FeatureClusteringOverview{
 
         svg.append('g')
             .selectAll('text')
-            .data(this.cluster_members)
+            .data(this.col_names)
             .enter()
             .append('text')
             .attr('class', 'heatmapLabelText')
-            .text(function(d,i) {
-                return (d.length > 1) ?
-                    '(' + d.length + ') ' + cluster_medoids[i]:
-                    matrix_names[i];
-            })
+            .text(function(d) { return d;})
             .attr('x', function(d,i) {
                 return (((0.5 / row_number) * width) + i * (width / row_number));
             })
