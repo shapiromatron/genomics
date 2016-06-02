@@ -146,11 +146,17 @@ class MatrixByMatrix():
         self.dendrogram = truncated_dg
         self.cluster_members = []
 
-        for i, entry in enumerate(truncated_dg['ivl']):
-            id_ = self.matrix_ids[int(full_dg['ivl'][i])]
-            members = [id_]
+        index = 0
+        for entry in truncated_dg['ivl']:
+            members = []
             if '(' in entry:
-                members = members * int(entry.split("(")[1].split(")")[0])
+                count = int(entry.split("(")[1].split(")")[0])
+                for i in range(count):
+                    members.append(full_dg['ivl'][index])
+                    index += 1
+            else:
+                members.append(full_dg['ivl'][index])
+                index += 1
             self.cluster_members.append(members)
         self.findMedoids()
 
@@ -305,7 +311,6 @@ class MatrixByMatrix():
         headers = None
         self.feature_names = []
         self.vector_columns = []
-
         for matrix in self.matrix_list:
             matrix_fn = matrix[2]
             self.vector_columns.append(matrix[1])
@@ -383,7 +388,9 @@ class MatrixByMatrix():
                     self.feature_names[i])
 
     def reorderFeatureMatrixByDendrogram(self):
-        order = self.dendrogram['leaves']
+        order = []
+        for entry in self.cluster_medoids:
+            order.append(self.matrix_ids.index(entry))
         for i, row in enumerate(self.vector_matrix):
             temp = []
             for index in order:
