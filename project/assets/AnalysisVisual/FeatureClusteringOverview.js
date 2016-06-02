@@ -341,7 +341,6 @@ class FeatureClusteringOverview{
                 'left': '24%',
             })
             .change(function() {
-                // console.log(this.value);
                 self.drawHeatmap(this.value);
                 self.drawClusterSelect(this.value);
                 self.drawFeatureSelect(this.value, '--');
@@ -572,7 +571,6 @@ class FeatureClusteringOverview{
 
         var plot_max = 0;
         for (var cluster = 0; cluster < this.feature_clusters[k]['centroids'].length; cluster++) {
-            console.log(cluster);
             for (var i = 0; i < this.feature_clusters[k]['centroids'][cluster].length; i++) {
                 if (parseFloat(this.feature_clusters[k]['centroids'][cluster][i]) > plot_max) {
                     plot_max = parseFloat(this.feature_clusters[k]['centroids'][cluster][i]);
@@ -587,9 +585,6 @@ class FeatureClusteringOverview{
                 }
             }
         }
-        console.log(plot_max);
-        console.log(this.feature_clusters[k]['centroids']);
-        // console.log(plot_max);
 
         var graph = d3.select(this.el_2.find('#graph').get(0)).append('svg')
             .attr('width', this.el_2.find('#centroid_plot').width())
