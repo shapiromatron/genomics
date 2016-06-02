@@ -152,10 +152,10 @@ class MatrixByMatrix():
             if '(' in entry:
                 count = int(entry.split("(")[1].split(")")[0])
                 for i in range(count):
-                    members.append(full_dg['ivl'][index])
+                    members.append(self.matrix_ids[int(full_dg['ivl'][index])])
                     index += 1
             else:
-                members.append(full_dg['ivl'][index])
+                members.append(self.matrix_ids[int(full_dg['ivl'][index])])
                 index += 1
             self.cluster_members.append(members)
         self.findMedoids()
