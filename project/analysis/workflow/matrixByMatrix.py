@@ -6,6 +6,7 @@ from scipy import stats
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import squareform, pdist
 from scipy.cluster.vq import kmeans2, whiten
+from math import floor
 import os
 import json
 
@@ -216,7 +217,7 @@ class MatrixByMatrix():
                     ccv1[sums.index(max(sums))]
                 )
                 self.med_correlation_values.append(
-                    ccv1[sums.index(numpy.median(sums))]
+                    ccv1[sums.index(sorted(sums)[int(floor((len(sums)-1)/2))])]
                 )
                 self.max_abs_correlation_values.append(
                     ccv1[sums.index(self.maxAbs(sums))]
