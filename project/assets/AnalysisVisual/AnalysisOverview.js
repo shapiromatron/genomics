@@ -23,6 +23,15 @@ class AnalysisOverview{
 
         var matrix = this.matrix,
             cluster_medoids = this.cluster_medoids;
+
+        this.row_names = _.map(this.cluster_members, function(d, i){
+            let name = (d.length > 1)?
+                    `(${d.length}) ${matrix[cluster_medoids[i]]}`:
+                    matrix[cluster_medoids[i]];
+
+            return name;
+        });
+
         if (this.sort_vector) {
             this.col_names = [];
             var start = parseInt(this.bin_parameters['window_start']),
@@ -32,13 +41,7 @@ class AnalysisOverview{
                 this.col_names.push((start + step*i) + ':' + (start + step*(i+1) - 1));
             }
         } else {
-            this.col_names = _.map(this.cluster_members, function(d, i){
-                let name = (d.length > 1)?
-                        `(${d.length}) ${cluster_medoids[i]}`:
-                        matrix[cluster_medoids[i]];
-
-                return name;
-            });
+            this.col_names = this.row_names;
         }
     }
 
@@ -342,10 +345,8 @@ class AnalysisOverview{
             .attr('height', height)
             .attr('width', width);
 
-        var data = _.map(this.cluster_members, function(d, i){
-            let name = (d.length > 1)?
-                    `(${d.length}) ${cluster_medoids[i]}`:
-                    matrix[cluster_medoids[i]],
+        var data = _.map(this.row_names, function(d, i){
+            let name = d,
                 y = (((0.5 / row_number) * height) + i * (height / row_number));
             return {name, y};
         });
