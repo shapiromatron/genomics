@@ -70,6 +70,7 @@ class AnalysisOverview{
             cluster_medoids = this.cluster_medoids,
             matrix_names = this.matrix_names,
             col_names = this.col_names,
+            row_names = this.row_names,
             matrix = this.matrix,
             sort_vector = this.sort_vector,
             getIndex = function(idx){
@@ -86,7 +87,7 @@ class AnalysisOverview{
 
                 $(this).tooltip({
                     container: 'body',
-                    title: `${matrix[idy]}<br/>${col_names[i]}<br/>${d.toFixed(2)}`,
+                    title: `${row_names[j]}<br/>${col_names[i]}<br/>${d.toFixed(2)}`,
                     html: true,
                     animation: false,
                 }).tooltip('show');
@@ -99,8 +100,14 @@ class AnalysisOverview{
                     .style('stroke', 'none');
             },
             showScatterplot = function(d, i, j){
+                var getIndexFromName = function(name, idx) {
+                    if (cluster_members[idx].length > 1) {
+                        name = name.split(') ')[1];
+                    }
+                    return (_.invert(matrix))[name];
+                };
 
-                var idy = getIndex(j),
+                var idy = getIndexFromName(row_names[j], j),
                     bin = col_names[i],
                     modalTitle = $('#ind_heatmap_modal_title'),
                     modalBody = $('#ind_heatmap_modal_body');
