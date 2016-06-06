@@ -113,7 +113,7 @@ class FeatureClusteringOverview{
 
         height = heatmap_col_tooltips.height();
         width = heatmap_col_tooltips.width();
-        col_number = this.feature_columns.length;
+        col_number = this.col_names.length;
 
         var cell_width = width/col_number;
         var svg = d3.select(heatmap_col_tooltips.get(0))
