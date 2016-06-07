@@ -353,7 +353,7 @@ class MatrixByMatrix():
         whitened = whiten(self.vector_matrix)
         std_devs = numpy.std(self.vector_matrix, axis=0)
         for k in range(2, 11):
-            centroids, labels = kmeans2(whitened, k)
+            centroids, labels = kmeans2(whitened, k, minit='points')
             self.kmeans_results[k] = {
                 'centroids': centroids.tolist(),
                 'labels': labels.tolist()
