@@ -75,7 +75,7 @@ class MatrixByMatrix():
     def createCorrelationMatrix(self):
         self.correlation_matrix = []
 
-        if self.sort_vector:
+        if self.sort_vector is not None:
             sort_vector = self.readInSortVector(self.sort_vector)
             for matrix in self.matrix_files:
                 self.correlation_matrix.append(
@@ -83,6 +83,7 @@ class MatrixByMatrix():
                         sort_vector, matrix, self.bin_number
                     )
                 )
+            self.sort_vector = sort_vector
         else:
             vector_list = self.createVectorList()
             for i, vl1 in enumerate(vector_list):
@@ -101,7 +102,7 @@ class MatrixByMatrix():
     def createDistanceMatrix(self):
         self.distance_matrix = []
 
-        if self.sort_vector:
+        if self.sort_vector is not None:
             for cm1 in self.correlation_matrix:
                 dists = []
                 for cm2 in self.correlation_matrix:
@@ -181,7 +182,7 @@ class MatrixByMatrix():
         # define cluster_correlation_values
         for cm1 in self.cluster_members:
             ccvs = []
-            if self.sort_vector:
+            if self.sort_vector is not None:
                 for cm2 in cm1:
                     ccvs2 = []
                     index = self.matrix_ids.index(cm2)
@@ -199,23 +200,37 @@ class MatrixByMatrix():
                                 self.correlation_matrix[index_1][index_2])
                     ccvs.append(ccvs2)
             self.cluster_correlation_values.append(ccvs)
-
         # get summary statistics
-        for i, ccv1 in enumerate(self.cluster_correlation_values):
+        if self.sort_vector is not None:
+            for i, ccv1 in enumerate(self.cluster_correlation_values):
+                sums = []
+                for j, ccv2 in enumerate(ccv1):
+                    sums.append(sum(ccv2))
+                self.max_correlation_values.append(
+                    ccv1[sums.index(max(sums))]
+                )
+                self.med_correlation_values.append(
+                    ccv1[sums.index(numpy.median(sums))]
+                )
+                self.max_abs_correlation_values.append(
+                    ccv1[sums.index(self.maxAbs(sums))]
+                )
+        else:
+            for i, ccv1 in enumerate(self.cluster_correlation_values):
 
-            max_cv = []
-            med_cv = []
-            max_abs_cv = []
+                max_cv = []
+                med_cv = []
+                max_abs_cv = []
 
-            for j, ccv2 in enumerate(self.cluster_correlation_values):
-                ccvs = self.cluster_correlation_values[i][j]
-                max_cv.append(max(ccvs))
-                med_cv.append(numpy.median(ccvs))
-                max_abs_cv.append(self.maxAbs(ccvs))
+                for j, ccv2 in enumerate(self.cluster_correlation_values[i]):
+                    ccvs = self.cluster_correlation_values[i][j]
+                    max_cv.append(max(ccvs))
+                    med_cv.append(numpy.median(ccvs))
+                    max_abs_cv.append(self.maxAbs(ccvs))
 
-            self.max_correlation_values.append(max_cv)
-            self.med_correlation_values.append(med_cv)
-            self.max_abs_correlation_values.append(max_abs_cv)
+                self.max_correlation_values.append(max_cv)
+                self.med_correlation_values.append(med_cv)
+                self.max_abs_correlation_values.append(max_abs_cv)
 
     def getOutputDict(self):
         # make values more portable for output JSON
@@ -229,6 +244,8 @@ class MatrixByMatrix():
             for i, val in enumerate(entry):
                 entry[i] = '%.2f' % round(val, 2)
         # Return an output dict of the analysis results
+        if self.sort_vector is not None:
+            self.sort_vector = self.sort_vector.tolist()
         return dict(
             bin_parameters={
                 "window_start": self.window_start,
@@ -247,7 +264,7 @@ class MatrixByMatrix():
             max_abs_correlation_values=self.max_abs_correlation_values,
             sort_orders=self.sort_orders,
             cluster_medoids=self.cluster_medoids,
-            sort_vector=getattr(self, 'sort_vector', None),
+            sort_vector=self.sort_vector,
             feature_clusters=self.kmeans_results,
             feature_vectors=self.vector_matrix,
             feature_columns=self.vector_columns,

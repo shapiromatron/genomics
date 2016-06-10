@@ -9,6 +9,7 @@ import zipfile
 import itertools
 import pandas as pd
 import math
+import numpy
 from scipy import stats
 
 from django.db import models
@@ -349,6 +350,12 @@ class UserDataset(GenomicDataset):
     def get_absolute_url(self):
         return reverse('analysis:user_dataset', args=[self.pk, ])
 
+    def get_bigwig_paths(self):
+        if self.is_stranded:
+            return [self.plus.data.path, self.minus.data.path]
+        else:
+            return [self.ambiguous.data.path]
+
     def get_update_url(self):
         return reverse('analysis:user_dataset_update', args=[self.pk, ])
 
@@ -453,6 +460,12 @@ class EncodeDataset(GenomicDataset):
                     .distinct()\
                     .order_by(fld)
         return dicts
+
+    def get_bigwig_paths(self):
+        if self.is_stranded:
+            return[self.data_plus.path, self.data_minus.path]
+        else:
+            return [self.data_ambiguous.path]
 
 
 class FeatureList(Dataset):
@@ -846,6 +859,8 @@ class Analysis(GenomicBinSettings):
             'feature_columns': output['feature_columns'],
             'feature_names': output['feature_names'],
             'feature_cluster_members': output['feature_cluster_members'],
+            'sort_vector': output['sort_vector'],
+            'bin_parameters': output['bin_parameters'],
         }
 
     def get_ks(self, vector_id, matrix_id):
@@ -890,6 +905,34 @@ class Analysis(GenomicBinSettings):
             'significance': sig,
         }
 
+    def get_ks_by_user_vector(self, matrix_id):
+        output = self.output_json
+        sort_vector = output.get('sort_vector', None)
+
+        if not sort_vector:
+            return False
+
+        # descending sort order
+        sort_order = numpy.argsort(sort_vector)[::-1]
+
+        flcm = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=matrix_id)\
+            .select_related('count_matrix')\
+            .first()
+
+        n = len(sort_order)
+        values = list(flcm.count_matrix.df['All bins'])
+        quartiles = [[], [], [], []]
+        for i, index in enumerate(sort_order):
+            quartiles[math.floor(4*i/n)].append(values[index])
+
+        stat, cv, sig = stats.anderson_ksamp(quartiles)
+        return {
+            'statistic': stat,
+            'critical_values': cv,
+            'significance': sig,
+        }
+
     def get_sort_vector(self, id_):
         if not self.output:
             return False
@@ -907,6 +950,23 @@ class Analysis(GenomicBinSettings):
             .filter(dataset__analysis=self.id)\
             .first()
         return list(flcm.df.columns)
+
+    def get_sortvector_scatterplot_data(self, idy, column=None):
+        y = AnalysisDatasets.objects\
+            .filter(analysis_id=self.id, count_matrix=idy)\
+            .select_related('count_matrix')\
+            .first()
+
+        yDf = y.count_matrix.df
+
+        if column not in yDf.columns:
+            column = FeatureListCountMatrix.ALL_BINS
+
+        yDf.rename(columns={column: 'y'}, inplace=True)
+
+        yDf = yDf[['y']]
+
+        return yDf.to_csv()
 
     def get_scatterplot_data(self, idx, idy, column):
         x = AnalysisDatasets.objects\
@@ -998,7 +1058,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
     @property
     def df(self):
         # get formatted pandas data frame
-        key = 'flcm-%s' % self.id
+        key = 'flcm-df-%s' % self.id
         df = cache.get(key)
         if df is None:
             df = pd.read_csv(self.matrix.path, sep='\t')
@@ -1031,10 +1091,7 @@ class FeatureListCountMatrix(GenomicBinSettings):
         # existing not found; create instead
         fn = get_random_filename(os.path.join(settings.MEDIA_ROOT, cls.UPLOAD_TO))
 
-        if dataset.is_stranded:
-            bigwigs = [dataset.data_plus.path, dataset.data_minus.path]
-        else:
-            bigwigs = [dataset.data_ambiguous.path]
+        bigwigs = dataset.get_bigwig_paths()
 
         BedMatrix(
             bigwigs=bigwigs,
