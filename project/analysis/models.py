@@ -907,7 +907,7 @@ class Analysis(GenomicBinSettings):
 
     def get_ks_by_user_vector(self, matrix_id):
         output = self.output_json
-        sort_vector = output['sort_vector']
+        sort_vector = output.get('sort_vector', None)
 
         if not sort_vector:
             return False
@@ -951,7 +951,7 @@ class Analysis(GenomicBinSettings):
             .first()
         return list(flcm.df.columns)
 
-    def get_sortvector_scatterplot_data(self, idy, column):
+    def get_sortvector_scatterplot_data(self, idy, column=None):
         y = AnalysisDatasets.objects\
             .filter(analysis_id=self.id, count_matrix=idy)\
             .select_related('count_matrix')\

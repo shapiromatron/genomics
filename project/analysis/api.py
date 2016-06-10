@@ -164,7 +164,7 @@ class AnalysisViewset(AnalysisObjectMixin, viewsets.ModelViewSet):
         idy = tryParseInt(self.request.GET.get('idy'))
         column = self.request.GET.get('column')
         if idy is None:
-            raise NotAcceptable("Parameters `idx` and `idy` are required")
+            raise NotAcceptable("Parameter `idy` is required; `column` is optional")  # noqa
         an = get_object_or_404(models.Analysis, pk=int(pk))
         self.check_object_permissions(request, an)
         return Response(an.get_sortvector_scatterplot_data(idy, column))
