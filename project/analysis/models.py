@@ -310,19 +310,23 @@ class UserDataset(GenomicDataset):
 
     data_type = models.CharField(
         max_length=16,
-        choices=DATA_TYPES)
+        choices=DATA_TYPES,
+        help_text='Experiment type')
     ambiguous = models.ForeignKey(
         DatasetDownload,
         null=True,
-        related_name='ambiguous')
+        related_name='ambiguous',
+        help_text='Coverage data for which strand is ambiguous or unknown')
     plus = models.ForeignKey(
         DatasetDownload,
         null=True,
-        related_name='plus')
+        related_name='plus',
+        help_text='Coverage data for which strand is plus')
     minus = models.ForeignKey(
         DatasetDownload,
         null=True,
-        related_name='minus')
+        related_name='minus',
+        help_text='Coverage data for which strand is minus')
     url = models.URLField(
         max_length=256,
         null=True)
@@ -398,41 +402,51 @@ class EncodeDataset(GenomicDataset):
     data_ambiguous = models.FileField(
         blank=True,
         max_length=256,
-        storage=encode_store)
+        storage=encode_store,
+        help_text='Coverage data for which strand is ambiguous or unknown')
     data_plus = models.FileField(
         blank=True,
         max_length=256,
-        storage=encode_store)
+        storage=encode_store,
+        help_text='Coverage data for which strand is plus')
     data_minus = models.FileField(
         blank=True,
         max_length=256,
-        storage=encode_store)
+        storage=encode_store,
+        help_text='Coverage data for which strand is minus')
     data_type = models.CharField(
         max_length=16,
-        db_index=True)
+        db_index=True,
+        help_text='Experiment type')
     cell_type = models.CharField(
         max_length=32,
-        db_index=True)
+        db_index=True,
+        help_text='Cell type (cell line or tissue); reported by ENCODE')
     antibody = models.CharField(
         max_length=32,
         blank=True,
-        db_index=True)
+        db_index=True,
+        help_text='Antibody used in pulldown; reported by ENCODE')
     rna_extract = models.CharField(
         max_length=32,
         blank=True,
-        db_index=True)
+        db_index=True,
+        help_text='RNA extraction protocol; reported by ENCODE')
     treatment = models.CharField(
         max_length=32,
         blank=True,
-        db_index=True)
+        db_index=True,
+        help_text='Experimental treatment of cells; reported by ENCODE')
     phase = models.CharField(
         max_length=32,
         blank=True,
-        db_index=True)
+        db_index=True,
+        help_text='Cell phase; reported by ENCODE')
     localization = models.CharField(
         max_length=32,
         blank=True,
-        db_index=True)
+        db_index=True,
+        help_text='Cellular localization; reported by ENCODE')
     extra_content = JSONField(default=dict)
 
     @property
@@ -553,7 +567,8 @@ class AnalysisDatasets(models.Model):
         max_length=128)
     count_matrix = models.ForeignKey(
         'FeatureListCountMatrix',
-        null=True)
+        null=True,
+        help_text='Matrix of read coverage over genomic features')
     created = models.DateTimeField(
         auto_now_add=True)
     last_updated = models.DateTimeField(
@@ -576,15 +591,19 @@ ANCHOR_CHOICES = (
 class GenomicBinSettings(models.Model):
     anchor = models.PositiveSmallIntegerField(
         choices=ANCHOR_CHOICES,
-        default=ANCHOR_CENTER)
+        default=ANCHOR_CENTER,
+        help_text='Where to center analysis window relative to BED range')
     bin_start = models.IntegerField(
-        default=-2500)
+        default=-2500,
+        help_text='Distance from anchor to start designating bins')
     bin_number = models.PositiveIntegerField(
         default=50,
-        validators=[MinValueValidator(50), MaxValueValidator(250)])
+        validators=[MinValueValidator(50), MaxValueValidator(250)],
+        help_text='Number of bins to use in search window')
     bin_size = models.PositiveIntegerField(
         default=100,
-        validators=[MinValueValidator(1)])
+        validators=[MinValueValidator(1)],
+        help_text='Size of bins to use in search window')
 
     class Meta:
         abstract = True
@@ -1044,7 +1063,8 @@ class FeatureListCountMatrix(GenomicBinSettings):
         related_name='intermediates')
     matrix = models.FileField(
         upload_to=UPLOAD_TO,
-        max_length=256)
+        max_length=256,
+        help_text='Matrix file of read coverage')
     created = models.DateTimeField(
         auto_now_add=True)
     last_updated = models.DateTimeField(
