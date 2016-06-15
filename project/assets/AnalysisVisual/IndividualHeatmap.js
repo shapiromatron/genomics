@@ -41,7 +41,6 @@ class IndividualHeatmap {
             'h': 0.25 * this.modal_dim.h,
             'w': 0.4 * this.modal_dim.w,
         };
-        console.log(this.quartile_dim);
         this.sort_dim = {
             'x': 0.05 * this.modal_dim.w,
             'y': 0.68 * this.modal_dim.h,
@@ -412,7 +411,11 @@ class IndividualHeatmap {
             .style('text-anchor', 'middle');
     }
 
-    drawHeatmap(data, ceiling, floor) {
+    drawHeatmap(data, norm_val) {
+        var sigmoid = function(i, median) {
+            return (1 + ((i - median)/(1 + Math.abs(i - median))));
+        };
+
         var modal_body = this.modal_body;
 
         modal_body.find('#heatmap_canvas').remove();
@@ -432,8 +435,17 @@ class IndividualHeatmap {
             .getContext('2d');
 
         var colorScale = d3.scale.linear()
-            .domain([ceiling, floor])
-            .range(['white', 'red']);
+            .domain([
+                norm_val.lower_quartile,
+                norm_val.median,
+                norm_val.upper_quartile,
+            ])
+            .clamp(false)
+            .range([
+                '#fee5d9',
+                '#fcae91',
+                '#fb6a4a',
+            ]);
 
         for (var i in data) {
             for (var j in data[i]) {
@@ -465,9 +477,7 @@ class IndividualHeatmap {
         var self = this;
         $.get(sortedUrl(this.id, dim_x, dim_y),
             function(data) {
-                self.drawHeatmap(
-                    data.zoomed_data, data.lower_quartile, data.upper_quartile
-                );
+                self.drawHeatmap(data.smoothed_data, data.norm_val);
                 self.drawHeatmapHeader(data.bin_labels);
                 self.drawMetaPlot(data.bin_averages, data.bin_labels);
                 self.drawQuartiles(data.quartile_averages, data.bin_labels);

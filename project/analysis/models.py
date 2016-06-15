@@ -1197,14 +1197,24 @@ class FeatureListCountMatrix(GenomicBinSettings):
                               stats.anderson_ksamp(quartile_vector_sums)):
             ad_results[key] = value
 
+        zoomed_data = ndimage.zoom(
+            sorted_flcm, (zoom_y, zoom_x), order=5, prefilter=False)
+        smoothed_data = ndimage.median_filter(zoomed_data, size=(1, 5))
+
         return {
             'bin_labels': bin_labels,
             'quartile_averages': quartile_averages,
             'bin_averages': numpy.mean(sorted_flcm, axis=0),
-            'lower_quartile': numpy.percentile(sorted_flcm, 25),
-            'upper_quartile': numpy.percentile(sorted_flcm, 75),
-            'median': numpy.percentile(sorted_flcm, 50),
-            'zoomed_data': ndimage.zoom(
-                sorted_flcm, (zoom_y, zoom_x), order=5, prefilter=False),
+            'norm_val': {
+                'lower_quartile': numpy.percentile(smoothed_data, 25),
+                'median': numpy.percentile(smoothed_data, 50),
+                'upper_quartile': numpy.percentile(smoothed_data, 75),
+                'max': numpy.max(smoothed_data),
+                'min': numpy.min(smoothed_data),
+                'average': numpy.mean(smoothed_data),
+                'stddev': numpy.std(smoothed_data),
+                'variance': numpy.var(smoothed_data),
+            },
+            'smoothed_data': smoothed_data,
             'ad_results': ad_results,
         }
